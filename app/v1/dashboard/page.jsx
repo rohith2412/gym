@@ -1,8 +1,9 @@
+import Background from '@/components/Background'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>mmm</div>
+    <div><Background /></div>
   )
 }
 
