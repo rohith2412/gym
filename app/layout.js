@@ -6,7 +6,7 @@ import { SessionProvider } from "next-auth/react";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className="noise-bg">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
