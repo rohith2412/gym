@@ -24,9 +24,15 @@ const Page = () => {
   if (!session) return null; 
 
   return (
+    
     <div className="flex h-screen w-screen items-start justify-start p-4 ">
+      
       <div className="flex flex-col">
-        <h2 className="text-gray-800">Welcome,</h2>
+        <h2 className="text-gray-800" style={{ fontFamily: 'Ubuntu, sans-serif' }}>
+  Welcome,
+</h2>
+
+
         <h1 className="text-xl">{session.user.name}</h1>
       </div>
 
