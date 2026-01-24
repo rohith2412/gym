@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Welcome from "@/components/Welcome";
 
 const Page = () => {
   const { data: session, status } = useSession();
@@ -9,7 +10,7 @@ const Page = () => {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/"); 
+      router.replace("/");
     }
   }, [status, router]);
 
@@ -21,24 +22,23 @@ const Page = () => {
     );
   }
 
-  if (!session) return null; 
+  if (!session) return null;
 
   return (
-    
-    <div className="flex h-screen w-screen items-start justify-start p-4 ">
-      
-      <div className="flex flex-col">
-        <h2 className="text-gray-800" style={{ fontFamily: 'Ubuntu, sans-serif' }}>
-  Welcome,
-</h2>
-
-
-        <h1 className="text-xl">{session.user.name}</h1>
+    <div className="grid  items-start justify-start ">
+      <Welcome />
+      <div className=" ">
+        {/* <h1 className="glass-effect text-gray-800 text-2xl border px-6 py-4 rounded-lg">
+          chest
+        </h1> */}
       </div>
-
-      {/* <h1 className="glass-effect text-gray-800 text-2xl border px-6 py-4 rounded-lg">
-        Hello
-      </h1> */}
+      <div className=" m-15 h-screen gap-10 grid justify-evenly  w-screen">
+        <div className="flex border w-screen   items-center ">chest</div>
+        <div className="flex border w-screen   items-center ">sholder</div>
+        <div className="flex border w-screen   items-center ">legs</div>
+        <div className="flex border w-screen   items-center ">back</div>
+        <div className="flex border w-screen   items-center ">arms</div>
+      </div>
     </div>
   );
 };
