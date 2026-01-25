@@ -1,26 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import {  signIn } from "next-auth/react";
 
 const LoginButton = () => {
-  const { data: session, status } = useSession();
   const [showGoogleButton, setShowGoogleButton] = useState(false);
-  const router = useRouter();
 
-  React.useEffect(() => {
-    if (session) {
-      router.push("/v1/dashboard");
-    }
-  }, [session, router]);
-
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
-
-  if (session) {
-    return null; 
-  }
 
   return (
     <div className="relative">
