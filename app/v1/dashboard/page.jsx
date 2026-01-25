@@ -28,7 +28,7 @@ const Page = () => {
     <div className="">
       <Welcome />
      
-    
+{/*     
       <div className="h-screen gap-8 grid w-screen p-4">
         <div className="flex gap-8">
           <div className="flex border w-full items-center justify-center">Chest</div>
@@ -47,7 +47,7 @@ const Page = () => {
           <div className="flex border w-full items-center justify-center">Legs</div>
         </div>
 
-      </div>
+      </div> */}
 
     </div>
   );
