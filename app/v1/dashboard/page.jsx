@@ -25,20 +25,30 @@ const Page = () => {
   if (!session) return null;
 
   return (
-    <div className="grid  items-start justify-start ">
+    <div className="">
       <Welcome />
-      <div className=" ">
-        {/* <h1 className="glass-effect text-gray-800 text-2xl border px-6 py-4 rounded-lg">
-          chest
-        </h1> */}
+     
+    
+      <div className="h-screen gap-8 grid w-screen p-4">
+        <div className="flex gap-8">
+          <div className="flex border w-full items-center justify-center">Chest</div>
+          <div className="flex border w-full items-center justify-center">Shoulders</div>
+        </div>
+        <div className="flex gap-8">
+          <div className="flex border w-full items-center justify-center">Back</div>
+          <div className="flex border w-full items-center justify-center">Arms</div>
+        </div>
+        <div className="flex gap-8">
+          <div className="flex border w-full items-center justify-center">Triceps</div>
+          <div className="flex border w-full items-center justify-center">Forearms</div>
+        </div>
+        <div className="flex gap-8">
+          <div className="flex border w-full items-center justify-center">Core/Abs</div>
+          <div className="flex border w-full items-center justify-center">Legs</div>
+        </div>
+
       </div>
-      <div className=" m-15 h-screen gap-10 grid justify-evenly  w-screen">
-        <div className="flex border w-screen   items-center ">chest</div>
-        <div className="flex border w-screen   items-center ">sholder</div>
-        <div className="flex border w-screen   items-center ">legs</div>
-        <div className="flex border w-screen   items-center ">back</div>
-        <div className="flex border w-screen   items-center ">arms</div>
-      </div>
+
     </div>
   );
 };

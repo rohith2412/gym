@@ -1,5 +1,5 @@
-import { connectdb } from "@/lib/connectdb";
-import Auth from "@/models/authModel";
+import { connectdb } from "../../../../lib/connectdb";
+import Auth from "../../../../models/authModel";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -11,9 +11,9 @@ const authOptions = {
     }),
   ],
 
-   session: {
+  session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   secret: process.env.NEXTAUTH_SECRET,
@@ -29,7 +29,7 @@ const authOptions = {
       if (!existingUser) {
         await Auth.create({
           name: profile.name,
-          email: profile.email
+          email: profile.email,
         });
       }
 
@@ -39,18 +39,21 @@ const authOptions = {
     async jwt({ token }) {
       if (!token.email) return token;
 
-      if (!token.isNewUserChecked) {
-        await connectdb();
+      await connectdb();
 
-        const dbUser = await Auth.findOne({ email: token.email });
+      const dbUser = await Auth.findOne({ email: token.email });
 
-        if (
-          dbUser?.createdAt?.getTime() === dbUser?.updatedAt?.getTime()
-        ) {
-          token.isNewUser = true;
+      if (dbUser) {
+        // Store the user's MongoDB _id in the token
+        token.userId = dbUser._id.toString();
+
+        // Check if this is a new user (only on first check)
+        if (!token.isNewUserChecked) {
+          if (dbUser.createdAt?.getTime() === dbUser.updatedAt?.getTime()) {
+            token.isNewUser = true;
+          }
+          token.isNewUserChecked = true;
         }
-
-        token.isNewUserChecked = true;
       }
 
       return token;
@@ -59,9 +62,9 @@ const authOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.email = token.email;
+        session.user.id = token.userId; // Add user ID to session
         session.user.isNewUser = token.isNewUser ?? false;
       }
-
       return session;
     },
   },
