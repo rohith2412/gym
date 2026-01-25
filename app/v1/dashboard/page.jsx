@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Welcome from "@/components/Welcome";
 import Background from "@/components/Background";
+import List from "@/components/List";
 
 const Page = () => {
   const { data: session, status } = useSession();
@@ -31,6 +32,9 @@ const Page = () => {
 
       <div className="pt-5">
         <Welcome />
+      </div>
+      <div>
+        <List />
       </div>
        {/* <button
         onClick={() => signOut({ callbackUrl: "/" })}
