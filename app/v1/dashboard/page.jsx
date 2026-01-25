@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Welcome from "@/components/Welcome";
+import Background from "@/components/Background";
 
 const Page = () => {
   const { data: session, status } = useSession();
@@ -26,7 +27,10 @@ const Page = () => {
 
   return (
     <div className="">
-      <Welcome />
+      <div className="pt-5">
+        <Welcome />
+      </div>
+      
      
 {/*     
       <div className="h-screen gap-8 grid w-screen p-4">

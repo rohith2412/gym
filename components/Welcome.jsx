@@ -22,17 +22,42 @@ const Welcome = () => {
   }
   if (!session) return null;
 
-  return (
-    <div className="flex flex-col">
-      <h2
-        className=""
-        style={{ fontFamily: "Ubuntu, sans-serif" }}
-      >
-        Welcome,
-      </h2>
+  const today = new Date();
 
-      <h1 className="text-xl">{session.user.name}</h1>
-    </div>
+  const monthYear = today.toLocaleDateString("en-US", {
+    month: "short",
+  });
+
+  const dayNumber = today.getDate(); // 26
+
+  return (
+    <div className="mx-7 rounded-2xl bg-orange-400/80 px-6 py-4 flex items-center justify-between">
+  {/* Left: Welcome text */}
+  <div className="flex flex-col justify-center">
+    <h2
+      className="text-sm opacity-80"
+      style={{ fontFamily: "Ubuntu, sans-serif" }}
+    >
+      Welcome
+    </h2>
+
+    <h1 className="text-xl font-semibold leading-tight">
+      {session.user.name?.split(" ")[0]}
+
+    </h1>
+  </div>
+
+  {/* Right: Date */}
+  <div className="flex flex-col items-center justify-center">
+    <p className="text-xs uppercase tracking-wide opacity-70">
+      {monthYear}
+    </p>
+    <p className="text-3xl font-bold leading-none">
+      {dayNumber}
+    </p>
+  </div>
+</div>
+
   );
 };
 

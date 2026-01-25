@@ -19,14 +19,13 @@ const LoginButton = () => {
   }
 
   if (session) {
-    return null; // Will redirect to dashboard
+    return null; 
   }
 
   return (
     <div className="relative">
-      {/* Main content */}
       <div
-        className={`transition-all duration-500 ${showGoogleButton ? "blur-sm scale-95" : ""}`}
+        className={`transition-all duration-200 ${showGoogleButton ? "blur-sm scale-95" : ""}`}
       >
         <button
           onClick={() => setShowGoogleButton(true)}
@@ -45,10 +44,9 @@ const LoginButton = () => {
         </button>
       </div>
 
-      {/* Google Sign-in Modal */}
       {showGoogleButton && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-white/10 backdrop-blur-xl p-12 rounded-3xl shadow-2xl border border-white/20 animate-scaleIn max-w-md w-full mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white/10 backdrop-blur-xl p-12 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full mx-4">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white mb-3">
                 Welcome Back
@@ -86,36 +84,6 @@ const LoginButton = () => {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        .animate-scaleIn {
-          animation: scaleIn 0.4s ease-out;
-        }
-      `}</style>
     </div>
   );
 };
