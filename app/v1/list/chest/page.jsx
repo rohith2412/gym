@@ -53,7 +53,7 @@ export default function ChestPage() {
       // Clear form and show success
       setWeight("");
       setReps("");
-      setSuccessMessage("Set added successfully!");
+      setSuccessMessage("Set logged");
       
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -68,8 +68,8 @@ export default function ChestPage() {
   // Loading state
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <p className="text-white text-xl">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen bg-neutral-950">
+        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
       </div>
     );
   }
@@ -77,87 +77,93 @@ export default function ChestPage() {
   // Not signed in
   if (status === "unauthenticated") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-neutral-950">
         <div className="text-center">
-          <h2 className="text-white text-2xl font-bold mb-2">Chest Workout Tracker</h2>
-          <p className="text-gray-400">Please sign in to track your workouts</p>
+          <h2 className="text-white text-xl font-medium mb-1">Chest Tracker</h2>
+          <p className="text-neutral-500 text-sm">Sign in to continue</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-neutral-950 text-white p-6 md:p-8">
+      <div className="max-w-xl mx-auto">
         
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Chest Workout Tracker</h1>
-          <p className="text-gray-400">Select an exercise and log your sets</p>
+        <div className="mb-12">
+          <h1 className="text-2xl font-medium mb-1">Chest</h1>
+          <p className="text-neutral-500 text-sm">Select an exercise</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-900 border border-red-700 text-white p-4 rounded-lg mb-6">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm">
             {error}
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
-          <div className="bg-green-900 border border-green-700 text-white p-4 rounded-lg mb-6">
+          <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg mb-6 text-sm">
             {successMessage}
           </div>
         )}
 
-        {/* Exercise List with Inline Form */}
-        <div className="space-y-3">
+        {/* Exercise List */}
+        <div className="space-y-2">
           {chestExercises.map((exercise) => (
             <div key={exercise}>
               {/* Exercise Button */}
               <button
                 onClick={() => setSelectedExercise(exercise === selectedExercise ? "" : exercise)}
-                className={`w-full text-left px-6 py-4 rounded-lg font-medium transition-all ${
+                className={`w-full text-left px-5 py-4 rounded-xl font-medium transition-all ${
                   selectedExercise === exercise
-                    ? "bg-white text-black"
-                    : "bg-gray-900 text-white hover:bg-gray-800"
+                    ? "bg-white text-neutral-950"
+                    : "bg-neutral-900/50 text-neutral-300 hover:bg-neutral-900 border border-neutral-800/50"
                 }`}
               >
                 {exercise}
               </button>
 
-              {/* Add Set Form - Shows directly below selected exercise */}
+              {/* Add Set Form */}
               {selectedExercise === exercise && (
-                <div className="bg-gray-900 rounded-lg p-6 mt-3 border-l-4 border-white">
-                  <h3 className="text-lg font-bold mb-4">Add New Set</h3>
+                <div className="bg-neutral-900/70 backdrop-blur-xl rounded-xl p-5 mt-2 border border-neutral-800/50">
                   
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <input
-                      type="number"
-                      placeholder="Weight (lbs)"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      className="flex-1 px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-white"
-                      required
-                      min="0"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Reps"
-                      value={reps}
-                      onChange={(e) => setReps(e.target.value)}
-                      className="flex-1 px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-white"
-                      required
-                      min="1"
-                    />
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loading}
-                      className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 transition-colors"
-                    >
-                      {loading ? "Adding..." : "Add Set"}
-                    </button>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <label className="text-neutral-500 text-xs mb-1.5 block">Weight</label>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-neutral-950/50 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600 transition-colors"
+                        required
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-neutral-500 text-xs mb-1.5 block">Reps</label>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={reps}
+                        onChange={(e) => setReps(e.target.value)}
+                        className="w-full px-3 py-2.5 bg-neutral-950/50 border border-neutral-800 rounded-lg text-white placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600 transition-colors"
+                        required
+                        min="1"
+                      />
+                    </div>
                   </div>
+
+                  <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="w-full px-4 py-2.5 bg-white text-neutral-950 text-sm font-medium rounded-lg hover:bg-neutral-100 disabled:bg-neutral-800 disabled:text-neutral-500 transition-colors"
+                  >
+                    {loading ? "Logging..." : "Log set"}
+                  </button>
                 </div>
               )}
             </div>
