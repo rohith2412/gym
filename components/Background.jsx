@@ -3,7 +3,7 @@ export default function Background() {
     <div 
       className="fixed inset-0 -z-10"
       style={{
-        background: 'linear-gradient(to bottom, #0b0b0b 0%, #141414 35%, #2a1812 50%, #4a2a1d 62%, #7a4630 72%, #a86645 80%, #cf8a60 88%, #e2a97f 94%, #f0c3a0 100%)'
+        background: 'linear-gradient(to bottom, #1a1a1a 0%, #242424 35%, #3a231a 50%, #5a3425 62%, #845039 72%, #b06b4a 80%, #d89164 88%, #eab58a 94%, #f5d0a8 100%)'
       }}
     />
   );
