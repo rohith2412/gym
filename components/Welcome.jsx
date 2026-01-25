@@ -28,36 +28,45 @@ const Welcome = () => {
     month: "short",
   });
 
-  const dayNumber = today.getDate(); // 26
+  const dayNumber = today.getDate();
 
   return (
-    <div className="mx-7 rounded-2xl bg-orange-400/80 px-6 py-4 flex items-center justify-between">
-  {/* Left: Welcome text */}
-  <div className="flex flex-col justify-center">
-    <h2
-      className="text-sm opacity-80"
-      style={{ fontFamily: "Ubuntu, sans-serif" }}
+    <div
+      className="relative mx-7 rounded-2xl px-6 py-4 flex items-center justify-between overflow-hidden
+  bg-gradient-to-br from-black via-orange-900/90 to-orange-500"
     >
-      Welcome
-    </h2>
+      {/* BIG noise overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[100]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+          mixBlendMode: 'overlay'
+        }}
+      />
 
-    <h1 className="text-xl font-semibold leading-tight">
-      {session.user.name?.split(" ")[0]}
+      {/* Left: Welcome */}
+      <div className="relative flex flex-col justify-center text-white">
+        <h2
+          className="text-sm opacity-70"
+          style={{ fontFamily: "Ubuntu, sans-serif" }}
+        >
+          Welcome
+        </h2>
 
-    </h1>
-  </div>
+        <h1 className="text-xl font-semibold leading-tight">
+          {session.user.name?.split(" ")[0]}
+        </h1>
+      </div>
 
-  {/* Right: Date */}
-  <div className="flex flex-col items-center justify-center">
-    <p className="text-xs uppercase tracking-wide opacity-70">
-      {monthYear}
-    </p>
-    <p className="text-3xl font-bold leading-none">
-      {dayNumber}
-    </p>
-  </div>
-</div>
-
+      {/* Right: Date */}
+      <div className="relative flex flex-col items-center justify-center text-white">
+        <p className="text-xs uppercase tracking-wide opacity-60">
+          {monthYear}
+        </p>
+        <p className="text-3xl font-bold leading-none">{dayNumber}</p>
+      </div>
+    </div>
   );
 };
 

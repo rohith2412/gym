@@ -27,19 +27,17 @@ const Page = () => {
 
   return (
     <div className="relative">
-      <Background />
-
-      {/* Small logout */}
-      <button
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className="fixed top-4 right-4 text-xs text-white/60 hover:text-white transition"
-      >
-        Logout
-      </button>
+     
 
       <div className="pt-5">
         <Welcome />
       </div>
+       {/* <button
+        onClick={() => signOut({ callbackUrl: "/" })}
+        className=""
+      >
+        Logout
+      </button> */}
     </div>
   );
 };

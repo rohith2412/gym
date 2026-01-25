@@ -18,7 +18,7 @@ export default function MainHome() {
 
   React.useEffect(() => {
     if (status === "authenticated") {
-      router.push("/v1/dashboard");
+      router.replace("/v1/dashboard");
     }
   }, [status, router]);
 
