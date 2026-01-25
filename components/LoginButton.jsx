@@ -9,7 +9,7 @@ const LoginButton = () => {
   return (
     <div className="relative">
       <div
-        className={`transition-all duration-200 ${showGoogleButton ? "blur-sm scale-95" : ""}`}
+        className={`transition-all duration-200 ${showGoogleButton ? "opacity-60 scale-95" : ""}`}
       >
         <button
           onClick={() => setShowGoogleButton(true)}
@@ -73,3 +73,6 @@ const LoginButton = () => {
 };
 
 export default LoginButton;
+
+
+//blur-sm
