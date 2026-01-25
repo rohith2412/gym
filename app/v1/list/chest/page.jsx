@@ -3,56 +3,40 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
+// Main chest exercises
 const chestExercises = [
-  "Bench Press",
-  "Incline Bench Press",
+  "Barbell Bench Press",
+  "Incline Dumbbell Press",
   "Decline Bench Press",
+  "Chest Dips",
+  "Cable Flyes",
+  "Push-Ups"
 ];
 
 export default function ChestPage() {
+  // Get user session
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
 
+  // Component state
   const [selectedExercise, setSelectedExercise] = useState("");
-  const [logs, setLogs] = useState([]);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch logs when exercise changes
-  useEffect(() => {
-    if (!selectedExercise || !userId) return;
-
-    setLoading(true);
-    setError("");
-
-    fetch(
-      `/api/workoutLogs?exercise=${encodeURIComponent(selectedExercise)}&userId=${userId}`
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch logs");
-        return res.json();
-      })
-      .then((data) => {
-        setLogs(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load workout logs");
-        setLoading(false);
-      });
-  }, [selectedExercise, userId]);
-
+  // Handle form submission to add new set
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!weight || !reps || !selectedExercise || !userId) return;
 
     setLoading(true);
     setError("");
+    setSuccessMessage("");
 
     try {
+      // Save new workout
       const res = await fetch("/api/workoutLogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,15 +50,13 @@ export default function ChestPage() {
 
       if (!res.ok) throw new Error("Failed to add workout log");
 
+      // Clear form and show success
       setWeight("");
       setReps("");
-
-      // Refresh logs
-      const logsRes = await fetch(
-        `/api/workoutLogs?exercise=${encodeURIComponent(selectedExercise)}&userId=${userId}`
-      );
-      const data = await logsRes.json();
-      setLogs(data);
+      setSuccessMessage("Set added successfully!");
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error(err);
       setError("Failed to add workout");
@@ -83,90 +65,105 @@ export default function ChestPage() {
     }
   };
 
+  // Loading state
   if (status === "loading") {
-    return <p className="p-6">Loading user session...</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    );
   }
 
+  // Not signed in
   if (status === "unauthenticated") {
-    return <p className="p-6">Please sign in to track your workouts.</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="text-center">
+          <h2 className="text-white text-2xl font-bold mb-2">Chest Workout Tracker</h2>
+          <p className="text-gray-400">Please sign in to track your workouts</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Chest Exercises</h1>
-
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-      )}
-
-      <div className="flex flex-col gap-2 mb-6">
-        {chestExercises.map((exercise) => (
-          <button
-            key={exercise}
-            className={`px-4 py-2 rounded transition-colors ${
-              selectedExercise === exercise
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-            onClick={() => setSelectedExercise(exercise)}
-          >
-            {exercise}
-          </button>
-        ))}
-      </div>
-
-      {selectedExercise && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">{selectedExercise} Logs</h2>
-
-          {loading && <p className="text-gray-500 mb-4">Loading...</p>}
-
-          <ul className="mb-4">
-            {logs.map((log) => (
-              <li key={log._id} className="border p-2 rounded mb-2">
-                <strong>Date:</strong> {new Date(log.date).toLocaleDateString()}{" "}
-                | <strong>Sets:</strong>
-                {log.sets.map((s, idx) => (
-                  <span key={idx}>
-                    {" "}
-                    {s.weight} lbs × {s.reps} reps
-                    {idx < log.sets.length - 1 ? "," : ""}
-                  </span>
-                ))}
-              </li>
-            ))}
-            {logs.length === 0 && !loading && <li>No logs yet for this exercise.</li>}
-          </ul>
-
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              type="number"
-              placeholder="Weight (lbs)"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              className="border p-2 rounded w-24"
-              required
-              min="0"
-            />
-            <input
-              type="number"
-              placeholder="Reps"
-              value={reps}
-              onChange={(e) => setReps(e.target.value)}
-              className="border p-2 rounded w-24"
-              required
-              min="1"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 rounded hover:bg-blue-600 disabled:bg-gray-400"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Set"}
-            </button>
-          </form>
+    <div className="min-h-screen bg-black text-white p-4 md:p-8">
+      <div className="max-w-2xl mx-auto">
+        
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Chest Workout Tracker</h1>
+          <p className="text-gray-400">Select an exercise and log your sets</p>
         </div>
-      )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-900 border border-red-700 text-white p-4 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-900 border border-green-700 text-white p-4 rounded-lg mb-6">
+            {successMessage}
+          </div>
+        )}
+
+        {/* Exercise List with Inline Form */}
+        <div className="space-y-3">
+          {chestExercises.map((exercise) => (
+            <div key={exercise}>
+              {/* Exercise Button */}
+              <button
+                onClick={() => setSelectedExercise(exercise === selectedExercise ? "" : exercise)}
+                className={`w-full text-left px-6 py-4 rounded-lg font-medium transition-all ${
+                  selectedExercise === exercise
+                    ? "bg-white text-black"
+                    : "bg-gray-900 text-white hover:bg-gray-800"
+                }`}
+              >
+                {exercise}
+              </button>
+
+              {/* Add Set Form - Shows directly below selected exercise */}
+              {selectedExercise === exercise && (
+                <div className="bg-gray-900 rounded-lg p-6 mt-3 border-l-4 border-white">
+                  <h3 className="text-lg font-bold mb-4">Add New Set</h3>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="number"
+                      placeholder="Weight (lbs)"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      className="flex-1 px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-white"
+                      required
+                      min="0"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Reps"
+                      value={reps}
+                      onChange={(e) => setReps(e.target.value)}
+                      className="flex-1 px-4 py-3 bg-black border border-gray-700 rounded-lg text-white focus:outline-none focus:border-white"
+                      required
+                      min="1"
+                    />
+                    <button
+                      onClick={handleSubmit}
+                      disabled={loading}
+                      className="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 transition-colors"
+                    >
+                      {loading ? "Adding..." : "Add Set"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
