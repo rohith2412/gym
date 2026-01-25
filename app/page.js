@@ -16,18 +16,16 @@ export default function Home() {
       {/* <MainLogo /> */}
 
       <div className={specialGothic.className}>
-        <div className="grid justify-start text-6xl pt-15">
-          <span>Lets</span>
-          <span>Track</span>
-          <span>Gym </span>
+        <div className="grid justify-start text-7xl pt-20 pl-8 leading-none tracking-tight">
+          <span className="text-white/50">Lets</span>
+          <span className="text-white/70">Track</span>
+          <span className="text-white">Gym</span>
         </div>
       </div>
 
-<div className="fixed bottom-0 left-0 w-full flex justify-center pb-6">
-  <LoginButton />
-</div>
-
-
+      <div className="fixed bottom-0 left-0 w-full flex justify-center pb-6">
+        <LoginButton />
+      </div>
     </div>
   );
 }
