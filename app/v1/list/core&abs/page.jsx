@@ -116,14 +116,28 @@ export default function CorePage() {
             <div key={exercise}>
               {/* Exercise Button */}
               <button
-                onClick={() => setSelectedExercise(exercise === selectedExercise ? "" : exercise)}
-                className={`w-full text-left px-5 py-4 rounded-xl font-medium transition-all ${
+                onClick={() =>
+                  setSelectedExercise(
+                    exercise === selectedExercise ? "" : exercise,
+                  )
+                }
+                className={`w-full text-left px-5 py-4 font-medium transition-all border-b border-neutral-900 focus:outline-none ${
                   selectedExercise === exercise
                     ? "bg-white text-neutral-950"
-                    : "bg-neutral-900/50 text-neutral-300 hover:bg-neutral-900 border border-neutral-800/50"
+                    : "text-neutral-300 hover:bg-neutral-900"
                 }`}
               >
-                {exercise}
+                <div className="flex items-center justify-between">
+                  <span>{exercise}</span>
+
+                  <img
+                    src="/ArrowDown.svg"
+                    alt="Expand"
+                    className={`w-6 h-6 transition-transform ${
+                      selectedExercise === exercise ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
               </button>
 
               {/* Add Set Form */}

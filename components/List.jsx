@@ -4,87 +4,34 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const MuscleGroupCard = ({ name, route, latestWorkout, trend }) => {
+const MuscleGroupCard = ({ name, route, exercises }) => {
   const router = useRouter();
 
-  // Calculate trend percentage based on last two workouts
-  const getTrendPercentage = () => {
-    if (!trend || trend.length < 2) return null;
-    const current = trend[trend.length - 1];
-    const previous = trend[trend.length - 2];
-    const change = ((current - previous) / previous) * 100;
-    return change.toFixed(1);
-  };
-//createLinePath
-  const trendPercent = getTrendPercentage();
-  const isPositive = trendPercent > 0;
-
-  // Create SVG path for line chart name
-  const createLinePath = () => {
-    if (!trend || trend.length === 0) return "";
-
-    const width = 80;
-    const height = 28;
-    const maxValue = Math.max(...trend);
-    const minValue = Math.min(...trend);
-    const range = maxValue - minValue || 1;
-
-    const points = trend.map((value, index) => {
-      const x = (index / (trend.length - 1)) * width;
-      const y = height - ((value - minValue) / range) * height;
-      return { x, y };
-    });
-
-    // Create smooth curve using quadratic bezier curves
-    let path = `M ${points[0].x},${points[0].y}`;
-
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const midX = (prev.x + curr.x) / 2;
-
-      path += ` Q ${prev.x},${prev.y} ${midX},${(prev.y + curr.y) / 2}`;
-      path += ` Q ${curr.x},${curr.y} ${curr.x},${curr.y}`;
-    }
-
-    return path;
-  };
-
   return (
-    <button
-      onClick={() => router.push(route)}
-      className=" p-2 pl-4 transition-all text-left group border-b border-neutral-900 pb-1"
-    >
-      <div className="flex items-center justify-between mb-3">
-        {/* Left: Name only */}
+    <div className="p-4 border-b border-neutral-900">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="text-white font-medium">{name}</h3>
-
-        {/* Right: Chart + percentage */}
-        <div className="flex gap-3 items-end">
-          {trend && trend.length > 0 && (
-            <svg width="80" height="28" className="opacity-60 mb-1">
-              <path
-                d={createLinePath()}
-                fill="none"
-                stroke={isPositive ? "#4ade80" : "#f87171"}
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-          {trendPercent !== null && (
-            <span
-              className={`text-sm font-medium tabular-nums ${isPositive ? "text-green-400" : "text-red-400"}`}
-            >
-              {isPositive ? "+" : ""}
-              {trendPercent}%
-            </span>
-          )}
-        </div>
+        <button
+          onClick={() => router.push(route)}
+          className="hover:opacity-70 transition-opacity"
+          aria-label="Add workout"
+        >
+          <img src="/AddButton.svg" alt="Add" width="24" height="24" />
+        </button>
       </div>
-    </button>
-    
+      {exercises && exercises.length > 0 ? (
+        <div className="space-y-1">
+          {exercises.map((exercise, index) => (
+            <div key={index} className="flex justify-between items-center">
+              <span className="text-neutral-500 text-sm">{exercise.name}</span>
+              <span className="text-neutral-400 text-sm">{exercise.maxWeight} lbs</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-neutral-600 text-sm">No workouts yet</p>
+      )}
+    </div>
   );
 };
 
@@ -98,14 +45,10 @@ export default function Dashboard() {
     { name: "Arms", route: "/v1/list/arms", muscleGroup: "Arms" },
     { name: "Back", route: "/v1/list/back", muscleGroup: "Back" },
     { name: "Chest", route: "/v1/list/chest", muscleGroup: "Chest" },
-    { name: "Core & Abs", route: "/v1/list/core", muscleGroup: "Core & Abs" },
+    { name: "Core & Abs", route: "/v1/list/core&abs", muscleGroup: "Core & Abs" },
     { name: "Forearms", route: "/v1/list/forearms", muscleGroup: "Forearms" },
     { name: "Legs", route: "/v1/list/legs", muscleGroup: "Legs" },
-    {
-      name: "Shoulders",
-      route: "/v1/list/shoulders",
-      muscleGroup: "Shoulders",
-    },
+    { name: "Shoulders", route: "/v1/list/shoulders", muscleGroup: "Shoulders" },
     { name: "Triceps", route: "/v1/list/triceps", muscleGroup: "Triceps" },
   ];
 
@@ -127,38 +70,39 @@ export default function Dashboard() {
           if (groupWorkouts.length === 0) {
             return {
               ...group,
-              latestWorkout: null,
-              trend: [],
+              exercises: [],
               lastWorkoutDate: null,
             };
           }
 
           // Sort by date descending
           groupWorkouts.sort((a, b) => new Date(b.date) - new Date(a.date));
+          const lastWorkoutDate = new Date(groupWorkouts[0].date);
 
-          const latestWorkout = groupWorkouts[0];
-          const lastWorkoutDate = new Date(latestWorkout.date);
+          // Group by exercise and find max weight for each
+          const exerciseMap = {};
+          groupWorkouts.forEach((workout) => {
+            const exerciseName = workout.exercise;
+            
+            // Find max weight for this exercise
+            const maxWeightInWorkout = Math.max(
+              ...workout.sets.map(set => set.weight)
+            );
 
-          // Get last 7 workouts for trend (or fewer if not available)
-          const trendData = groupWorkouts
-            .slice(0, 7)
-            .reverse()
-            .map((w) => {
-              // Calculate total volume (weight × reps) for the workout
-              return w.sets.reduce(
-                (sum, set) => sum + set.weight * set.reps,
-                0,
-              );
-            });
+            if (!exerciseMap[exerciseName] || maxWeightInWorkout > exerciseMap[exerciseName]) {
+              exerciseMap[exerciseName] = maxWeightInWorkout;
+            }
+          });
+
+          // Convert to array format
+          const exercises = Object.entries(exerciseMap).map(([name, maxWeight]) => ({
+            name,
+            maxWeight,
+          }));
 
           return {
             ...group,
-            latestWorkout: {
-              exercise: latestWorkout.exercise,
-              weight: latestWorkout.sets[0].weight,
-              reps: latestWorkout.sets[0].reps,
-            },
-            trend: trendData,
+            exercises,
             lastWorkoutDate,
           };
         });
@@ -176,7 +120,7 @@ export default function Dashboard() {
       } finally {
         setLoading(false);
       }
-    }; //MuscleGroupCard
+    };
 
     fetchWorkoutData();
   }, [userId]);
@@ -204,24 +148,16 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-6 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        {/* <div className="mb-12">
-          <h1 className=" text-gray-300  font-medium mb-1">Dashboard</h1>
-        </div> */}
-
-        {/* Muscle Groups Grid */} 
+        {/* All devices: Single column on mobile, grid on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {muscleGroups.map((group) => (
             <MuscleGroupCard
               key={group.name}
               name={group.name}
               route={group.route}
-              latestWorkout={group.latestWorkout}
-              trend={group.trend}
+              exercises={group.exercises}
             />
-            //name
           ))}
-          
         </div>
       </div>
     </div>

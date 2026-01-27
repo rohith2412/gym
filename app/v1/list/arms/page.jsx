@@ -10,7 +10,7 @@ const armsExercises = [
   "Tricep Dips",
   "Skull Crushers",
   "Cable Curls",
-  "Overhead Tricep Extension"
+  "Overhead Tricep Extension",
 ];
 
 export default function ArmsPage() {
@@ -54,7 +54,7 @@ export default function ArmsPage() {
       setWeight("");
       setReps("");
       setSuccessMessage("Set logged");
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
@@ -89,7 +89,6 @@ export default function ArmsPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-6 md:p-8">
       <div className="max-w-xl mx-auto">
-        
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-2xl font-medium mb-1">Arms</h1>
@@ -116,23 +115,38 @@ export default function ArmsPage() {
             <div key={exercise}>
               {/* Exercise Button */}
               <button
-                onClick={() => setSelectedExercise(exercise === selectedExercise ? "" : exercise)}
-                className={`w-full text-left px-5 py-4 rounded-xl font-medium transition-all ${
+                onClick={() =>
+                  setSelectedExercise(
+                    exercise === selectedExercise ? "" : exercise,
+                  )
+                }
+                className={`w-full text-left px-5 py-4 font-medium transition-all border-b border-neutral-900 focus:outline-none ${
                   selectedExercise === exercise
                     ? "bg-white text-neutral-950"
-                    : "bg-neutral-900/50 text-neutral-300 hover:bg-neutral-900 border border-neutral-800/50"
+                    : "text-neutral-300 hover:bg-neutral-900"
                 }`}
               >
-                {exercise}
+                <div className="flex items-center justify-between">
+                  <span>{exercise}</span>
+
+                  <img
+                    src="/ArrowDown.svg"
+                    alt="Expand"
+                    className={`w-6 h-6 transition-transform ${
+                      selectedExercise === exercise ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
               </button>
 
               {/* Add Set Form */}
               {selectedExercise === exercise && (
                 <div className="bg-neutral-900/70 backdrop-blur-xl rounded-xl p-5 mt-2 border border-neutral-800/50">
-                  
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label className="text-neutral-500 text-xs mb-1.5 block">Weight</label>
+                      <label className="text-neutral-500 text-xs mb-1.5 block">
+                        Weight
+                      </label>
                       <input
                         type="number"
                         placeholder="0"
@@ -144,7 +158,9 @@ export default function ArmsPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-neutral-500 text-xs mb-1.5 block">Reps</label>
+                      <label className="text-neutral-500 text-xs mb-1.5 block">
+                        Reps
+                      </label>
                       <input
                         type="number"
                         placeholder="0"
