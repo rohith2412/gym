@@ -23,95 +23,95 @@ export default function MainHome() {
   }, [status, router]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       <Background />
 
-      {/* Hero Section */}
-      <div className="flex-1 flex flex-col justify-center px-7 space-y-4 pb-24">
-        {/* Main Title Card */}
-        <div className={specialGothic.className}>
-          <div className="relative rounded-md py-8 flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-300 to-gray-300">
-            {/* Noise overlay */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[70]"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "repeat",
-                mixBlendMode: "overlay",
-              }}
-            />
-            <div className="relative grid justify-center text-center leading-[0.85] text-8xl tracking-tight">
-              <span className="text-gray-900">Lets</span>
-              <span className="text-gray-900">Track</span>
-              <span className="text-gray-900">Gym</span>
+      {/* Main Content - All on screen */}
+      <div className="flex-1 flex flex-col justify-between px-5 py-8">
+        {/* Hero Section */}
+        <div className="space-y-4">
+          {/* Main Title Card */}
+          <div className={specialGothic.className}>
+            <div className="relative rounded-2xl py-10 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300">
+              {/* Noise overlay */}
+              <div
+                className="pointer-events-none absolute inset-0 opacity-60"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                  mixBlendMode: "overlay",
+                }}
+              />
+              <div className="relative text-start pl-5 leading-[0.9] text-6xl tracking-tighter">
+                <span className="block text-gray-900">Lets</span>
+                <span className="block text-gray-900">Track</span>
+                <span className="block text-gray-900">Gym</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Cards */}
+          <div className="space-y-2.5">
+            {/* Feature 1 */}
+            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-50"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                  mixBlendMode: "overlay",
+                }}
+              />
+              <p
+                className="relative text-sm text-white leading-relaxed"
+                style={{ fontFamily: "Ubuntu, sans-serif" }}
+              >
+                Record your max lifts. No workouts, no reps, just pure strength.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-green-400 to-green-500">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-50"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                  mixBlendMode: "overlay",
+                }}
+              />
+              <p
+                className="relative text-sm text-white leading-relaxed"
+                style={{ fontFamily: "Ubuntu, sans-serif" }}
+              >
+                Track progress over time. Personal bests at a glance.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-red-400 to-red-500">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-50"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                  mixBlendMode: "overlay",
+                }}
+              />
+              <p
+                className="relative text-sm text-white leading-relaxed"
+                style={{ fontFamily: "Ubuntu, sans-serif" }}
+              >
+                Share PRs with friends or keep them private. Your choice.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Feature Cards */}
-        <div className="space-y-3">
-          {/* Feature 1 */}
-          <div className="relative rounded-md px-5 py-6 flex items-center overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[70]"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "repeat",
-                mixBlendMode: "overlay",
-              }}
-            />
-            <p
-              className="relative text-sm opacity-80 leading-relaxed"
-              style={{ fontFamily: "Ubuntu, sans-serif" }}
-            >
-              A minimalist fitness app built to record the maximum weight you
-              lifted for any exercise - no workouts, no reps, no noise.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="relative rounded-md px-5 py-6 flex items-center overflow-hidden bg-gradient-to-br from-green-400 to-green-500">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[70]"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "repeat",
-                mixBlendMode: "overlay",
-              }}
-            />
-            <p
-              className="relative text-sm opacity-80 leading-relaxed"
-              style={{ fontFamily: "Ubuntu, sans-serif" }}
-            >
-              Watch your strength grow over time. Each lift is stored and easy to
-              compare - personal bests at a glance.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="relative rounded-md px-5 py-6 flex items-center overflow-hidden bg-gradient-to-br from-red-400 to-red-500">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[70]"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "repeat",
-                mixBlendMode: "overlay",
-              }}
-            />
-            <p
-              className="relative text-sm opacity-80 leading-relaxed"
-              style={{ fontFamily: "Ubuntu, sans-serif" }}
-            >
-              Celebrate your PRs with friends - or keep it private. Your strength,
-              your record.
-            </p>
-          </div>
+        {/* Login Button - Static at bottom */}
+        <div className="pt-6">
+          <LoginButton />
         </div>
-      </div>
-
-      {/* Login Button - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 w-full flex justify-center pb-6">
-        <LoginButton />
       </div>
     </div>
   );
