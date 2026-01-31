@@ -27,12 +27,12 @@ export default function MainHome() {
       <Background />
 
       {/* Main Content - All on screen */}
-      <div className="flex-1 flex flex-col justify-between px-5 py-8">
+      <div className="flex-1 flex flex-col justify-between px-5 py-8 min-h-[600px]">
         {/* Hero Section */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex-shrink-0">
           {/* Main Title Card */}
           <div className={specialGothic.className}>
-            <div className="relative rounded-2xl py-10 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300">
+            <div className="relative rounded-2xl py-10 min-h-[180px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300">
               {/* Noise overlay */}
               <div
                 className="pointer-events-none absolute inset-0 opacity-60"
@@ -42,7 +42,7 @@ export default function MainHome() {
                   mixBlendMode: "overlay",
                 }}
               />
-              <div className="relative text-start pl-5 leading-[0.9] text-6xl tracking-tighter">
+              <div className="relative text-center leading-[0.9] text-6xl sm:text-7xl tracking-tighter">
                 <span className="block text-gray-900">Lets</span>
                 <span className="block text-gray-900">Track</span>
                 <span className="block text-gray-900">Gym</span>
@@ -53,7 +53,7 @@ export default function MainHome() {
           {/* Feature Cards */}
           <div className="space-y-2.5">
             {/* Feature 1 */}
-            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500">
+            <div className="relative rounded-xl px-4 py-4 min-h-[70px] flex items-center overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500">
               <div
                 className="pointer-events-none absolute inset-0 opacity-50"
                 style={{
@@ -71,7 +71,7 @@ export default function MainHome() {
             </div>
 
             {/* Feature 2 */}
-            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-green-400 to-green-500">
+            <div className="relative rounded-xl px-4 py-4 min-h-[70px] flex items-center overflow-hidden bg-gradient-to-br from-green-400 to-green-500">
               <div
                 className="pointer-events-none absolute inset-0 opacity-50"
                 style={{
@@ -89,7 +89,7 @@ export default function MainHome() {
             </div>
 
             {/* Feature 3 */}
-            <div className="relative rounded-xl px-4 py-4 overflow-hidden bg-gradient-to-br from-red-400 to-red-500">
+            <div className="relative rounded-xl px-4 py-4 min-h-[70px] flex items-center overflow-hidden bg-gradient-to-br from-red-400 to-red-500">
               <div
                 className="pointer-events-none absolute inset-0 opacity-50"
                 style={{
@@ -109,7 +109,7 @@ export default function MainHome() {
         </div>
 
         {/* Login Button - Static at bottom */}
-        <div className="pt-6">
+        <div className="pt-6 flex-shrink-0 min-h-[60px]">
           <LoginButton />
         </div>
       </div>
