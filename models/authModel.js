@@ -6,7 +6,8 @@ const authSchema = new Schema({
     type: String,
     unique: true,
     required: true,
-  }
+  },
+  photo: String,   // ← add this
 }, { timestamps: true });
 
 export default mongoose.models.Auth || mongoose.model("Auth", authSchema);

@@ -1,49 +1,33 @@
 "use client";
-import React, { useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Welcome from "@/components/Welcome";
-import Background from "@/components/Background";
-import List from "@/components/List";
 
-const Page = () => {
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
+    if (status === "loading") return;
+
     if (status === "unauthenticated") {
       router.replace("/");
+      return;
     }
-  }, [status, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
+    if (!session?.user?.hasIntro) {
+      router.replace("/v1/StartersIntro");
+    }
+  }, [status, session, router]);
+
+  if (status === "loading" || !session?.user?.hasIntro) {
+    return null; 
   }
 
-  if (!session) return null;
-
   return (
-    <div className="relative">
-     
-
-      <div className="pt-5">
-        <Welcome />
-      </div>
-      <div>
-        <List />
-      </div>
-       {/* <button
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className=""
-      >
-        Logout
-      </button> */}
-    </div>
+    <main>
+      <h1>Dashboard</h1>
+    </main>
   );
-};
-
-export default Page;
+}

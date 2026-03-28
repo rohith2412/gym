@@ -1,98 +1,160 @@
 "use client";
-import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const LoginButton = () => {
   const [showGoogleButton, setShowGoogleButton] = useState(false);
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) {
+      router.push("/v1/dashboard");
+    }
+  }, [session, router]);
+
+  useEffect(() => {
+    if (showGoogleButton) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showGoogleButton]);
+
+  const modal = (
+    <>
+      <style>{`
+        @keyframes slide-up {
+          from { transform: translateY(100%); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .apex-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.5);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          z-index: 9999;
+          padding: 0;
+          animation: fade-in 0.2s ease-out;
+        }
+        @media (min-width: 640px) {
+          .apex-modal-overlay { align-items: center; padding: 1rem; }
+          .apex-modal-sheet { border-radius: 24px !important; animation: fade-in 0.2s ease-out !important; }
+        }
+        .apex-modal-sheet {
+          background: #fff;
+          width: 100%;
+          max-width: 440px;
+          border-radius: 24px 24px 0 0;
+          padding: 2.5rem 2rem 2rem;
+          box-shadow: 0 -4px 60px rgba(0,0,0,0.15);
+          animation: slide-up 0.3s cubic-bezier(.22,1,.36,1);
+        }
+      `}</style>
+
+      <div
+        className="apex-modal-overlay"
+        onClick={() => setShowGoogleButton(false)}
+      >
+        <div className="apex-modal-sheet" onClick={(e) => e.stopPropagation()}>
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 800,
+                letterSpacing: "0.14em",
+                color: "#1a1a1a",
+                marginBottom: "0.75rem",
+              }}
+            >
+              APEX
+            </div>
+            <h2
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#1a1a1a",
+                letterSpacing: "-0.02em",
+                marginBottom: "0.4rem",
+              }}
+            >
+              Welcome
+            </h2>
+            <p style={{ fontSize: 13, color: "#888", fontWeight: 300 }}>
+              Sign in to start building your plan
+            </p>
+          </div>
+
+          <div className="flex justify-center items-center scale-130">
+            <button onClick={() => signIn("google")}>
+              <img src="/Googlelogo.svg" alt="Google" />
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+            <p
+              style={{
+                fontSize: 11,
+                color: "#bbb",
+                lineHeight: 1.6,
+                marginBottom: "0.75rem",
+              }}
+            >
+              By continuing, you agree to our Terms &amp; Privacy Policy
+            </p>
+            <button
+              onClick={() => setShowGoogleButton(false)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 13,
+                color: "#aaa",
+                fontFamily: "inherit",
+                fontWeight: 500,
+                padding: "0.25rem 0.5rem",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <>
-      {/* Main Login Button */}
-      <button
-        onClick={() => setShowGoogleButton(true)}
-        className="w-full bg-gray-100 text-black py-4 rounded-xl font-medium active:scale-[0.98] transition-transform duration-150"
+      <span
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowGoogleButton(true);
+        }}
+        style={{
+          display: "block",
+          width: "100%",
+          fontSize: 15,
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
       >
-        <span className="text-base">Get Started</span>
-      </button>
+        Build my plan - free
+      </span>
 
-      {/* Modal Overlay */}
-      {showGoogleButton && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
-          onClick={() => setShowGoogleButton(false)}
-        >
-          {/* Modal Content */}
-          <div
-            className="bg-white w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl p-8 shadow-2xl animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Welcome
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Sign in to start tracking your PRs
-              </p>
-            </div>
-
-            {/* Google Sign In Button */}
-            <button
-              onClick={() => signIn("google")}
-              className="w-full bg-white border-2 border-gray-200 hover:border-gray-300 py-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] shadow-sm hover:shadow-md"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              <span className="text-gray-700 font-medium">Continue with Google</span>
-            </button>
-
-            {/* Footer */}
-            <div className="mt-6 text-center space-y-3">
-              <p className="text-gray-400 text-xs leading-relaxed">
-                By continuing, you agree to our Terms & Privacy Policy
-              </p>
-              <button
-                onClick={() => setShowGoogleButton(false)}
-                className="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
+      {typeof window !== 'undefined' && showGoogleButton && createPortal(modal, document.body)}
     </>
   );
 };

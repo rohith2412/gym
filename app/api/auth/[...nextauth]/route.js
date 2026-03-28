@@ -1,5 +1,6 @@
 import { connectdb } from "../../../../lib/connectdb";
 import Auth from "../../../../models/authModel";
+import userIntroModel from "../../../../models/userIntroModel";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -13,7 +14,7 @@ const authOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, 
   },
 
   secret: process.env.NEXTAUTH_SECRET,
@@ -30,7 +31,10 @@ const authOptions = {
         await Auth.create({
           name: profile.name,
           email: profile.email,
+          photo: profile.picture,   
         });
+      } else {
+        await Auth.updateOne({ email: profile.email }, { photo: profile.picture });
       }
 
       return true;
@@ -44,16 +48,20 @@ const authOptions = {
       const dbUser = await Auth.findOne({ email: token.email });
 
       if (dbUser) {
-        // Store the user's MongoDB _id in the token
         token.userId = dbUser._id.toString();
+        token.photo = dbUser.photo ?? null;
 
-        // Check if this is a new user (only on first check)
         if (!token.isNewUserChecked) {
           if (dbUser.createdAt?.getTime() === dbUser.updatedAt?.getTime()) {
             token.isNewUser = true;
           }
           token.isNewUserChecked = true;
         }
+
+        // Check if the user has completed intro — re-check on every jwt call
+        // so it updates immediately after they submit the intro form.
+        const introData = await userIntroModel.findOne({ userId: dbUser._id.toString() });
+        token.hasIntro = !!introData;
       }
 
       return token;
@@ -62,8 +70,10 @@ const authOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.email = token.email;
-        session.user.id = token.userId; // Add user ID to session
+        session.user.id = token.userId;
         session.user.isNewUser = token.isNewUser ?? false;
+        session.user.hasIntro = token.hasIntro ?? false; // ← available on client
+        session.user.photo = token.photo ?? null;
       }
       return session;
     },
@@ -73,3 +83,4 @@ const authOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
+export { authOptions };
