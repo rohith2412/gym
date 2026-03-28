@@ -73,7 +73,7 @@ function Tile({ label, value, unit, accent }) {
     <div style={s.tile}>
       <span style={s.tileLabel}>{label}</span>
       <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 4 }}>
-        <span style={{ ...s.tileValue, ...(accent ? { color: accent } : {}) }}>
+        <span style={{  ...(accent ? { color: accent } : {}) }}>
           {value}
         </span>
         {unit && <span style={s.tileUnit}>{unit}</span>}
@@ -392,14 +392,14 @@ export default function ProfilePage() {
               </div>
               <div style={s.wideTile}>
                 <span style={s.tileLabel}>Top exercise</span>
-                <span style={{ ...s.tileValue, fontSize: 16, marginTop: 5, display: "block" }}>
+                <span style={{  fontSize: 16, marginTop: 5, display: "block" }}>
                   {workoutStats.topExercise}
                 </span>
               </div>
               {workoutStats.topMuscle && workoutStats.topMuscle !== "—" && (
                 <div style={s.wideTile}>
                   <span style={s.tileLabel}>Most trained</span>
-                  <span style={{ ...s.tileValue, fontSize: 16, marginTop: 5, display: "block" }}>
+                  <span style={{  fontSize: 16, marginTop: 5, display: "block" }}>
                     {workoutStats.topMuscle}
                   </span>
                 </div>
@@ -428,7 +428,7 @@ export default function ProfilePage() {
                         {bmiInfo.label}
                       </span>
                     </div>
-                    <span style={{ ...s.tileValue, marginTop: 4, display: "block" }}>
+                    <span style={{  marginTop: 4, display: "block" }}>
                       {bmiVal}
                     </span>
                     {/* BMI bar */}
@@ -503,11 +503,11 @@ export default function ProfilePage() {
                   <span style={s.menuChevron}>›</span>
                 </button>
                 <div style={s.menuDivider} />
-                <button style={s.menuRow} onClick={() => router.push("/v1/tracking")}>
+                {/* <button style={s.menuRow} onClick={() => router.push("/v1/tracking")}>
                   <span style={s.menuIcon}>📊</span>
                   <span style={s.menuRowLabel}>View progress</span>
                   <span style={s.menuChevron}>›</span>
-                </button>
+                </button> */}
                 <div style={s.menuDivider} />
                 <button
                   style={{ ...s.menuRow, opacity: signingOut ? 0.5 : 1 }}
