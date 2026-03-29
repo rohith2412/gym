@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const calcBmi = (weight, height) => {
   if (!weight || !height) return null;
   return (weight / Math.pow(height / 100, 2)).toFixed(1);
@@ -46,10 +46,11 @@ function Avatar({ src, name, size = 68 }) {
         src={src}
         alt={name}
         onError={() => setErr(true)}
+        referrerPolicy="no-referrer"
         style={{
           width: size, height: size, borderRadius: "50%",
-          objectFit: "cover", border: "2px solid #f0f0f0", display: "block",
-          flexShrink: 0,
+          objectFit: "cover", display: "block", flexShrink: 0,
+          border: "2px solid #e8e5de",
         }}
       />
     );
@@ -57,28 +58,39 @@ function Avatar({ src, name, size = 68 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%",
-      background: "#111", color: "#fff", flexShrink: 0,
+      background: "#1a1a1a", color: "#fff", flexShrink: 0,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.34, fontWeight: 600, letterSpacing: "-0.02em",
-      fontFamily: "'DM Serif Display', serif",
+      fontSize: size * 0.36, fontWeight: 700,
     }}>
       {initials}
     </div>
   );
 }
 
-// ── Stat tile ─────────────────────────────────────────────────────────────────
-function Tile({ label, value, unit, accent }) {
+// ── Card ──────────────────────────────────────────────────────────────────────
+function Card({ children, style = {} }) {
   return (
-    <div style={s.tile}>
-      <span style={s.tileLabel}>{label}</span>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 4 }}>
-        <span style={{  ...(accent ? { color: accent } : {}) }}>
-          {value}
-        </span>
-        {unit && <span style={s.tileUnit}>{unit}</span>}
-      </div>
+    <div style={{
+      background: "#fff",
+      border: "1px solid #e8e5de",
+      borderRadius: 20,
+      padding: "1.1rem 1.25rem",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      ...style,
+    }}>
+      {children}
     </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return (
+    <p style={{
+      fontSize: 11, fontWeight: 700, letterSpacing: "0.12em",
+      textTransform: "uppercase", color: "#aaa", margin: "0 0 0.65rem",
+    }}>
+      {children}
+    </p>
   );
 }
 
@@ -198,46 +210,57 @@ const e = {
   },
   sheet: {
     width: "100%", maxWidth: 430, margin: "0 auto",
-    background: "#fff", borderRadius: "20px 20px 0 0",
+    background: "#fff", borderRadius: "22px 22px 0 0",
     maxHeight: "90vh", display: "flex", flexDirection: "column",
     animation: "slideUp 0.28s cubic-bezier(.32,1.2,.64,1)",
   },
   handle: {
-    width: 36, height: 4, background: "#e5e7eb",
+    width: 36, height: 4, background: "#e8e5de",
     borderRadius: 99, margin: "12px auto 0", flexShrink: 0,
   },
   head: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    padding: "14px 20px 12px", borderBottom: "1px solid #f0f0f0", flexShrink: 0,
+    padding: "14px 20px 12px", borderBottom: "1px solid #e8e5de", flexShrink: 0,
   },
-  headTitle: { fontSize: 17, fontWeight: 400, color: "#111", fontFamily: "'DM Serif Display', serif" },
-  closeBtn: { border: "none", background: "none", fontSize: 14, color: "#bbb", cursor: "pointer", fontFamily: "inherit", padding: "4px 8px" },
-  body: { overflowY: "auto", padding: "18px 20px 48px", display: "flex", flexDirection: "column", gap: 22 },
+  headTitle: {
+    fontSize: 16, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em",
+  },
+  closeBtn: {
+    border: "none", background: "none", fontSize: 14, color: "#bbb",
+    cursor: "pointer", fontFamily: "inherit", padding: "4px 8px",
+  },
+  body: {
+    overflowY: "auto", padding: "18px 20px 48px",
+    display: "flex", flexDirection: "column", gap: 22,
+  },
   group: { display: "flex", flexDirection: "column", gap: 8 },
   groupTop: { display: "flex", justifyContent: "space-between", alignItems: "baseline" },
-  groupLabel: { fontSize: 10, fontWeight: 400, color: "#bbb", letterSpacing: "0.1em", textTransform: "uppercase" },
-  groupVal: { fontSize: 15, fontWeight: 600, color: "#111" },
-  slider: { width: "100%", accentColor: "#111", cursor: "pointer" },
+  groupLabel: {
+    fontSize: 10, fontWeight: 700, color: "#aaa",
+    letterSpacing: "0.12em", textTransform: "uppercase",
+  },
+  groupVal: { fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" },
+  slider: { width: "100%", accentColor: "#1a1a1a", cursor: "pointer" },
   rangeRow: { display: "flex", justifyContent: "space-between", fontSize: 10, color: "#ccc" },
   chips: { display: "flex", gap: 8, flexWrap: "wrap" },
   chip: {
     display: "flex", alignItems: "center", padding: "8px 14px",
-    borderRadius: 99, border: "1.5px solid #eee", background: "#fafafa",
-    fontSize: 13, fontWeight: 400, color: "#555", cursor: "pointer",
+    borderRadius: 99, border: "1.5px solid #e8e5de", background: "#fafaf8",
+    fontSize: 13, fontWeight: 500, color: "#555", cursor: "pointer",
     fontFamily: "inherit", transition: "all 0.12s",
   },
-  chipActive: { background: "#111", borderColor: "#111", color: "#fff" },
+  chipActive: { background: "#1a1a1a", borderColor: "#1a1a1a", color: "#fff" },
   daysRow: { display: "flex", gap: 7 },
   dayBtn: {
-    flex: 1, padding: "9px 0", border: "1.5px solid #eee",
-    borderRadius: 10, background: "#fafafa", fontSize: 13, fontWeight: 500,
+    flex: 1, padding: "9px 0", border: "1.5px solid #e8e5de",
+    borderRadius: 10, background: "#fafaf8", fontSize: 13, fontWeight: 600,
     color: "#aaa", cursor: "pointer", fontFamily: "inherit", transition: "all 0.12s",
   },
-  dayBtnActive: { background: "#111", borderColor: "#111", color: "#fff" },
+  dayBtnActive: { background: "#1a1a1a", borderColor: "#1a1a1a", color: "#fff" },
   saveBtn: {
-    background: "#111", color: "#fff", border: "none", borderRadius: 12,
-    padding: "14px", fontSize: 15, fontWeight: 500, cursor: "pointer",
-    fontFamily: "inherit", marginTop: 4,
+    background: "#1a1a1a", color: "#fafaf8", border: "none", borderRadius: 14,
+    padding: "14px", fontSize: 14, fontWeight: 700, cursor: "pointer",
+    fontFamily: "inherit", letterSpacing: "0.01em",
   },
   saveBtnOff: { opacity: 0.35, cursor: "not-allowed" },
 };
@@ -247,18 +270,16 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [intro, setIntro]             = useState(null);
+  const [intro, setIntro]               = useState(null);
   const [loadingIntro, setLoadingIntro] = useState(true);
   const [workoutStats, setWorkoutStats] = useState({ sessions: 0, totalVol: 0, topExercise: "—" });
-  const [showEdit, setShowEdit]       = useState(false);
-  const [signingOut, setSigningOut]   = useState(false);
+  const [showEdit, setShowEdit]         = useState(false);
+  const [signingOut, setSigningOut]     = useState(false);
 
-  // Auth guard
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/");
   }, [status, router]);
 
-  // Fetch intro
   useEffect(() => {
     if (!session?.user?.id) return;
     fetch("/api/user-intro")
@@ -268,7 +289,6 @@ export default function ProfilePage() {
       .finally(() => setLoadingIntro(false));
   }, [session?.user?.id]);
 
-  // Fetch workout stats from existing tracking API
   useEffect(() => {
     if (!session?.user?.id) return;
     fetch("/api/tracking?limit=100")
@@ -280,26 +300,12 @@ export default function ProfilePage() {
         const totalVol = logs.reduce((sum, log) =>
           sum + log.exercises.reduce((s2, ex) =>
             s2 + ex.sets.reduce((s3, set) => s3 + set.reps * set.weight, 0), 0), 0);
-        // Most-logged exercise
         const freq = {};
         logs.forEach((log) =>
           log.exercises.forEach((ex) => { freq[ex.name] = (freq[ex.name] || 0) + 1; })
         );
         const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
-        // Most-trained muscle group
-        const mgFreq = {};
-        logs.forEach((log) =>
-          log.exercises.forEach((ex) => {
-            if (ex.muscleGroup) mgFreq[ex.muscleGroup] = (mgFreq[ex.muscleGroup] || 0) + 1;
-          })
-        );
-        const topMg = Object.entries(mgFreq).sort((a, b) => b[1] - a[1])[0];
-        setWorkoutStats({
-          sessions,
-          totalVol,
-          topExercise: top ? top[0] : "—",
-          topMuscle: topMg ? topMg[0] : "—",
-        });
+        setWorkoutStats({ sessions, totalVol, topExercise: top ? top[0] : "—" });
       })
       .catch(() => {});
   }, [session?.user?.id]);
@@ -309,224 +315,210 @@ export default function ProfilePage() {
     await signOut({ callbackUrl: "/" });
   };
 
-  // Loading state
   if (status === "loading" || loadingIntro) {
     return (
-      <>
+      <div style={S.root}>
         <style>{GLOBAL_STYLES}</style>
-        <div style={s.root}>
-          <div style={s.phone}>
-            <div style={s.loadWrap}>
-              <div style={s.loadSpinner} />
-            </div>
-          </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={S.spinner} />
         </div>
-      </>
+      </div>
     );
   }
 
-  const user = session?.user;
-  const bmiVal = intro ? calcBmi(intro.weight, intro.height) : null;
+  const user    = session?.user;
+  const bmiVal  = intro ? calcBmi(intro.weight, intro.height) : null;
   const bmiInfo = bmiVal ? bmiCategory(bmiVal) : null;
-  const goal = intro?.fitnessGoal ? GOAL_MAP[intro.fitnessGoal] : null;
-  const exp  = intro?.experienceLevel ? EXP_MAP[intro.experienceLevel] : null;
+  const goal    = intro?.fitnessGoal     ? GOAL_MAP[intro.fitnessGoal]     : null;
+  const exp     = intro?.experienceLevel ? EXP_MAP[intro.experienceLevel]  : null;
 
   return (
-    <>
+    <div style={S.root}>
       <style>{GLOBAL_STYLES}</style>
 
-      <div style={s.root}>
-        <div style={s.phone}>
+      {/* ── Sticky header ── */}
+      <header style={S.header}>
+        <button style={S.backBtn} onClick={() => router.back()}>←</button>
+        <span style={S.headerTitle}>Profile</span>
+        <div style={{ width: 36 }} />
+      </header>
 
-          {/* ── Sticky header ── */}
-          <div style={s.header}>
-            <button style={s.backBtn} onClick={() => router.back()}>←</button>
-            <span style={s.headerTitle}>Profile</span>
-            <button
-              style={s.editHeaderBtn}
-              onClick={() => intro && setShowEdit(true)}
-            >
-              Edit
-            </button>
-          </div>
+      <main style={S.main}>
 
-          <div style={s.scroll}>
-
-            {/* ── Hero ── */}
-            <div style={s.hero}>
-              <Avatar
-                src={user?.photo || user?.image}
-                name={user?.name}
-                size={68}
-              />
-              <div style={s.heroRight}>
-                <h1 style={s.heroName}>{user?.name ?? "Athlete"}</h1>
-                <p style={s.heroEmail}>{user?.email}</p>
-                <div style={s.heroPills}>
-                  {intro?.gender && (
-                    <span style={s.pill}>
-                      {intro.gender === "male" ? "♂" : intro.gender === "female" ? "♀" : "◎"}
-                      {" "}{intro.gender}
-                    </span>
-                  )}
-                  {intro?.age && <span style={s.pill}>{intro.age} yrs</span>}
-                  {intro?.workoutDaysPerWeek > 0 && (
-                    <span style={s.pill}>{intro.workoutDaysPerWeek}×/wk</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* ── Activity stats ── */}
-            <div style={s.section}>
-              <p style={s.sectionLabel}>Activity</p>
-              <div style={s.tileRow}>
-                <Tile label="Sessions" value={workoutStats.sessions} />
-                <Tile
-                  label="Total volume"
-                  value={workoutStats.totalVol >= 1000
-                    ? (workoutStats.totalVol / 1000).toFixed(1) + "k"
-                    : workoutStats.totalVol}
-                  unit="lbs"
-                />
-              </div>
-              <div style={s.wideTile}>
-                <span style={s.tileLabel}>Top exercise</span>
-                <span style={{  fontSize: 16, marginTop: 5, display: "block" }}>
-                  {workoutStats.topExercise}
+        {/* ── Hero ── */}
+        <Card style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+          <Avatar src={user?.photo || user?.image} name={user?.name} size={64} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h1 style={S.heroName}>{user?.name ?? "Athlete"}</h1>
+            <p style={S.heroEmail}>{user?.email}</p>
+            <div style={S.heroPills}>
+              {intro?.gender && (
+                <span style={S.pill}>
+                  {intro.gender === "male" ? "♂" : intro.gender === "female" ? "♀" : "◎"} {intro.gender}
                 </span>
-              </div>
-              {workoutStats.topMuscle && workoutStats.topMuscle !== "—" && (
-                <div style={s.wideTile}>
-                  <span style={s.tileLabel}>Most trained</span>
-                  <span style={{  fontSize: 16, marginTop: 5, display: "block" }}>
-                    {workoutStats.topMuscle}
-                  </span>
-                </div>
+              )}
+              {intro?.age && <span style={S.pill}>{intro.age} yrs</span>}
+              {intro?.workoutDaysPerWeek > 0 && (
+                <span style={S.pill}>{intro.workoutDaysPerWeek}×/wk</span>
               )}
             </div>
+          </div>
+        </Card>
 
-            {/* ── Body stats ── */}
-            {intro && (
-              <div style={s.section}>
-                <p style={s.sectionLabel}>Body</p>
-                <div style={s.tileRow}>
-                  <Tile label="Height" value={intro.height} unit="cm" />
-                  <Tile label="Weight" value={intro.weight} unit="kg" />
-                </div>
+        {/* ── Activity stats ── */}
+        {workoutStats.sessions > 0 && (
+          <>
+            <SectionLabel>Activity</SectionLabel>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+              <Card style={{ padding: "1rem 1.1rem" }}>
+                <span style={S.statIcon}>🏋️</span>
+                <p style={S.statValue}>{workoutStats.sessions}</p>
+                <p style={S.statLabel}>Workouts logged</p>
+              </Card>
+              <Card style={{ padding: "1rem 1.1rem" }}>
+                <span style={S.statIcon}>📈</span>
+                <p style={S.statValue}>
+                  {workoutStats.totalVol >= 1000
+                    ? `${(workoutStats.totalVol / 1000).toFixed(1)}t`
+                    : `${workoutStats.totalVol}`}
+                </p>
+                <p style={S.statLabel}>Total volume</p>
+              </Card>
+            </div>
+            <Card style={{ marginBottom: 10, padding: "1rem 1.25rem" }}>
+              <p style={S.statLabel}>Top exercise</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginTop: 4 }}>
+                {workoutStats.topExercise}
+              </p>
+            </Card>
+          </>
+        )}
 
-                {bmiVal && bmiInfo && (
-                  <div style={s.wideTile}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={s.tileLabel}>BMI</span>
-                      <span style={{
-                        fontSize: 11, fontWeight: 500, padding: "2px 9px",
-                        borderRadius: 99,
-                        background: bmiInfo.color + "20",
-                        color: bmiInfo.color,
-                      }}>
-                        {bmiInfo.label}
-                      </span>
-                    </div>
-                    <span style={{  marginTop: 4, display: "block" }}>
-                      {bmiVal}
-                    </span>
-                    {/* BMI bar */}
-                    <div style={s.bmiBar}>
-                      {[
-                        { w: 22, color: "#93c5fd" },  // < 18.5 (underweight)
-                        { w: 40, color: "#86efac" },  // 18.5-25 (healthy)
-                        { w: 22, color: "#fcd34d" },  // 25-30 (overweight)
-                        { w: 16, color: "#fca5a5" },  // > 30 (obese)
-                      ].map((seg, i) => (
-                        <div key={i} style={{ flex: seg.w, height: "100%", background: seg.color, opacity: 0.5 }} />
-                      ))}
-                      <div style={{
-                        position: "absolute",
-                        left: `${Math.min(96, Math.max(2, ((parseFloat(bmiVal) - 10) / 30) * 100))}%`,
-                        top: "50%", transform: "translate(-50%, -50%)",
-                        width: 12, height: 12, borderRadius: "50%",
-                        background: bmiInfo.color,
-                        border: "2px solid #fff",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                        transition: "left 0.4s ease",
-                      }} />
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#ccc", marginTop: 4 }}>
-                      <span>10</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ── Training profile ── */}
-            {intro && (goal || exp) && (
-              <div style={s.section}>
-                <p style={s.sectionLabel}>Training</p>
-                <div style={s.badgeRow}>
-                  {goal && (
-                    <div style={s.badge}>
-                      <span style={s.badgeIcon}>{goal.icon}</span>
-                      <span style={s.badgeLabel}>{goal.label}</span>
-                    </div>
-                  )}
-                  {exp && (
-                    <div style={s.badge}>
-                      <span style={s.badgeIcon}>{exp.icon}</span>
-                      <span style={s.badgeLabel}>{exp.label}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* No intro state */}
-            {!intro && !loadingIntro && (
-              <div style={s.section}>
-                <div style={s.emptyCard}>
-                  <p style={s.emptyText}>Complete your fitness profile to unlock body stats and training insights.</p>
-                  <button style={s.emptyBtn} onClick={() => router.push("/v1/StartersIntro")}>
-                    Complete setup →
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* ── Account ── */}
-            <div style={s.section}>
-              <p style={s.sectionLabel}>Account</p>
-              <div style={s.menuCard}>
-                <button style={s.menuRow} onClick={() => intro && setShowEdit(true)}>
-                  <span style={s.menuIcon}>✏️</span>
-                  <span style={s.menuRowLabel}>Edit fitness profile</span>
-                  <span style={s.menuChevron}>›</span>
-                </button>
-                <div style={s.menuDivider} />
-                {/* <button style={s.menuRow} onClick={() => router.push("/v1/tracking")}>
-                  <span style={s.menuIcon}>📊</span>
-                  <span style={s.menuRowLabel}>View progress</span>
-                  <span style={s.menuChevron}>›</span>
-                </button> */}
-                <div style={s.menuDivider} />
-                <button
-                  style={{ ...s.menuRow, opacity: signingOut ? 0.5 : 1 }}
-                  onClick={handleSignOut}
-                  disabled={signingOut}
-                >
-                  <span style={s.menuIcon}>🚪</span>
-                  <span style={{ ...s.menuRowLabel, color: "#ef4444" }}>
-                    {signingOut ? "Signing out…" : "Sign out"}
-                  </span>
-                  <span style={s.menuChevron}>›</span>
-                </button>
-              </div>
+        {/* ── Body stats ── */}
+        {intro && (
+          <>
+            <SectionLabel>Body</SectionLabel>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+              <Card style={{ padding: "1rem 1.1rem" }}>
+                <p style={S.statLabel}>Height</p>
+                <p style={S.statValue}>{intro.height} <span style={S.statUnit}>cm</span></p>
+              </Card>
+              <Card style={{ padding: "1rem 1.1rem" }}>
+                <p style={S.statLabel}>Weight</p>
+                <p style={S.statValue}>{intro.weight} <span style={S.statUnit}>kg</span></p>
+              </Card>
             </div>
 
-            <p style={s.versionText}>APEX · v1.0</p>
-          </div>
-        </div>
-      </div>
+            {bmiVal && bmiInfo && (
+              <Card style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <p style={S.statLabel}>BMI</p>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: "3px 9px",
+                    borderRadius: 99,
+                    background: bmiInfo.color + "18",
+                    color: bmiInfo.color,
+                    letterSpacing: "0.05em",
+                  }}>
+                    {bmiInfo.label}
+                  </span>
+                </div>
+                <p style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.05em", lineHeight: 1, marginBottom: 10 }}>
+                  {bmiVal}
+                </p>
+                {/* BMI bar */}
+                <div style={{ display: "flex", height: 6, borderRadius: 99, overflow: "visible", position: "relative", gap: 2 }}>
+                  {[
+                    { w: 22, color: "#93c5fd" },
+                    { w: 40, color: "#86efac" },
+                    { w: 22, color: "#fcd34d" },
+                    { w: 16, color: "#fca5a5" },
+                  ].map((seg, i) => (
+                    <div key={i} style={{ flex: seg.w, height: "100%", background: seg.color, opacity: 0.5, borderRadius: 99 }} />
+                  ))}
+                  <div style={{
+                    position: "absolute",
+                    left: `${Math.min(96, Math.max(2, ((parseFloat(bmiVal) - 10) / 30) * 100))}%`,
+                    top: "50%", transform: "translate(-50%, -50%)",
+                    width: 12, height: 12, borderRadius: "50%",
+                    background: bmiInfo.color,
+                    border: "2px solid #fff",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                  }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#ccc", marginTop: 5 }}>
+                  <span>10</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+                </div>
+              </Card>
+            )}
+          </>
+        )}
+
+        {/* ── Training profile ── */}
+        {intro && (goal || exp) && (
+          <>
+            <SectionLabel>Training</SectionLabel>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              {goal && (
+                <Card style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "0.9rem 1rem" }}>
+                  <span style={{ fontSize: 22 }}>{goal.icon}</span>
+                  <div>
+                    <p style={S.statLabel}>Goal</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", marginTop: 2 }}>{goal.label}</p>
+                  </div>
+                </Card>
+              )}
+              {exp && (
+                <Card style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "0.9rem 1rem" }}>
+                  <span style={{ fontSize: 22 }}>{exp.icon}</span>
+                  <div>
+                    <p style={S.statLabel}>Level</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", marginTop: 2 }}>{exp.label}</p>
+                  </div>
+                </Card>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* No intro state */}
+        {!intro && !loadingIntro && (
+          <Card style={{ textAlign: "center", padding: "2rem 1.5rem", marginBottom: 10 }}>
+            <p style={{ fontSize: 28, marginBottom: 8 }}>📋</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#1a1a1a", marginBottom: 6 }}>Profile incomplete</p>
+            <p style={{ fontSize: 13, color: "#aaa", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+              Complete your fitness profile to unlock body stats and training insights.
+            </p>
+            <button style={S.ctaBtn} onClick={() => router.push("/v1/StartersIntro")}>
+              Complete setup →
+            </button>
+          </Card>
+        )}
+
+        {/* ── Account ── */}
+        <SectionLabel>Account</SectionLabel>
+        <Card style={{ padding: 0, overflow: "hidden", marginBottom: 10 }}>
+          <button style={S.menuRow} onClick={() => intro && setShowEdit(true)}>
+            <span style={S.menuIcon}>✏️</span>
+            <span style={S.menuLabel}>Edit fitness profile</span>
+            <span style={S.menuChevron}>›</span>
+          </button>
+          <div style={S.menuDivider} />
+          <button
+            style={{ ...S.menuRow, opacity: signingOut ? 0.5 : 1 }}
+            onClick={handleSignOut}
+            disabled={signingOut}
+          >
+            <span style={S.menuIcon}>🚪</span>
+            <span style={{ ...S.menuLabel, color: "#ef4444" }}>
+              {signingOut ? "Signing out…" : "Sign out"}
+            </span>
+            <span style={S.menuChevron}>›</span>
+          </button>
+        </Card>
+
+        <p style={S.version}>APEX · v1.0</p>
+      </main>
 
       {showEdit && intro && (
         <EditSheet
@@ -535,166 +527,105 @@ export default function ProfilePage() {
           onSaved={(updated) => setIntro((prev) => ({ ...prev, ...updated }))}
         />
       )}
-    </>
+    </div>
   );
 }
 
 // ── Global styles ─────────────────────────────────────────────────────────────
 const GLOBAL_STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
-  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-  body { margin: 0; background: #f5f5f4; }
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { -webkit-font-smoothing: antialiased; background: #fafaf8; }
   @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0);   }
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
   ::-webkit-scrollbar { display: none; }
+  button { cursor: pointer; }
 `;
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-const s = {
+const S = {
   root: {
-    minHeight: "100vh", background: "#f5f5f4",
-    display: "flex", justifyContent: "center",
-    fontFamily: "'DM Sans', system-ui, sans-serif",
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    background: "#fafaf8",
+    minHeight: "100dvh",
+    maxWidth: 430,
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
   },
-  phone: {
-    width: "100%", maxWidth: 430, background: "#fff",
-    minHeight: "100vh", display: "flex", flexDirection: "column",
-  },
-  loadWrap: {
-    flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-  },
-  loadSpinner: {
+  spinner: {
     width: 22, height: 22, borderRadius: "50%",
-    border: "2px solid #f0f0f0", borderTopColor: "#111",
+    border: "2px solid #e8e5de", borderTopColor: "#1a1a1a",
     animation: "spin 0.7s linear infinite",
   },
-
-  // Header
   header: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    padding: "52px 20px 14px",
-    background: "#fff", borderBottom: "1px solid #f0f0f0",
+    padding: "1.2rem 1.25rem 0.8rem",
     position: "sticky", top: 0, zIndex: 10,
+    background: "rgba(250,250,248,0.92)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    borderBottom: "1px solid rgba(232,229,222,0.5)",
   },
   backBtn: {
-    border: "none", background: "none", fontSize: 20, color: "#111",
-    cursor: "pointer", padding: "4px 8px 4px 0", fontFamily: "inherit", lineHeight: 1,
+    width: 36, height: 36, border: "1px solid #e8e5de",
+    background: "#fff", borderRadius: 10,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 18, color: "#1a1a1a", lineHeight: 1,
+    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
   },
   headerTitle: {
-    fontSize: 17, fontWeight: 400, color: "#111",
-    fontFamily: "'DM Serif Display', serif",
+    fontSize: 16, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em",
   },
-  editHeaderBtn: {
-    border: "none", background: "none", fontSize: 14, fontWeight: 500,
-    color: "#111", cursor: "pointer", fontFamily: "inherit", padding: "4px 0 4px 8px",
+  main: {
+    padding: "1rem 1.25rem 2.5rem",
+    flex: 1,
   },
-
-  scroll: { overflowY: "auto", paddingBottom: 48, animation: "fadeIn 0.3s ease" },
-
-  // Hero card
-  hero: {
-    display: "flex", alignItems: "center", gap: 16,
-    padding: "22px 20px 18px", borderBottom: "1px solid #f5f5f5",
-  },
-  heroRight: { flex: 1, display: "flex", flexDirection: "column", gap: 2 },
   heroName: {
-    fontSize: 20, fontWeight: 400, color: "#111", margin: 0,
-    letterSpacing: "-0.02em", fontFamily: "'DM Serif Display', serif",
+    fontSize: 18, fontWeight: 800, color: "#1a1a1a",
+    letterSpacing: "-0.04em", lineHeight: 1.1,
   },
-  heroEmail: { fontSize: 12, color: "#aaa", margin: 0, fontWeight: 300 },
+  heroEmail: {
+    fontSize: 12, color: "#aaa", marginTop: 2, fontWeight: 400,
+  },
   heroPills: { display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" },
   pill: {
     fontSize: 11, padding: "3px 9px", borderRadius: 99,
-    background: "#f5f5f5", color: "#666", fontWeight: 400,
-    textTransform: "capitalize",
+    background: "#f4f2ed", border: "1px solid #e8e5de",
+    color: "#666", fontWeight: 500, textTransform: "capitalize",
   },
-
-  // Sections
-  section: { padding: "18px 16px 0", display: "flex", flexDirection: "column", gap: 10 },
-  sectionLabel: {
-    fontSize: 10, fontWeight: 400, color: "#bbb",
-    letterSpacing: "0.12em", textTransform: "uppercase", margin: 0,
+  statIcon: { fontSize: 18, display: "block", marginBottom: 6 },
+  statValue: {
+    fontSize: 22, fontWeight: 800, color: "#1a1a1a",
+    letterSpacing: "-0.04em", lineHeight: 1,
   },
-
-  // Tiles
-  tileRow: { display: "flex", gap: 10 },
-  tile: {
-    flex: 1, background: "#fafafa",
-    border: "1.5px solid #f0f0f0", borderRadius: 14,
-    padding: "14px 16px",
+  statUnit: { fontSize: 11, fontWeight: 400, color: "#aaa" },
+  statLabel: {
+    fontSize: 11, fontWeight: 700, color: "#aaa",
+    letterSpacing: "0.08em", textTransform: "uppercase",
   },
-  wideTile: {
-    background: "#fafafa", border: "1.5px solid #f0f0f0",
-    borderRadius: 14, padding: "14px 16px",
-  },
-  tileLabel: {
-    fontSize: 10, fontWeight: 400, color: "#bbb",
-    letterSpacing: "0.1em", textTransform: "uppercase",
-  },
-  tileValue: {
-    fontSize: 28, fontWeight: 400, color: "#111",
-    letterSpacing: "-0.03em", lineHeight: 1,
-    fontFamily: "'DM Serif Display', serif",
-  },
-  tileUnit: { fontSize: 11, fontWeight: 300, color: "#aaa" },
-
-  // BMI bar
-  bmiBar: {
-    display: "flex", height: 6, borderRadius: 99,
-    overflow: "visible", position: "relative",
-    marginTop: 10, gap: 2,
-  },
-
-  // Training badges
-  badgeRow: { display: "flex", gap: 8, flexWrap: "wrap" },
-  badge: {
-    display: "flex", alignItems: "center", gap: 8,
-    padding: "10px 16px", background: "#fafafa",
-    border: "1.5px solid #f0f0f0", borderRadius: 14,
-  },
-  badgeIcon: { fontSize: 18 },
-  badgeLabel: { fontSize: 14, fontWeight: 500, color: "#111" },
-
-  // Empty state
-  emptyCard: {
-    background: "#fafafa", border: "1.5px solid #f0f0f0",
-    borderRadius: 14, padding: "22px 20px", textAlign: "center",
-    display: "flex", flexDirection: "column", gap: 12, alignItems: "center",
-  },
-  emptyText: { fontSize: 14, color: "#aaa", margin: 0, fontWeight: 300, lineHeight: 1.6 },
-  emptyBtn: {
-    background: "#111", color: "#fff", border: "none",
-    borderRadius: 10, padding: "10px 20px", fontSize: 13,
-    fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
-  },
-
-  // Menu card
-  menuCard: {
-    background: "#fafafa", border: "1.5px solid #f0f0f0",
-    borderRadius: 14, overflow: "hidden",
+  ctaBtn: {
+    width: "100%", padding: "0.85rem",
+    background: "#1a1a1a", color: "#fafaf8",
+    border: "none", borderRadius: 14,
+    fontSize: 14, fontWeight: 700,
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    letterSpacing: "0.01em",
   },
   menuRow: {
     width: "100%", display: "flex", alignItems: "center", gap: 12,
-    padding: "15px 16px", background: "none", border: "none",
-    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+    padding: "1rem 1.25rem", background: "none", border: "none",
+    fontFamily: "'Plus Jakarta Sans', sans-serif", textAlign: "left",
   },
   menuIcon: { fontSize: 16, flexShrink: 0 },
-  menuRowLabel: { flex: 1, fontSize: 14, fontWeight: 400, color: "#111" },
-  menuChevron: { fontSize: 16, color: "#ddd" },
-  menuDivider: { height: 1, background: "#f0f0f0", margin: "0 16px" },
-
-  versionText: {
-    textAlign: "center", fontSize: 10, color: "#ddd",
-    fontWeight: 300, marginTop: 28, letterSpacing: "0.1em",
-    paddingBottom: 16,
+  menuLabel: { flex: 1, fontSize: 14, fontWeight: 500, color: "#1a1a1a" },
+  menuChevron: { fontSize: 18, color: "#ddd", fontWeight: 300 },
+  menuDivider: { height: 1, background: "#e8e5de", margin: "0 1.25rem" },
+  version: {
+    textAlign: "center", fontSize: 10, color: "#ccc",
+    fontWeight: 500, marginTop: 24, letterSpacing: "0.1em",
   },
 };
