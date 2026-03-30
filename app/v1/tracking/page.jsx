@@ -191,7 +191,8 @@ const PANEL = {
 
 const HANDLE = {
   width: 36, height: 4, background: "#e8e5de",
-  borderRadius: 99, margin: "12px auto 0", flexShrink: 0,
+  borderRadius: 99, margin: "12px auto 0",
+  flexShrink: 0,
 };
 
 const NUM_INPUT = {
@@ -244,7 +245,7 @@ function MuscleDetailSheet({ mg, delta, logs, onClose }) {
             >✕</button>
           </div>
         </div>
-        <div style={{ overflowY: "auto", WebkitOverflowScrolling: "touch", padding: "12px 16px 48px", display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", padding: "12px 16px 48px", display: "flex", flexDirection: "column", gap: 8 }}>
           {allExercises.length === 0 && (
             <p style={{ textAlign: "center", color: "#ccc", fontSize: 14, padding: "32px 0" }}>
               No exercises logged yet for {mg}.
