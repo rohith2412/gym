@@ -214,9 +214,10 @@ const NUM_INPUT = {
   touchAction: "manipulation",
 };
 
-// ─── MUSCLE DETAIL SHEET ──────────────────────────────────────────────────────
-function MuscleDetailSheet({ mg, delta, logs, onClose }) {
-  useScrollLock(true);
+// ─── MUSCLE ACCORDION ROW ─────────────────────────────────────────────────────
+function MuscleAccordionRow({ mg, lastBest, delta, exNames, sessionCount, logs }) {
+  const [open, setOpen] = useState(false);
+
   const allExercises = [];
   const seen = new Set();
   logs.forEach((log) => {
@@ -229,71 +230,64 @@ function MuscleDetailSheet({ mg, delta, logs, onClose }) {
   });
 
   return (
-    <div style={OVERLAY} onClick={onClose}>
-      <div style={PANEL} onClick={(e) => e.stopPropagation()}>
-        <div style={HANDLE} />
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 18px 12px", borderBottom: "1px solid #e8e5de", flexShrink: 0,
-        }}>
-          <span style={{ fontSize: 17, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>{mg}</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <DeltaBadge delta={delta} />
-            <button
-              onClick={onClose}
-              style={{ border: "none", background: "none", fontSize: 15, color: "#bbb", cursor: "pointer", padding: "4px 8px" }}
-            >✕</button>
-          </div>
+    <div style={{ display: "flex", flexDirection: "column", borderRadius: 20, border: "1px solid #e8e5de", background: "#fff", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+      {/* ── Header row (always visible, tap to toggle) ── */}
+      <div
+        onClick={() => setOpen((v) => !v)}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.9rem 1.1rem", cursor: "pointer" }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{mg}</span>
+          <span style={{ fontSize: 11, color: "#aaa" }}>
+            {sessionCount} session{sessionCount !== 1 ? "s" : ""} · {exNames.length} exercise{exNames.length !== 1 ? "s" : ""}
+          </span>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch", padding: "12px 16px 48px", display: "flex", flexDirection: "column", gap: 8 }}>
-          {allExercises.length === 0 && (
-            <p style={{ textAlign: "center", color: "#ccc", fontSize: 14, padding: "32px 0" }}>
-              No exercises logged yet for {mg}.
-            </p>
-          )}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em" }}>
+            {lastBest}<span style={{ fontSize: 11, fontWeight: 400, color: "#aaa", marginLeft: 2 }}>lbs</span>
+          </span>
+          <DeltaBadge delta={delta} />
+          <span style={{
+            fontSize: 13, color: "#ccc", display: "inline-block",
+            transform: open ? "rotate(90deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}>›</span>
+        </div>
+      </div>
+
+      {/* ── Expandable exercise list ── */}
+      {open && (
+        <div style={{ borderTop: "1px solid #f0ede8", padding: "8px 1.1rem 1rem", display: "flex", flexDirection: "column", gap: 10 }}>
           {allExercises.map((ex, i) => (
-            <Card key={i} style={{ padding: "1rem 1.1rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{ex.name}</span>
-                <span style={{ fontSize: 12, color: "#aaa" }}>{maxW(ex.sets)} lbs max</span>
+            <div key={i}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "6px 0 6px" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{ex.name}</span>
+                <span style={{ fontSize: 11, color: "#aaa" }}>{maxW(ex.sets)} lbs max</span>
               </div>
-              <div style={{ borderTop: "1px solid #e8e5de", paddingTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                 {ex.sets.map((s, j) => (
-                  <div key={j} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
-                    <span style={{ width: 20, color: "#ccc", fontWeight: 700, textAlign: "center" }}>{s.setNumber}</span>
-                    <span style={{ color: "#777" }}>{s.reps} reps</span>
-                    <span style={{ color: "#777" }}>× {s.weight} lbs</span>
+                  <div key={j} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 12, paddingLeft: 4 }}>
+                    <span style={{ width: 16, color: "#ccc", fontWeight: 700, textAlign: "center", flexShrink: 0 }}>{s.setNumber}</span>
+                    <span style={{ color: "#888" }}>{s.reps} reps × {s.weight} lbs</span>
                     <span style={{ marginLeft: "auto", color: "#bbb" }}>{(s.reps * s.weight).toLocaleString()} vol</span>
                   </div>
                 ))}
               </div>
-            </Card>
+              {i < allExercises.length - 1 && <div style={{ height: 1, background: "#f0ede8", marginTop: 10 }} />}
+            </div>
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
 // ─── PROGRESS SCREEN ──────────────────────────────────────────────────────────
-function ProgressScreen({ logs, onDetailSheetChange }) {
+function ProgressScreen({ logs }) {
   const allExercises = [...new Set(logs.flatMap((l) => l.exercises.map((e) => e.name)))];
   const [selected, setSelected] = useState("");
   const [data, setData] = useState([]);
   const [fetching, setFetching] = useState(false);
-  const [detailMg, setDetailMg] = useState(null);
-  const [detailDelta, setDetailDelta] = useState(null);
-
-  const openDetail = (mg, delta) => {
-    setDetailMg(mg);
-    setDetailDelta(delta);
-    onDetailSheetChange?.(true);
-  };
-
-  const closeDetail = () => {
-    setDetailMg(null);
-    onDetailSheetChange?.(false);
-  };
 
   useEffect(() => {
     if (!selected && allExercises.length) setSelected(allExercises[0]);
@@ -327,33 +321,22 @@ function ProgressScreen({ logs, onDetailSheetChange }) {
   }
 
   return (
-    <>
-      <div style={{ padding: "1rem 1.25rem 140px", display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ padding: "1rem 1.25rem 140px", display: "flex", flexDirection: "column", gap: 14 }}>
 
-        <SectionLabel>Body parts</SectionLabel>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {muscleStats.map(({ mg, lastBest, delta, exNames, sessionCount }) => (
-            <Card
-              key={mg}
-              onClick={() => openDetail(mg, delta)}
-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.9rem 1.1rem" }}
-            >
-              <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{mg}</span>
-                <span style={{ fontSize: 11, color: "#aaa" }}>
-                  {sessionCount} session{sessionCount !== 1 ? "s" : ""} · {exNames.length} exercise{exNames.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                <span style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em" }}>
-                  {lastBest}<span style={{ fontSize: 11, fontWeight: 400, color: "#aaa", marginLeft: 2 }}>lbs</span>
-                </span>
-                <DeltaBadge delta={delta} />
-                <span style={{ fontSize: 14, color: "#ccc" }}>›</span>
-              </div>
-            </Card>
-          ))}
-        </div>
+      <SectionLabel>Body parts</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {muscleStats.map(({ mg, lastBest, delta, exNames, sessionCount }) => (
+          <MuscleAccordionRow
+            key={mg}
+            mg={mg}
+            lastBest={lastBest}
+            delta={delta}
+            exNames={exNames}
+            sessionCount={sessionCount}
+            logs={logs}
+          />
+        ))}
+      </div>
 
         <SectionLabel style={{ marginTop: 6 }}>Drill down</SectionLabel>
         <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
@@ -458,11 +441,6 @@ function ProgressScreen({ logs, onDetailSheetChange }) {
           </>
         )}
       </div>
-
-      {detailMg && (
-        <MuscleDetailSheet mg={detailMg} delta={detailDelta} logs={logs} onClose={closeDetail} />
-      )}
-    </>
   );
 }
 
@@ -910,7 +888,6 @@ export default function TrackingPage() {
   const [loadingLogs, setLoadingLogs] = useState(true);
   const [showLog, setShowLog] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  const [detailSheetOpen, setDetailSheetOpen] = useState(false);
 
   const deleteLog = async (id) => {
     if (confirmDeleteId !== id) {
@@ -1018,14 +995,14 @@ export default function TrackingPage() {
 
         {/* ── Content ── */}
         <main style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-          {tab === "progress" && <ProgressScreen logs={logs} onDetailSheetChange={setDetailSheetOpen} />}
+          {tab === "progress" && <ProgressScreen logs={logs} />}
           {tab === "history" && (
             <HistoryScreen logs={logs} loading={loadingLogs} onDelete={deleteLog} confirmDeleteId={confirmDeleteId} />
           )}
         </main>
 
         {/* ── FAB — hidden when any sheet is open so it never bleeds through overlays ── */}
-        {!showLog && !detailSheetOpen && (
+        {!showLog && (
         <div style={{
           position: "sticky", bottom: 0,
           padding: "0.75rem 1.25rem 2rem",
