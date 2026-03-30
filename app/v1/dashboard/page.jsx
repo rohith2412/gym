@@ -216,7 +216,9 @@ export default function Dashboard() {
           >
             <span style={{ fontSize: 18 }}>➕</span>
           </button>
-          <ProfilePicture size={40} />
+          <a href="/v1/profile">
+            <ProfilePicture size={40} />
+          </a>
         </div>
       </header>
 
