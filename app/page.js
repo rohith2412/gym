@@ -149,18 +149,25 @@ export default function LandingPage() {
         .btn-outline:hover { background: #f5f4f0 !important; }
       `}</style>
 
+      {/* ── Nav ── */}
       <nav style={{ ...S.nav, ...(scrolled ? S.navScrolled : {}) }}>
-        <div style={S.logo}>APEX</div>
-
+        <div style={S.logo}>
+          <span style={S.logoText}>
+            <span style={{ color: '#1a1a1a' }}>Your</span>
+            <span style={{ color: '#ff6b35' }}>Pocket</span>
+            <span style={{ color: '#1a1a1a' }}>Gym</span>
+          </span>
+        </div>
         <button
           className="btn-dark"
           style={S.navCta}
-          onClick={() => router.push("/intro")}
+          onClick={() => router.push("/v1/login")}
         >
           Start free
         </button>
       </nav>
 
+      {/* ── Hero ── */}
       <section style={S.hero}>
         <div style={S.glow} />
 
@@ -179,7 +186,7 @@ export default function LandingPage() {
 
         <p style={S.heroSub}>
           AI-powered training that adapts to your body, your life, and your
-          goals - from day one to your best ever.
+          goals — from day one to your best ever.
         </p>
 
         <div style={S.heroBtns}>
@@ -210,6 +217,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Ticker ── */}
       <div style={S.tickerOuter}>
         <div style={S.tickerInner}>
           {[...Array(2)].flatMap((_, rep) =>
@@ -229,140 +237,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      <section id="features" style={S.sec} data-s="feat">
-        <div style={{ ...S.secHead, ...r("feat") }}>
-          <p style={S.eyebrow}>Why Apex</p>
-          <h2 style={S.h2}>
-            Everything you need.
-            <br />
-            Nothing you don&#39;t.
-          </h2>
-        </div>
-        <div style={S.featGrid}>
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className="hover-card"
-              data-s={`f${i}`}
-              style={{ ...S.featCard, ...r(`f${i}`, i * 0.09) }}
-            >
-              <div style={S.featIcon}>{f.icon}</div>
-              <h3 style={S.featTitle}>{f.title}</h3>
-              <p style={S.featDesc}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section style={S.howOuter} data-s="how">
-        <div style={{ ...S.howCard, ...r("how") }}>
-          <div>
-            <p style={{ ...S.eyebrow, color: "#ff6b35" }}>How it works</p>
-            <h2
-              style={{
-                ...S.h2,
-                color: "#fafaf8",
-                fontSize: "clamp(1.8rem,7vw,2.6rem)",
-                marginBottom: "1rem",
-              }}
-            >
-              Answer 7 questions.
-              <br />
-              Get your plan instantly.
-            </h2>
-            <p
-              style={{
-                fontSize: 14,
-                color: "rgba(250,250,248,0.5)",
-                lineHeight: 1.8,
-                fontWeight: 300,
-              }}
-            >
-              Tell us your body, goals, and schedule. Our AI builds a fully
-              personalised training plan in seconds — then refines it every
-              week.
-            </p>
-            <button
-              className="btn-orange"
-              style={S.btnOrange}
-              onClick={() => router.push("/intro")}
-            >
-              Take the quiz →
-            </button>
-          </div>
-
-          <div style={S.stepsCol}>
-            {[
-              "Answer 7 quick questions",
-              "AI generates your plan",
-              "Train & log your sessions",
-              "Plan adapts every week",
-            ].map((step, i) => (
-              <div key={i} style={S.stepRow}>
-                <div style={S.stepNum}>{i + 1}</div>
-                <span style={S.stepText}>{step}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" style={S.sec} data-s="price">
-        <div style={{ ...S.secHead, ...r("price") }}>
-          <p style={S.eyebrow}>Pricing</p>
-          <h2 style={S.h2}>Simple, honest pricing.</h2>
-        </div>
-        <div style={S.pricingCol}>
-          {plans.map((pl, i) => (
-            <div
-              key={i}
-              className="hover-card"
-              data-s={`p${i}`}
-              style={{
-                ...S.planCard,
-                ...(pl.highlight ? S.planHL : {}),
-                ...r(`p${i}`, i * 0.1),
-              }}
-            >
-              {pl.highlight && <div style={S.planBadge}>Most popular</div>}
-              <div style={S.planName}>{pl.name}</div>
-              <div style={S.planPrice}>
-                {pl.price}
-                <span style={S.planPriceSub}> / {pl.sub}</span>
-              </div>
-              <div style={S.planLine} />
-              <ul style={S.planPerks}>
-                {pl.perks.map((p, j) => (
-                  <li key={j} style={S.perk}>
-                    <span
-                      style={{
-                        ...S.check,
-                        color: pl.highlight ? "#ff6b35" : "#22c55e",
-                      }}
-                    >
-                      ✓
-                    </span>
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className={pl.highlight ? "btn-dark" : "btn-outline"}
-                style={{
-                  ...S.planBtn,
-                  background: pl.highlight ? "#1a1a1a" : "transparent",
-                  color: pl.highlight ? "#fafaf8" : "#1a1a1a",
-                  border: pl.highlight ? "none" : "1.5px solid #d4d0c8",
-                }}
-                onClick={() => router.push("/intro")}
-              >
-                {pl.cta}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
+      {/* ── Testimonials ── */}
       <section
         id="results"
         style={{ ...S.sec, background: "#f4f2ed" }}
@@ -393,6 +268,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Final CTA ── */}
       <section style={S.finalOuter} data-s="final">
         <div style={{ ...S.finalInner, ...r("final") }}>
           <p style={{ ...S.eyebrow, color: "rgba(250,250,248,0.4)" }}>
@@ -411,9 +287,9 @@ export default function LandingPage() {
               maxWidth: 300,
               padding: "1.1rem 2rem",
             }}
-            onClick={() => router.push("/intro")}
+            onClick={() => router.push("/v1/login")}
           >
-            Build my free plan →
+            Start with us →
           </button>
           <p
             style={{
@@ -422,14 +298,15 @@ export default function LandingPage() {
               marginTop: "0.75rem",
             }}
           >
-            Free forever · No credit card · Takes 60 seconds
+            Free forever · No credit card
           </p>
         </div>
       </section>
 
+      {/* ── Footer ── */}
       <footer style={S.footer}>
-        <div style={S.footerLogo}>APEX</div>
-        <p style={S.footerSub}>© 2025 Apex Fitness. All rights reserved.</p>
+        <div style={S.footerLogo}>YourPocketGym</div>
+        <p style={S.footerSub}>© 2025 YourPocketGym. All rights reserved.</p>
       </footer>
     </div>
   );
@@ -461,24 +338,25 @@ const S = {
     borderBottom: "0.5px solid #e8e5de",
   },
   logo: {
-    fontSize: 17,
-    fontWeight: 800,
-    letterSpacing: "0.14em",
-    color: "#1a1a1a",
-  },
-  navMid: {
     display: "flex",
-    gap: "2rem",
-    position: "absolute",
-    left: "50%",
-    transform: "translateX(-50%)",
+    alignItems: "center",
+    gap: 8,
   },
-  navLink: {
-    fontSize: 13,
-    color: "#888",
-    letterSpacing: "0.01em",
-    transition: "color 0.15s",
+  logoMark: {
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: "0.1em",
+    color: "#fafaf8",
+    background: "#ff6b35",
+    borderRadius: 8,
+    padding: "3px 7px",
+    lineHeight: 1.4,
   },
+  logoText: {
+  fontSize: 18,
+  fontWeight: 800,
+  letterSpacing: '-0.035em',
+},
   navCta: {
     background: "#1a1a1a",
     color: "#fafaf8",
@@ -489,6 +367,7 @@ const S = {
     fontWeight: 500,
     fontFamily: "inherit",
     transition: "background 0.15s",
+    cursor: "pointer",
   },
   hero: {
     minHeight: "100svh",
@@ -570,6 +449,7 @@ const S = {
     maxWidth: 340,
     letterSpacing: "0.01em",
     transition: "background 0.15s",
+    cursor: "pointer",
   },
   btnOutline: {
     background: "transparent",
@@ -583,6 +463,7 @@ const S = {
     width: "100%",
     maxWidth: 340,
     transition: "background 0.15s",
+    cursor: "pointer",
   },
   btnOrange: {
     background: "#ff6b35",
@@ -598,6 +479,7 @@ const S = {
     letterSpacing: "0.01em",
     marginTop: "1.75rem",
     transition: "background 0.15s",
+    cursor: "pointer",
   },
   disclaimer: {
     fontSize: 11,
@@ -674,136 +556,6 @@ const S = {
     lineHeight: 1.1,
     color: "#1a1a1a",
   },
-  featGrid: { display: "flex", flexDirection: "column", gap: 10 },
-  featCard: {
-    background: "#fff",
-    border: "1px solid #e8e5de",
-    borderRadius: 18,
-    padding: "1.5rem",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-  },
-  featIcon: {
-    width: 46,
-    height: 46,
-    background: "#fafaf8",
-    border: "1px solid #e8e5de",
-    borderRadius: 12,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 20,
-    marginBottom: "1rem",
-  },
-  featTitle: {
-    fontSize: 15,
-    fontWeight: 700,
-    color: "#1a1a1a",
-    marginBottom: 6,
-  },
-  featDesc: { fontSize: 13, color: "#888", lineHeight: 1.7, fontWeight: 300 },
-  howOuter: { padding: "0 1.25rem 5rem" },
-  howCard: {
-    background: "#1a1a1a",
-    borderRadius: 24,
-    padding: "2.5rem 1.5rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "2.5rem",
-  },
-  stepsCol: { display: "flex", flexDirection: "column", gap: 10 },
-  stepRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    background: "rgba(255,255,255,0.05)",
-    border: "0.5px solid rgba(255,255,255,0.07)",
-    borderRadius: 12,
-    padding: "0.9rem 1rem",
-  },
-  stepNum: {
-    width: 28,
-    height: 28,
-    borderRadius: "50%",
-    background: "#ff6b35",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 12,
-    fontWeight: 700,
-    flexShrink: 0,
-  },
-  stepText: { fontSize: 13, color: "rgba(250,250,248,0.7)", fontWeight: 400 },
-  pricingCol: { display: "flex", flexDirection: "column", gap: 12 },
-  planCard: {
-    background: "#fff",
-    border: "1px solid #e8e5de",
-    borderRadius: 18,
-    padding: "1.75rem",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-    position: "relative",
-  },
-  planHL: {
-    border: "2px solid #1a1a1a",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-  },
-  planBadge: {
-    position: "absolute",
-    top: -13,
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "#1a1a1a",
-    color: "#fafaf8",
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: "0.07em",
-    padding: "0.3rem 1rem",
-    borderRadius: 99,
-    whiteSpace: "nowrap",
-  },
-  planName: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "#aaa",
-    letterSpacing: "0.12em",
-    textTransform: "uppercase",
-    marginBottom: "0.5rem",
-  },
-  planPrice: {
-    fontSize: 38,
-    fontWeight: 800,
-    color: "#1a1a1a",
-    letterSpacing: "-0.04em",
-    lineHeight: 1,
-  },
-  planPriceSub: { fontSize: 14, fontWeight: 300, color: "#aaa" },
-  planLine: { height: 1, background: "#e8e5de", margin: "1.25rem 0" },
-  planPerks: {
-    listStyle: "none",
-    display: "flex",
-    flexDirection: "column",
-    gap: 9,
-    marginBottom: "1.5rem",
-  },
-  perk: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 9,
-    fontSize: 13,
-    color: "#555",
-    lineHeight: 1.5,
-  },
-  check: { fontWeight: 700, flexShrink: 0, marginTop: 1 },
-  planBtn: {
-    width: "100%",
-    padding: "0.9rem",
-    borderRadius: 12,
-    fontSize: 14,
-    fontWeight: 600,
-    fontFamily: "inherit",
-    letterSpacing: "0.01em",
-    transition: "opacity 0.15s, background 0.15s",
-  },
   testiCol: { display: "flex", flexDirection: "column", gap: 10 },
   testiCard: {
     background: "#fff",
@@ -863,10 +615,10 @@ const S = {
     gap: 8,
   },
   footerLogo: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 800,
-    letterSpacing: "0.14em",
-    color: "#ccc",
+    letterSpacing: "-0.02em",
+    color: "#bbb",
   },
   footerSub: { fontSize: 11, color: "#bbb" },
 };

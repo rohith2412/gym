@@ -517,7 +517,7 @@ export default function ProfilePage() {
           </button>
         </Card>
 
-        <p style={S.version}>APEX · v1.0</p>
+        <p style={S.version}>YourPocketGym · v1.0</p>
       </main>
 
       {showEdit && intro && (

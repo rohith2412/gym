@@ -70,28 +70,27 @@ const LoginButton = () => {
       >
         <div className="apex-modal-sheet" onClick={(e) => e.stopPropagation()}>
           <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <div
-              style={{
-                fontSize: 17,
-                fontWeight: 800,
-                letterSpacing: "0.14em",
-                color: "#1a1a1a",
-                marginBottom: "0.75rem",
-              }}
-            >
-              APEX
-            </div>
+
             <h2
               style={{
                 fontSize: 22,
-                fontWeight: 800,
+                fontWeight: 400,
                 color: "#1a1a1a",
                 letterSpacing: "-0.02em",
                 marginBottom: "0.4rem",
               }}
             >
-              Welcome
+              Welcome 👋
             </h2>
+
+            <div style={S.root}>
+              <span style={S.logoText}>
+                <span style={{ color: "#1a1a1a" }}>Your</span>
+                <span style={{ color: "#ff6b35" }}>Pocket</span>
+                <span style={{ color: "#1a1a1a" }}>Gym</span>
+              </span>
+            </div>
+            
             <p style={{ fontSize: 13, color: "#888", fontWeight: 300 }}>
               Sign in to start building your plan
             </p>
@@ -151,12 +150,25 @@ const LoginButton = () => {
           cursor: "pointer",
         }}
       >
-        Build my plan - free
+        Join Now - free
       </span>
 
-      {typeof window !== 'undefined' && showGoogleButton && createPortal(modal, document.body)}
+      {typeof window !== "undefined" &&
+        showGoogleButton &&
+        createPortal(modal, document.body)}
     </>
   );
 };
 
 export default LoginButton;
+
+const S = {
+  root: {
+    marginBottom: "20px",
+  },
+  logoText: {
+    fontSize: 24,
+    fontWeight: 800,
+    letterSpacing: "-0.035em",
+  },
+};

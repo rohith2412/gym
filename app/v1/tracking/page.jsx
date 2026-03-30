@@ -975,7 +975,9 @@ export default function TrackingPage() {
               >
                 ➕
               </button>
-              <ProfilePicture size={40} />
+              <a href="/v1/profile">
+            <ProfilePicture size={40} />
+          </a>
             </div>
           </div>
 
