@@ -49,17 +49,14 @@ const EXERCISE_LIBRARY = {
 const MUSCLE_GROUPS = Object.keys(EXERCISE_LIBRARY);
 
 // ─── Body scroll lock ─────────────────────────────────────────────────────────
-// Uses a ref-counted approach so nested sheets don't fight each other.
-// The lock is applied once on first mount and released only when all consumers unmount.
+// Ref-counted so nested sheets don't fight each other.
 const scrollLockCount = { n: 0 };
 const scrollLockSavedY = { y: 0 };
 
 function useScrollLock(active) {
   useEffect(() => {
     if (!active) return;
-
     if (scrollLockCount.n === 0) {
-      // First lock — capture scroll position and freeze body
       scrollLockSavedY.y = window.scrollY;
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
@@ -67,11 +64,9 @@ function useScrollLock(active) {
       document.body.style.width = "100%";
     }
     scrollLockCount.n++;
-
     return () => {
       scrollLockCount.n--;
       if (scrollLockCount.n === 0) {
-        // Last consumer unmounted — restore
         document.body.style.overflow = "";
         document.body.style.position = "";
         document.body.style.top = "";
@@ -280,13 +275,24 @@ function MuscleDetailSheet({ mg, delta, logs, onClose }) {
 }
 
 // ─── PROGRESS SCREEN ──────────────────────────────────────────────────────────
-function ProgressScreen({ logs }) {
+function ProgressScreen({ logs, onDetailSheetChange }) {
   const allExercises = [...new Set(logs.flatMap((l) => l.exercises.map((e) => e.name)))];
   const [selected, setSelected] = useState("");
   const [data, setData] = useState([]);
   const [fetching, setFetching] = useState(false);
   const [detailMg, setDetailMg] = useState(null);
   const [detailDelta, setDetailDelta] = useState(null);
+
+  const openDetail = (mg, delta) => {
+    setDetailMg(mg);
+    setDetailDelta(delta);
+    onDetailSheetChange?.(true);
+  };
+
+  const closeDetail = () => {
+    setDetailMg(null);
+    onDetailSheetChange?.(false);
+  };
 
   useEffect(() => {
     if (!selected && allExercises.length) setSelected(allExercises[0]);
@@ -328,7 +334,7 @@ function ProgressScreen({ logs }) {
           {muscleStats.map(({ mg, lastBest, delta, exNames, sessionCount }) => (
             <Card
               key={mg}
-              onClick={() => { setDetailMg(mg); setDetailDelta(delta); }}
+              onClick={() => openDetail(mg, delta)}
               style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.9rem 1.1rem" }}
             >
               <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -453,7 +459,7 @@ function ProgressScreen({ logs }) {
       </div>
 
       {detailMg && (
-        <MuscleDetailSheet mg={detailMg} delta={detailDelta} logs={logs} onClose={() => setDetailMg(null)} />
+        <MuscleDetailSheet mg={detailMg} delta={detailDelta} logs={logs} onClose={closeDetail} />
       )}
     </>
   );
@@ -903,6 +909,7 @@ export default function TrackingPage() {
   const [loadingLogs, setLoadingLogs] = useState(true);
   const [showLog, setShowLog] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [detailSheetOpen, setDetailSheetOpen] = useState(false);
 
   const deleteLog = async (id) => {
     if (confirmDeleteId !== id) {
@@ -1010,13 +1017,14 @@ export default function TrackingPage() {
 
         {/* ── Content ── */}
         <main style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
-          {tab === "progress" && <ProgressScreen logs={logs} />}
+          {tab === "progress" && <ProgressScreen logs={logs} onDetailSheetChange={setDetailSheetOpen} />}
           {tab === "history" && (
             <HistoryScreen logs={logs} loading={loadingLogs} onDelete={deleteLog} confirmDeleteId={confirmDeleteId} />
           )}
         </main>
 
-        {/* ── FAB ── */}
+        {/* ── FAB — hidden when any sheet is open so it never bleeds through overlays ── */}
+        {!showLog && !detailSheetOpen && (
         <div style={{
           position: "sticky", bottom: 0,
           padding: "0.75rem 1.25rem 2rem",
@@ -1041,6 +1049,7 @@ export default function TrackingPage() {
             Log workout
           </button>
         </div>
+        )}
       </div>
 
       {showLog && <LogSheet onClose={() => setShowLog(false)} onSaved={fetchLogs} />}
