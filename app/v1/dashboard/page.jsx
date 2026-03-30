@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ProfilePicture from "@/components/ProfilePicture";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────────────── lbs 
 function totalVol(log) {
   return log.exercises.reduce(
     (sum, ex) => sum + ex.sets.reduce((s, set) => s + set.reps * set.weight, 0),
@@ -198,7 +198,7 @@ export default function Dashboard() {
           0%   { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
-        ::-webkit-scrollbar { display: none; }
+        ::-webkit-scrollbsar { display: none; }
         button { cursor: pointer; }
       `}</style>
 
@@ -259,7 +259,7 @@ export default function Dashboard() {
                   </div>
                   {weekVolume > 0 && (
                     <p style={{ fontSize: 12, color: "#aaa", marginTop: 2 }}>
-                      {weekVolume.toLocaleString()} kg lifted
+                      {weekVolume.toLocaleString()} lbs lifted
                     </p>
                   )}
                 </div>
@@ -357,7 +357,7 @@ export default function Dashboard() {
               </>
             )} */}
 
-            {/* ── Personal bests ── */}
+            {/* ── Personal bests ── kg  */}
             {topBests.length > 0 && (
               <>
                 <SectionLabel>Personal bests</SectionLabel>
@@ -381,7 +381,7 @@ export default function Dashboard() {
                           {name}
                         </p>
                         <p style={{ fontSize: 14, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", flexShrink: 0 }}>
-                          {weight} <span style={{ fontSize: 11, fontWeight: 400, color: "#aaa" }}>kg</span>
+                          {weight} <span style={{ fontSize: 11, fontWeight: 400, color: "#aaa" }}>lbs</span>
                         </p>
                       </div>
                     ))}
@@ -445,7 +445,7 @@ export default function Dashboard() {
                           {log.exercises.map((e) => e.name).join(", ")}
                         </p>
                         <p style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
-                          {sets} sets · {vol.toLocaleString()} kg
+                          {sets} sets · {vol.toLocaleString()} lbs
                         </p>
                       </div>
 

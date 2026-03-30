@@ -49,25 +49,35 @@ const EXERCISE_LIBRARY = {
 const MUSCLE_GROUPS = Object.keys(EXERCISE_LIBRARY);
 
 // ─── Body scroll lock ─────────────────────────────────────────────────────────
-// Prevents the page behind the sheet from scrolling on iOS/Android.
+// Uses a ref-counted approach so nested sheets don't fight each other.
+// The lock is applied once on first mount and released only when all consumers unmount.
+const scrollLockCount = { n: 0 };
+const scrollLockSavedY = { y: 0 };
+
 function useScrollLock(active) {
-  const scrollY = useRef(0);
   useEffect(() => {
     if (!active) return;
-    scrollY.current = window.scrollY;
-    const prev = {
-      overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      top: document.body.style.top,
-      width: document.body.style.width,
-    };
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY.current}px`;
-    document.body.style.width = "100%";
+
+    if (scrollLockCount.n === 0) {
+      // First lock — capture scroll position and freeze body
+      scrollLockSavedY.y = window.scrollY;
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollLockSavedY.y}px`;
+      document.body.style.width = "100%";
+    }
+    scrollLockCount.n++;
+
     return () => {
-      Object.assign(document.body.style, prev);
-      window.scrollTo(0, scrollY.current);
+      scrollLockCount.n--;
+      if (scrollLockCount.n === 0) {
+        // Last consumer unmounted — restore
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, scrollLockSavedY.y);
+      }
     };
   }, [active]);
 }
@@ -168,7 +178,6 @@ const B = {
 };
 
 // ─── Shared overlay / sheet styles ───────────────────────────────────────────
-// z-index 9999 ensures sheets appear above sticky header (z-index 10).
 const OVERLAY = {
   position: "fixed", inset: 0,
   background: "rgba(0,0,0,0.5)",
@@ -190,13 +199,12 @@ const HANDLE = {
   borderRadius: 99, margin: "12px auto 0", flexShrink: 0,
 };
 
-// All number inputs: font-size MUST be ≥ 16px or iOS Safari will zoom.
 const NUM_INPUT = {
   flex: 1,
   border: "1px solid #e8e5de",
   borderRadius: 10,
   padding: "8px 4px",
-  fontSize: 16,        // ← critical: prevents iOS zoom
+  fontSize: 16,
   fontWeight: 800,
   textAlign: "center",
   color: "#1a1a1a",
@@ -251,14 +259,14 @@ function MuscleDetailSheet({ mg, delta, logs, onClose }) {
             <Card key={i} style={{ padding: "1rem 1.1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{ex.name}</span>
-                <span style={{ fontSize: 12, color: "#aaa" }}>{maxW(ex.sets)} kg max</span>
+                <span style={{ fontSize: 12, color: "#aaa" }}>{maxW(ex.sets)} lbs max</span>
               </div>
               <div style={{ borderTop: "1px solid #e8e5de", paddingTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                 {ex.sets.map((s, j) => (
                   <div key={j} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
                     <span style={{ width: 20, color: "#ccc", fontWeight: 700, textAlign: "center" }}>{s.setNumber}</span>
                     <span style={{ color: "#777" }}>{s.reps} reps</span>
-                    <span style={{ color: "#777" }}>× {s.weight} kg</span>
+                    <span style={{ color: "#777" }}>× {s.weight} lbs</span>
                     <span style={{ marginLeft: "auto", color: "#bbb" }}>{(s.reps * s.weight).toLocaleString()} vol</span>
                   </div>
                 ))}
@@ -331,7 +339,7 @@ function ProgressScreen({ logs }) {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                 <span style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em" }}>
-                  {lastBest}<span style={{ fontSize: 11, fontWeight: 400, color: "#aaa", marginLeft: 2 }}>kg</span>
+                  {lastBest}<span style={{ fontSize: 11, fontWeight: 400, color: "#aaa", marginLeft: 2 }}>lbs</span>
                 </span>
                 <DeltaBadge delta={delta} />
                 <span style={{ fontSize: 14, color: "#ccc" }}>›</span>
@@ -372,7 +380,7 @@ function ProgressScreen({ logs }) {
               <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#aaa", margin: 0 }}>Best weight</p>
                 <p style={{ fontSize: 32, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.05em", lineHeight: 1, margin: 0 }}>
-                  {last.bestWeight}<span style={{ fontSize: 13, fontWeight: 400, color: "#aaa", marginLeft: 4 }}>kg</span>
+                  {last.bestWeight}<span style={{ fontSize: 13, fontWeight: 400, color: "#aaa", marginLeft: 4 }}>lbs</span>
                 </p>
                 {prev && <DeltaBadge delta={last.bestWeight - prev.bestWeight} />}
               </div>
@@ -430,10 +438,10 @@ function ProgressScreen({ logs }) {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", margin: 0 }}>
-                      {d.sets} sets · {d.totalReps} reps · {d.bestWeight} kg max
+                      {d.sets} sets · {d.totalReps} reps · {d.bestWeight} lbs max
                     </p>
                     <p style={{ fontSize: 11, color: "#aaa", margin: "2px 0 0" }}>
-                      {d.totalVolume.toLocaleString()} kg total
+                      {d.totalVolume.toLocaleString()} lbs total
                     </p>
                   </div>
                   <DeltaBadge delta={d.volumeDelta} neutral={d.improved === null} />
@@ -452,8 +460,9 @@ function ProgressScreen({ logs }) {
 }
 
 // ─── EXERCISE PICKER SHEET ────────────────────────────────────────────────────
+// NOTE: No useScrollLock here — LogSheet already holds the lock.
+// Adding a second lock caused the body position to reset on picker close.
 function ExercisePicker({ muscleGroup, alreadyAdded, onConfirm, onClose }) {
-  useScrollLock(true);
   const list = EXERCISE_LIBRARY[muscleGroup] || [];
   const [picked, setPicked] = useState([]);
   const toggle = (name) =>
@@ -625,7 +634,6 @@ function LogSheet({ onClose, onSaved }) {
                 <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", margin: 0, letterSpacing: "-0.04em" }}>
                   Log workout
                 </h2>
-                {/* Date input: must be 16px to prevent zoom; shrink visually with transform */}
                 <input
                   type="date"
                   value={date}
@@ -633,7 +641,7 @@ function LogSheet({ onClose, onSaved }) {
                   style={{
                     border: "1px solid #e8e5de", borderRadius: 10,
                     padding: "6px 10px",
-                    fontSize: 16,                          // ← prevents iOS zoom
+                    fontSize: 16,
                     transform: "scale(0.82)",
                     transformOrigin: "right center",
                     color: "#1a1a1a", fontFamily: "inherit",
@@ -710,7 +718,7 @@ function LogSheet({ onClose, onSaved }) {
 
                     {/* Col headers */}
                     <div style={{ display: "flex", alignItems: "center", gap: 8, paddingBottom: 6, borderBottom: "1px solid #e8e5de", marginBottom: 6 }}>
-                      {["SET", "REPS", "KG"].map((lbl) => (
+                      {["SET", "REPS", "LBS"].map((lbl) => (
                         <span key={lbl} style={{ flex: 1, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "#ccc", textAlign: "center" }}>{lbl}</span>
                       ))}
                       <span style={{ width: 32 }} />
@@ -767,7 +775,7 @@ function LogSheet({ onClose, onSaved }) {
                   style={{
                     border: "1px solid #e8e5de", borderRadius: 14,
                     padding: "12px 14px",
-                    fontSize: 16,   // ← 16px prevents iOS zoom
+                    fontSize: 16,
                     color: "#1a1a1a", fontFamily: "inherit",
                     outline: "none", resize: "none",
                     background: "#fff", width: "100%", boxSizing: "border-box",
@@ -870,7 +878,7 @@ function HistoryScreen({ logs, loading, onDelete, confirmDeleteId }) {
                     {ex.name}
                   </span>
                   <span style={{ fontSize: 11, color: "#aaa", flexShrink: 0 }}>
-                    {ex.sets.length} sets · {maxW(ex.sets)} kg · {totalVol(ex.sets).toLocaleString()} vol
+                    {ex.sets.length} sets · {maxW(ex.sets)} lbs · {totalVol(ex.sets).toLocaleString()} vol
                   </span>
                 </div>
               ))}
@@ -929,7 +937,6 @@ export default function TrackingPage() {
           to   { transform: translateY(0);    opacity: 1; }
         }
         ::-webkit-scrollbar { display: none; }
-        /* Prevent iOS zoom on focus — browser zooms when font-size < 16px */
         input, select, textarea { font-size: 16px !important; }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -976,8 +983,8 @@ export default function TrackingPage() {
                 ➕
               </button>
               <a href="/v1/profile">
-            <ProfilePicture size={40} />
-          </a>
+                <ProfilePicture size={40} />
+              </a>
             </div>
           </div>
 
