@@ -12,9 +12,7 @@ function toLocalISO(date = new Date()) {
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
-function todayISO() {
-  return toLocalISO();
-}
+function todayISO() { return toLocalISO(); }
 function sumMacros(logs) {
   const t = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
   logs.forEach((l) => {
@@ -27,14 +25,17 @@ function sumMacros(logs) {
   return t;
 }
 function round1(n) { return Math.round(n * 10) / 10; }
-function fmt(n) { return Math.round(n); }
+function fmt(n)    { return Math.round(n); }
+
+// Better emojis per meal type
 function mealEmoji(type) {
-  return { breakfast: "🌅", lunch: "☀️", dinner: "🌙", snack: "🍎" }[type] ?? "🍽️";
+  return { breakfast: "🥞", lunch: "🥗", dinner: "🍜", snack: "🫐" }[type] ?? "🍽️";
+}
+function mealTypeLabel(type) {
+  return { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner", snack: "Snack" }[type] ?? type;
 }
 function timeStr(dateStr) {
-  return new Date(dateStr).toLocaleTimeString("en-US", {
-    hour: "numeric", minute: "2-digit",
-  });
+  return new Date(dateStr).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 function getGreeting() {
   const h = new Date().getHours();
@@ -43,29 +44,27 @@ function getGreeting() {
   return "evening";
 }
 
-// ─── Macro ring (small SVG) ───────────────────────────────────────────────────
-function MacroRing({ value, max, color, label, unit = "g", size = 68 }) {
-  const r   = (size - 10) / 2;
+// ─── Macro ring ───────────────────────────────────────────────────────────────
+function MacroRing({ value, max, color, label, size = 68 }) {
+  const r    = (size - 10) / 2;
   const circ = 2 * Math.PI * r;
   const pct  = max > 0 ? Math.min(value / max, 1) : 0;
   const dash = pct * circ;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f0ede6" strokeWidth={6} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#f0ede6" strokeWidth={6} />
         <circle
-          cx={size / 2} cy={size / 2} r={r} fill="none"
+          cx={size/2} cy={size/2} r={r} fill="none"
           stroke={color} strokeWidth={6}
-          strokeDasharray={`${dash} ${circ}`}
-          strokeLinecap="round"
+          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
           style={{ transition: "stroke-dasharray 0.6s ease" }}
         />
         <text
-          x={size / 2} y={size / 2}
-          textAnchor="middle" dominantBaseline="central"
+          x={size/2} y={size/2} textAnchor="middle" dominantBaseline="central"
           fill="#1a1a1a" fontFamily="'Plus Jakarta Sans', sans-serif"
           fontSize={13} fontWeight={800}
-          style={{ transform: "rotate(90deg)", transformOrigin: `${size / 2}px ${size / 2}px` }}
+          style={{ transform: "rotate(90deg)", transformOrigin: `${size/2}px ${size/2}px` }}
         >
           {fmt(value)}
         </text>
@@ -77,26 +76,19 @@ function MacroRing({ value, max, color, label, unit = "g", size = 68 }) {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Primitives ───────────────────────────────────────────────────────────────
 function Card({ children, style = {}, onClick }) {
   return (
-    <div
-      onClick={onClick}
-      style={{
-        background: "#fff",
-        border: "1px solid #e8e5de",
-        borderRadius: 20,
-        padding: "1.25rem",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-        cursor: onClick ? "pointer" : undefined,
-        ...style,
-      }}
-    >
+    <div onClick={onClick} style={{
+      background: "#fff", border: "1px solid #e8e5de",
+      borderRadius: 20, padding: "1.25rem",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      cursor: onClick ? "pointer" : undefined, ...style,
+    }}>
       {children}
     </div>
   );
 }
-
 function SectionLabel({ children, action, onAction }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.65rem" }}>
@@ -111,7 +103,6 @@ function SectionLabel({ children, action, onAction }) {
     </div>
   );
 }
-
 function SkeletonCard({ height = 90 }) {
   return (
     <div style={{ background: "#fff", border: "1px solid #e8e5de", borderRadius: 20, height, overflow: "hidden", position: "relative" }}>
@@ -120,34 +111,32 @@ function SkeletonCard({ height = 90 }) {
   );
 }
 
-// ─── Upload / Camera sheet ────────────────────────────────────────────────────
+// ─── Log Sheet (photo upload) ─────────────────────────────────────────────────
 function LogSheet({ onClose, onSuccess }) {
-  const fileRef      = useRef(null);
-  const [preview, setPreview]     = useState(null);
-  const [base64,  setBase64]      = useState(null);
-  const [mealType, setMealType]   = useState("snack");
-  const [loading, setLoading]     = useState(false);
-  const [error,   setError]       = useState(null);
+  const fileRef = useRef(null);
+  const [preview,  setPreview]  = useState(null);
+  const [base64,   setBase64]   = useState(null);
+  // No default mealType — user must pick
+  const [mealType, setMealType] = useState(null);
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState(null);
 
   function handleFile(file) {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target.result);
-      setBase64(e.target.result);
-    };
+    reader.onload = (e) => { setPreview(e.target.result); setBase64(e.target.result); };
     reader.readAsDataURL(file);
   }
 
   async function submit() {
-    if (!base64) return;
+    if (!base64 || !mealType) return;
     setLoading(true);
     setError(null);
     try {
       const res  = await fetch("/api/meal-log", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ image: base64, mealType }),
+        body: JSON.stringify({ image: base64, mealType }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Unknown error");
@@ -159,33 +148,32 @@ function LogSheet({ onClose, onSuccess }) {
     }
   }
 
-  const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
+  const MEAL_TYPES = [
+    { key: "breakfast", label: "Breakfast", emoji: "🥞" },
+    { key: "lunch",     label: "Lunch",     emoji: "🥗" },
+    { key: "dinner",    label: "Dinner",    emoji: "🍜" },
+    { key: "snack",     label: "Snack",     emoji: "🫐" },
+  ];
+
+  const canSubmit = base64 && mealType && !loading;
 
   return (
     <>
-      {/* Backdrop */}
       <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 40, backdropFilter: "blur(3px)" }} />
-
-      {/* Sheet */}
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430, background: "#fafaf8",
-        borderRadius: "24px 24px 0 0",
-        padding: "1.5rem 1.25rem 2.5rem",
+        borderRadius: "24px 24px 0 0", padding: "1.5rem 1.25rem 2.5rem",
         zIndex: 50, boxShadow: "0 -4px 40px rgba(0,0,0,0.12)",
       }}>
-        {/* Handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>Log a meal</h2>
 
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>
-          Log a meal
-        </h2>
-
-        {/* Photo upload area */}
+        {/* Photo area */}
         <div
           onClick={() => fileRef.current?.click()}
           style={{
-            height: 180, borderRadius: 16,
+            height: 170, borderRadius: 16,
             border: preview ? "none" : "2px dashed #e0ddd6",
             background: preview ? "transparent" : "#f4f2ed",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -197,7 +185,7 @@ function LogSheet({ onClose, onSuccess }) {
             <img src={preview} alt="meal" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 16 }} />
           ) : (
             <div style={{ textAlign: "center" }}>
-              <p style={{ fontSize: 32, marginBottom: 8 }}>📷</p>
+              <p style={{ fontSize: 36, marginBottom: 6 }}>📸</p>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#bbb" }}>Tap to upload or take a photo</p>
             </div>
           )}
@@ -205,49 +193,48 @@ function LogSheet({ onClose, onSuccess }) {
             <button
               onClick={(e) => { e.stopPropagation(); setPreview(null); setBase64(null); }}
               style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", border: "none", borderRadius: 99, width: 28, height: 28, fontSize: 14, cursor: "pointer" }}
-            >
-              ✕
-            </button>
+            >✕</button>
           )}
         </div>
-        <input
-          ref={fileRef} type="file" accept="image/*" capture="environment"
-          style={{ display: "none" }}
-          onChange={(e) => handleFile(e.target.files[0])}
-        />
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
 
-        {/* Meal type selector */}
-        <div style={{ display: "flex", gap: 6, marginBottom: "1.25rem" }}>
+        {/* Meal type — no default, must tap one */}
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#aaa", marginBottom: 8 }}>
+          What meal is this?
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: "1.25rem" }}>
           {MEAL_TYPES.map((t) => (
             <button
-              key={t}
-              onClick={() => setMealType(t)}
+              key={t.key}
+              onClick={() => setMealType(t.key)}
               style={{
-                flex: 1, padding: "0.5rem 0", borderRadius: 10, border: "1px solid",
-                borderColor: mealType === t ? "#1a1a1a" : "#e8e5de",
-                background: mealType === t ? "#1a1a1a" : "#fff",
-                color: mealType === t ? "#fafaf8" : "#aaa",
-                fontSize: 10, fontWeight: 700, letterSpacing: "0.08em",
-                textTransform: "capitalize", fontFamily: "inherit", cursor: "pointer",
+                padding: "0.75rem", borderRadius: 14, border: "1px solid",
+                borderColor: mealType === t.key ? "#1a1a1a" : "#e8e5de",
+                background: mealType === t.key ? "#1a1a1a" : "#fff",
+                color: mealType === t.key ? "#fafaf8" : "#1a1a1a",
+                fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
               }}
             >
-              {mealEmoji(t)} {t}
+              <span style={{ fontSize: 18 }}>{t.emoji}</span> {t.label}
             </button>
           ))}
         </div>
 
-        {error && (
-          <p style={{ fontSize: 12, color: "#e53e3e", marginBottom: 10, fontWeight: 600 }}>
-            ⚠️ {error}
+        {!mealType && (
+          <p style={{ fontSize: 12, color: "#ffb347", fontWeight: 600, marginBottom: 10 }}>
+            👆 Select a meal type above
           </p>
+        )}
+        {error && (
+          <p style={{ fontSize: 12, color: "#e53e3e", marginBottom: 10, fontWeight: 600 }}>⚠️ {error}</p>
         )}
 
         <button
           onClick={submit}
-          disabled={!base64 || loading}
+          disabled={!canSubmit}
           style={{
-            ...S.ctaBtn,
-            opacity: (!base64 || loading) ? 0.5 : 1,
+            ...S.ctaBtn, opacity: canSubmit ? 1 : 0.4,
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           }}
         >
@@ -256,16 +243,14 @@ function LogSheet({ onClose, onSuccess }) {
               <span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
               Analysing with AI…
             </>
-          ) : (
-            "✨ Analyse & log meal"
-          )}
+          ) : "✨ Analyse & log meal"}
         </button>
       </div>
     </>
   );
 }
 
-// ─── Result sheet (shown after AI analysis) ───────────────────────────────────
+// ─── Result Sheet ─────────────────────────────────────────────────────────────
 function ResultSheet({ log, onClose }) {
   return (
     <>
@@ -273,26 +258,23 @@ function ResultSheet({ log, onClose }) {
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430, background: "#fafaf8",
-        borderRadius: "24px 24px 0 0",
-        padding: "1.5rem 1.25rem 2.5rem",
+        borderRadius: "24px 24px 0 0", padding: "1.5rem 1.25rem 2.5rem",
         zIndex: 50, boxShadow: "0 -4px 40px rgba(0,0,0,0.12)",
         maxHeight: "80dvh", overflowY: "auto",
       }}>
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
 
-        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.25rem" }}>
-          <span style={{ fontSize: 24 }}>{mealEmoji(log.mealType)}</span>
+          <span style={{ fontSize: 30 }}>{mealEmoji(log.mealType)}</span>
           <div>
-            <p style={{ fontSize: 12, color: "#aaa", fontWeight: 500, textTransform: "capitalize" }}>{log.mealType}</p>
+            <p style={{ fontSize: 12, color: "#aaa", fontWeight: 500 }}>{mealTypeLabel(log.mealType)}</p>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>
               {fmt(log.totals?.calories ?? 0)} kcal
             </h2>
           </div>
-          <span style={{ marginLeft: "auto", fontSize: 22, background: "#f0ede6", padding: "0.4rem", borderRadius: 10 }}>✅</span>
+          <span style={{ marginLeft: "auto", fontSize: 22, background: "rgba(34,197,94,0.1)", padding: "0.4rem", borderRadius: 10 }}>✅</span>
         </div>
 
-        {/* Macro row */}
         <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "1.25rem", padding: "1rem", background: "#f4f2ed", borderRadius: 16 }}>
           {[
             { label: "Protein", value: log.totals?.protein, color: "#ff6b35" },
@@ -300,13 +282,14 @@ function ResultSheet({ log, onClose }) {
             { label: "Fat",     value: log.totals?.fat,     color: "#bbb" },
           ].map((m) => (
             <div key={m.label} style={{ textAlign: "center" }}>
-              <p style={{ fontSize: 18, fontWeight: 800, color: m.color, letterSpacing: "-0.04em" }}>{fmt(m.value ?? 0)}<span style={{ fontSize: 10, fontWeight: 400, color: "#aaa" }}>g</span></p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: m.color, letterSpacing: "-0.04em" }}>
+                {fmt(m.value ?? 0)}<span style={{ fontSize: 10, fontWeight: 400, color: "#aaa" }}>g</span>
+              </p>
               <p style={{ fontSize: 10, fontWeight: 700, color: "#bbb", letterSpacing: "0.08em", textTransform: "uppercase" }}>{m.label}</p>
             </div>
           ))}
         </div>
 
-        {/* Food items */}
         <SectionLabel>Detected foods</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: "1.25rem" }}>
           {log.foods.map((f, i) => (
@@ -331,10 +314,84 @@ function ResultSheet({ log, onClose }) {
             💡 {log.aiNotes}
           </p>
         )}
-
         <button onClick={onClose} style={S.ctaBtn}>Done</button>
       </div>
     </>
+  );
+}
+
+// ─── Meal card (matching tracking page style) ─────────────────────────────────
+function MealCard({ log, index, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const date = new Date(log.date);
+
+  function handleDelete(e) {
+    e.stopPropagation();
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 3000);
+      return;
+    }
+    onDelete(log._id);
+  }
+
+  return (
+    <Card style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem 1.1rem" }}>
+      {/* Date block — same style as tracking page */}
+      <div style={{
+        width: 44, height: 44, borderRadius: 13,
+        background: index === 0 ? "#1a1a1a" : "#f4f2ed",
+        border: "1px solid #e8e5de",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.06em", color: index === 0 ? "rgba(255,255,255,0.45)" : "#ccc" }}>
+          {date.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
+        </span>
+        <span style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.1, color: index === 0 ? "#fff" : "#1a1a1a" }}>
+          {date.getDate()}
+        </span>
+      </div>
+
+      {/* Meal info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 16 }}>{mealEmoji(log.mealType)}</span>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{mealTypeLabel(log.mealType)}</p>
+          {index === 0 && (
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#ff6b35", background: "rgba(255,107,53,0.1)", borderRadius: 99, padding: "0.22rem 0.55rem" }}>
+              Latest
+            </span>
+          )}
+        </div>
+        <p style={{ fontSize: 11, color: "#aaa", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {log.foods.map((f) => f.name).join(", ")}
+        </p>
+        <p style={{ fontSize: 10, color: "#ccc", marginTop: 2 }}>{timeStr(log.date)}</p>
+      </div>
+
+      {/* Calories */}
+      <div style={{ textAlign: "right", flexShrink: 0 }}>
+        <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>{fmt(log.totals?.calories ?? 0)}</p>
+        <p style={{ fontSize: 10, color: "#bbb" }}>kcal</p>
+        <p style={{ fontSize: 10, color: "#ff6b35", marginTop: 2 }}>{fmt(log.totals?.protein ?? 0)}g prot</p>
+      </div>
+
+      {/* Delete — confirm style matching tracking page */}
+      <button
+        onClick={handleDelete}
+        style={{
+          border: "none", fontSize: 11, fontWeight: 700,
+          color: confirmDelete ? "#f43f5e" : "#ccc",
+          cursor: "pointer", fontFamily: "inherit",
+          padding: "4px 8px", borderRadius: 8,
+          background: confirmDelete ? "rgba(244,63,94,0.08)" : "transparent",
+          transition: "all 0.15s", flexShrink: 0,
+        }}
+      >
+        {confirmDelete ? "Confirm?" : "Delete"}
+      </button>
+    </Card>
   );
 }
 
@@ -343,12 +400,12 @@ export default function NutritionPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [logs,      setLogs]      = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [vis,       setVis]       = useState(false);
-  const [showLog,   setShowLog]   = useState(false);
-  const [result,    setResult]    = useState(null);
-  const [selDate,   setSelDate]   = useState(todayISO());
+  const [logs,    setLogs]    = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [vis,     setVis]     = useState(false);
+  const [showLog, setShowLog] = useState(false);
+  const [result,  setResult]  = useState(null);
+  const [selDate, setSelDate] = useState(todayISO());
 
   // Auth guard
   useEffect(() => {
@@ -357,9 +414,10 @@ export default function NutritionPage() {
     if (session && !session.user?.hasIntro) { router.replace("/v1/StartersIntro"); return; }
   }, [status, session, router]);
 
-  // Fetch logs for selected date
+  // Fetch logs — vis resets on date change so animation re-fires
   const fetchLogs = useCallback(async (date) => {
     setLoading(true);
+    setVis(false);
     try {
       const res  = await fetch(`/api/meal-log?date=${date}`);
       const json = await res.json();
@@ -367,7 +425,8 @@ export default function NutritionPage() {
     } catch (e) { console.error(e); }
     finally {
       setLoading(false);
-      setTimeout(() => setVis(true), 40);
+      // Small delay so the fade-in fires after content renders
+      requestAnimationFrame(() => setTimeout(() => setVis(true), 40));
     }
   }, []);
 
@@ -378,17 +437,14 @@ export default function NutritionPage() {
 
   if (status === "loading" || (session && !session.user?.hasIntro)) return null;
 
-  const firstName  = session?.user?.name?.split(" ")[0] ?? "Athlete";
+  const firstName   = session?.user?.name?.split(" ")[0] ?? "Athlete";
   const todayTotals = sumMacros(logs);
-  const isToday    = selDate === todayISO();
-
-  // Goals (you can make these dynamic / from user intro later)
-  const GOALS = { calories: 2200, protein: 160, carbs: 250, fat: 70 };
+  const isToday     = selDate === todayISO();
+  const GOALS       = { calories: 2200, protein: 160, carbs: 250, fat: 70 };
 
   function handleSuccess(newLog) {
     setShowLog(false);
     setResult(newLog);
-    // Optimistic prepend
     if (toLocalISO(new Date(newLog.date)) === selDate) {
       setLogs((prev) => [newLog, ...prev]);
     }
@@ -399,22 +455,19 @@ export default function NutritionPage() {
     setLogs((prev) => prev.filter((l) => l._id !== id));
   }
 
-  // ── Date nav helpers ──
   function shiftDate(days) {
     const d = new Date(selDate);
     d.setDate(d.getDate() + days);
     const iso = toLocalISO(d);
-    if (iso <= todayISO()) {
-      setSelDate(iso);
-      setVis(false);
-    }
+    if (iso <= todayISO()) setSelDate(iso);
   }
+
   function dateLabel() {
     if (selDate === todayISO()) return "Today";
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     if (selDate === toLocalISO(yesterday)) return "Yesterday";
-    return new Date(selDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return new Date(selDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
   const calPct = Math.min((todayTotals.calories / GOALS.calories) * 100, 100);
@@ -431,34 +484,37 @@ export default function NutritionPage() {
         button { cursor: pointer; }
       `}</style>
 
-      {/* ── Sticky header ── */}
+      {/* ── Header ── */}
       <header style={S.header}>
         <div>
           <p style={S.greeting}>Good {getGreeting()}</p>
           <h1 style={S.name}>{firstName} 🥗</h1>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button
-            style={S.iconBtn}
-            onClick={() => setShowLog(true)}
-            title="Log meal"
-          >
+          <button style={S.iconBtn} onClick={() => setShowLog(true)} title="Log meal">
             <span style={{ fontSize: 18 }}>➕</span>
           </button>
-          <a href="/v1/profile">
-            <ProfilePicture size={40} />
-          </a>
+          <a href="/v1/profile"><ProfilePicture size={40} /></a>
         </div>
       </header>
 
       {/* ── Body ── */}
-      <main style={{ ...S.main, opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(10px)", transition: "opacity 0.45s ease, transform 0.45s ease" }}>
+      <main style={{
+        ...S.main,
+        opacity: vis ? 1 : 0,
+        transform: vis ? "translateY(0)" : "translateY(10px)",
+        transition: "opacity 0.38s ease, transform 0.38s ease",
+      }}>
 
-        {/* ── Date navigator ── */}
+        {/* Date nav */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <button onClick={() => shiftDate(-1)} style={S.navBtn}>‹</button>
           <p style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" }}>{dateLabel()}</p>
-          <button onClick={() => shiftDate(1)} style={{ ...S.navBtn, opacity: selDate === todayISO() ? 0.25 : 1 }} disabled={selDate === todayISO()}>›</button>
+          <button
+            onClick={() => shiftDate(1)}
+            style={{ ...S.navBtn, opacity: isToday ? 0.25 : 1 }}
+            disabled={isToday}
+          >›</button>
         </div>
 
         {loading ? (
@@ -470,7 +526,7 @@ export default function NutritionPage() {
           </div>
         ) : (
           <>
-            {/* ── Calorie summary card ── */}
+            {/* Calorie summary */}
             <Card style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
                 <div>
@@ -506,79 +562,28 @@ export default function NutritionPage() {
               </div>
             </Card>
 
-            {/* ── Meal log ── */}
+            {/* Meals list */}
             <SectionLabel>Meals logged</SectionLabel>
 
             {logs.length === 0 ? (
               <Card style={{ textAlign: "center", padding: "2.5rem 1.5rem", marginBottom: 10 }}>
-                <p style={{ fontSize: 28, marginBottom: 10 }}>🍽️</p>
+                <p style={{ fontSize: 32, marginBottom: 10 }}>🍽️</p>
                 <p style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 6 }}>
                   {isToday ? "No meals logged yet" : "No meals on this day"}
                 </p>
                 <p style={{ fontSize: 13, color: "#aaa", lineHeight: 1.7, marginBottom: "1.25rem" }}>
                   {isToday ? "Take a photo of your next meal to track calories and macros automatically." : "Nothing was logged here."}
                 </p>
-                {isToday && (
-                  <button onClick={() => setShowLog(true)} style={S.ctaBtn}>
-                    📷 Log a meal →
-                  </button>
-                )}
+                {isToday && <button onClick={() => setShowLog(true)} style={S.ctaBtn}>📸 Log a meal →</button>}
               </Card>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
-                {logs.map((log, i) => {
-                  const cals = fmt(log.totals?.calories ?? 0);
-                  const prot = fmt(log.totals?.protein  ?? 0);
-                  return (
-                    <Card
-                      key={log._id}
-                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "0.9rem 1rem" }}
-                    >
-                      {/* Icon */}
-                      <div style={{
-                        width: 44, height: 44, borderRadius: 13,
-                        background: i === 0 ? "#1a1a1a" : "#f4f2ed",
-                        border: "1px solid #e8e5de",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 20, flexShrink: 0,
-                      }}>
-                        {mealEmoji(log.mealType)}
-                      </div>
-
-                      {/* Details */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", textTransform: "capitalize" }}>
-                          {log.mealType}
-                        </p>
-                        <p style={{ fontSize: 11, color: "#aaa", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {log.foods.map((f) => f.name).join(", ")}
-                        </p>
-                        <p style={{ fontSize: 10, color: "#ccc", marginTop: 2 }}>
-                          {timeStr(log.date)}
-                        </p>
-                      </div>
-
-                      {/* Calories */}
-                      <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>{cals}</p>
-                        <p style={{ fontSize: 10, color: "#bbb" }}>kcal</p>
-                        <p style={{ fontSize: 10, color: "#ff6b35", marginTop: 2 }}>{prot}g protein</p>
-                      </div>
-
-                      {/* Delete */}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(log._id); }}
-                        style={{ background: "none", border: "none", color: "#ddd", fontSize: 16, padding: "0.2rem", flexShrink: 0 }}
-                      >
-                        ✕
-                      </button>
-                    </Card>
-                  );
-                })}
-
+                {logs.map((log, i) => (
+                  <MealCard key={log._id} log={log} index={i} onDelete={handleDelete} />
+                ))}
                 {isToday && (
                   <button onClick={() => setShowLog(true)} style={{ ...S.ctaBtn, marginTop: 4 }}>
-                    📷 Log another meal →
+                    📸 Log another meal →
                   </button>
                 )}
               </div>
@@ -587,59 +592,45 @@ export default function NutritionPage() {
         )}
       </main>
 
-      {/* ── Sheets ── */}
       {showLog && <LogSheet onClose={() => setShowLog(false)} onSuccess={handleSuccess} />}
       {result   && <ResultSheet log={result} onClose={() => setResult(null)} />}
     </div>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const S = {
   root: {
     fontFamily: "'Plus Jakarta Sans', sans-serif",
-    background: "#fafaf8",
-    minHeight: "100dvh",
-    maxWidth: 430,
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
+    background: "#fafaf8", minHeight: "100dvh",
+    maxWidth: 430, margin: "0 auto",
+    display: "flex", flexDirection: "column",
   },
   header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    display: "flex", justifyContent: "space-between", alignItems: "center",
     padding: "1.2rem 1.25rem 0.8rem",
-    position: "sticky",
-    top: 0,
+    position: "sticky", top: 0,
     background: "rgba(250,250,248,0.92)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    borderBottom: "1px solid rgba(232,229,222,0.5)",
-    zIndex: 10,
+    backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+    borderBottom: "1px solid rgba(232,229,222,0.5)", zIndex: 10,
   },
   greeting: { fontSize: 12, color: "#aaa", fontWeight: 400 },
   name: { fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em", lineHeight: 1.1 },
   iconBtn: {
-    width: 40, height: 40, borderRadius: 12,
-    background: "#fff", border: "1px solid #e8e5de",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+    width: 40, height: 40, borderRadius: 12, background: "#fff",
+    border: "1px solid #e8e5de", display: "flex", alignItems: "center",
+    justifyContent: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
   },
   main: { padding: "1rem 1.25rem 2rem", flex: 1 },
   eyebrow: { fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#aaa" },
   ctaBtn: {
-    width: "100%", padding: "0.9rem",
-    background: "#1a1a1a", color: "#fafaf8",
-    border: "none", borderRadius: 14,
-    fontSize: 14, fontWeight: 700,
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    letterSpacing: "0.01em", cursor: "pointer",
+    width: "100%", padding: "0.9rem", background: "#1a1a1a", color: "#fafaf8",
+    border: "none", borderRadius: 14, fontSize: 14, fontWeight: 700,
+    fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: "0.01em", cursor: "pointer",
   },
   navBtn: {
-    width: 36, height: 36, borderRadius: 10,
-    background: "#fff", border: "1px solid #e8e5de",
-    fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center",
+    width: 36, height: 36, borderRadius: 10, background: "#fff",
+    border: "1px solid #e8e5de", fontSize: 18,
+    display: "flex", alignItems: "center", justifyContent: "center",
     color: "#1a1a1a", cursor: "pointer",
   },
 };
