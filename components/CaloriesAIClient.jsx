@@ -192,7 +192,7 @@ function CalAITool({ onResult }) {
             <span style={{ width: 15, height: 15, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
             Analysing with AI…
           </>
-        ) : "✨ Analyse my meal — free"}
+        ) : "✨ Analyse my meal - free"}
       </button>
     </div>
   );
@@ -210,7 +210,7 @@ function ResultCard({ result, onContinue }) {
             {fmt(result.totals?.calories)} <span style={{ fontSize: 14, fontWeight: 400, color: "#bbb" }}>kcal</span>
           </h3>
         </div>
-        <span style={{ marginLeft: "auto", fontSize: 24, background: "rgba(34,197,94,0.1)", padding: "0.5rem", borderRadius: 12 }}>✅</span>
+        {/* <span style={{ marginLeft: "auto", fontSize: 24, background: "rgba(34,197,94,0.1)", padding: "0.5rem", borderRadius: 12 }}>✅</span> */}
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: "1.25rem" }}>
@@ -257,7 +257,7 @@ function ResultCard({ result, onContinue }) {
             fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: "pointer",
           }}
         >
-          Start tracking free →
+          Start tracking  →
         </button>
       </div>
     </div>
@@ -345,7 +345,7 @@ export default function CaloriesAIClient() {
             Snap a photo.<br />Get <span style={{ color: "#ff6b35" }}>instant calories</span>.
           </h1>
           <p style={{ fontSize: 16, color: "#888", lineHeight: 1.7, maxWidth: 480, margin: "0 auto 2rem" }}>
-            The fastest AI calorie tracker. No manual logging — just photograph your meal and our AI detects every food item with calories, protein, carbs and fat in seconds.
+            The fastest AI calorie tracker. No manual logging - just photograph your meal and our AI detects every food item with calories, protein, carbs and fat in seconds.
           </p>
           {!toolVisible && !result && (
             <>
@@ -360,7 +360,7 @@ export default function CaloriesAIClient() {
           )}
         </section>
 
-        {/* SEO content — hidden once tool or result is showing */}
+        {/* SEO content - hidden once tool or result is showing */}
         {!toolVisible && !result && (
           <>
             {/* How it works */}
@@ -389,8 +389,8 @@ export default function CaloriesAIClient() {
                   {[
                     { icon: "⚡", title: "Instant results",    desc: "Full nutritional breakdown in under 10 seconds" },
                     { icon: "🎯", title: "High accuracy",      desc: "AI-powered portion estimation across thousands of foods" },
-                    { icon: "📱", title: "Works on any meal",  desc: "Restaurant food, home cooking, packaged snacks — anything" },
-                    { icon: "💪", title: "Macro-focused",      desc: "Protein, carbs, fat and fiber — not just calories" },
+                    { icon: "📱", title: "Works on any meal",  desc: "Restaurant food, home cooking, packaged snacks - anything" },
+                    { icon: "💪", title: "Macro-focused",      desc: "Protein, carbs, fat and fiber - not just calories" },
                     { icon: "📈", title: "Track over time",    desc: "See your daily and weekly nutrition at a glance" },
                   ].map((f) => (
                     <div key={f.title} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -410,10 +410,10 @@ export default function CaloriesAIClient() {
               <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>Frequently asked questions</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
-                  { q: "How accurate is the AI calorie tracker?",      a: "Our AI uses GPT-4o Vision, which achieves high accuracy on common foods. Estimates may vary on mixed dishes or non-standard portions — the AI flags lower-confidence items." },
+                  { q: "How accurate is the AI calorie tracker?",      a: "Our AI uses GPT-4o Vision, which achieves high accuracy on common foods. Estimates may vary on mixed dishes or non-standard portions - the AI flags lower-confidence items." },
                   { q: "Do I need to manually enter portion sizes?",    a: "No. The AI estimates portion sizes from the photo automatically. You can see each item's portion guess in the breakdown." },
                   { q: "What foods can it recognise?",                  a: "The AI recognises thousands of foods including restaurant meals, fast food, home cooking, packaged goods and ethnic cuisines from around the world." },
-                  { q: "Is this better than MyFitnessPal?",            a: "For photo-based logging yes — no manual search, no barcode scanning. Just snap and go. For long-term tracking we combine it with a full dashboard so you never lose sight of your daily goals." },
+                  { q: "Is this better than MyFitnessPal?",            a: "For photo-based logging yes - no manual search, no barcode scanning. Just snap and go. For long-term tracking we combine it with a full dashboard so you never lose sight of your daily goals." },
                 ].map((faq, i) => (
                   <details key={i} style={{ background: "#fff", border: "1px solid #e8e5de", borderRadius: 16, padding: "1rem 1.25rem", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                     <summary style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
