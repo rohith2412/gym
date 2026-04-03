@@ -455,12 +455,13 @@ export default function NutritionPage() {
     setLogs((prev) => prev.filter((l) => l._id !== id));
   }
 
-  function shiftDate(days) {
-    const d = new Date(selDate);
-    d.setDate(d.getDate() + days);
-    const iso = toLocalISO(d);
-    if (iso <= todayISO()) setSelDate(iso);
-  }
+function shiftDate(days) {
+  const [y, m, d] = selDate.split("-").map(Number);
+  const date = new Date(y, m - 1, d); // local midnight, no timezone shift
+  date.setDate(date.getDate() + days);
+  const iso = toLocalISO(date);
+  if (iso <= todayISO()) setSelDate(iso);
+}
 
   function dateLabel() {
     if (selDate === todayISO()) return "Today";
