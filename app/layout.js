@@ -1,7 +1,5 @@
-// app/layout.js - server component (no "use client")
-// metadata lives here, interactive logic moved to ClientLayout
+// app/layout.js
 
-import Dock from "@/components/Dock";
 import ClientLayout from "./ClientLayout";
 import "./globals.css";
 import { Ubuntu } from "next/font/google";
@@ -13,15 +11,12 @@ const ubuntu = Ubuntu({
 
 export const metadata = {
   metadataBase: new URL("https://yourpocketgym.com"),
-
   title: {
     default: "YourPocketGym - AI Fitness & Nutrition Tracker",
     template: "%s | YourPocketGym",
   },
-
   description:
     "YourPocketGym is your AI-powered fitness companion. Track workouts, log meals with a photo, and hit your goals faster.",
-
   keywords: [
     "fitness tracker",
     "workout tracker",
@@ -29,13 +24,9 @@ export const metadata = {
     "macro tracker",
     "ai fitness app",
   ],
-
-  // ✅ Canonical URL - prevents duplicate content indexing
   alternates: {
     canonical: "https://yourpocketgym.com",
   },
-
-  // ✅ Open Graph - controls how links look when shared on social media
   openGraph: {
     title: "YourPocketGym - AI Fitness & Nutrition Tracker",
     description:
@@ -46,36 +37,26 @@ export const metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og-image.png", // ← add a 1200x630px image to your /public folder
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "YourPocketGym - AI Fitness & Nutrition Tracker",
       },
     ],
   },
-
-  // ✅ Twitter / X card
   twitter: {
     card: "summary_large_image",
     title: "YourPocketGym - AI Fitness & Nutrition Tracker",
     description:
       "Track workouts, log meals with a photo, and hit your fitness goals faster with AI.",
-    images: ["/og-image.png"], // ← same image as OG
+    images: ["/og-image.png"],
   },
-
-  // ✅ Google Search Console verification
   verification: {
     google: "9ba5b7bea102f189",
   },
-
-  // ✅ Robots directive - tell crawlers to index public pages
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
   },
 };
 
@@ -84,7 +65,6 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={ubuntu.className}>
         <ClientLayout>{children}</ClientLayout>
-        <Dock />
       </body>
     </html>
   );

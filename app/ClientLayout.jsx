@@ -1,12 +1,13 @@
-// app/ClientLayout.jsx - client component
-// Handles SessionProvider + mobile-only gate
-
 "use client";
 
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Dock from "@/components/Dock";
 
 export default function ClientLayout({ children }) {
+  const pathname = usePathname();
+
   const MOBILE_ONLY = process.env.NEXT_PUBLIC_MOBILE_ONLY === "true";
 
   const [isMobile] = useState(() =>
@@ -15,17 +16,34 @@ export default function ClientLayout({ children }) {
     )
   );
 
+  // 🚫 Hide Dock on specific routes
+  const hideDock = [
+    "/",
+    "/v1/login",
+    "/v1/profile",
+  ].includes(pathname);
+
+  // 📱 Mobile-only gate
   if (MOBILE_ONLY && !isMobile) {
     return (
-      <div style={{
-        display: "flex", height: "100vh",
-        alignItems: "center", justifyContent: "center",
-        fontSize: "20px",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "20px",
+        }}
+      >
         Please open this website on a mobile device 📱
       </div>
     );
   }
 
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider>
+      {children}
+      {!hideDock && <Dock />} {/* 👈 Dock control here */}
+    </SessionProvider>
+  );
 }
