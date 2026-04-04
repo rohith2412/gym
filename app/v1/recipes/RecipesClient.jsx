@@ -1,5 +1,6 @@
 "use client";
 
+import ProfilePicture from "@/components/ProfilePicture";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -398,7 +399,9 @@ export default function RecipesClient() {
             <div>
               <p style={{ fontSize: 12, color: "#aaa", fontWeight: 400 }}>AI-powered</p>
               <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em", lineHeight: 1.1 }}>Protein Recipes 💪</h1>
+
             </div>
+            <a href="/v1/profile"><ProfilePicture size={40} /></a>
             {isShowingDetail && (
               <button
                 onClick={() => { setRecipe(null); setSelected2(null); }}

@@ -513,6 +513,9 @@ function ProfileBanner({ intro, extra, onEditExtra }) {
   );
 }
 
+{/* <a href="/v1/profile">
+  <ProfilePicture size={40} />
+</a> */}
 // ─── Extra Detail Form ────────────────────────────────────────────────────────
 function ExtraForm({ extra, onChange, onClose }) {
   const [local, setLocal] = useState({ ...extra });

@@ -5,13 +5,13 @@ import { useRouter }  from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
 import ProfilePicture from "@/components/ProfilePicture";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function toLocalISO(date = new Date()) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
+
 function todayISO() { return toLocalISO(); }
 function sumMacros(logs) {
   const t = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
@@ -27,7 +27,6 @@ function sumMacros(logs) {
 function round1(n) { return Math.round(n * 10) / 10; }
 function fmt(n)    { return Math.round(n); }
 
-// Better emojis per meal type
 function mealEmoji(type) {
   return { breakfast: "🥞", lunch: "🥗", dinner: "🍜", snack: "🫐" }[type] ?? "🍽️";
 }
@@ -44,7 +43,6 @@ function getGreeting() {
   return "evening";
 }
 
-// ─── Macro ring ───────────────────────────────────────────────────────────────
 function MacroRing({ value, max, color, label, size = 68 }) {
   const r    = (size - 10) / 2;
   const circ = 2 * Math.PI * r;
@@ -76,7 +74,6 @@ function MacroRing({ value, max, color, label, size = 68 }) {
   );
 }
 
-// ─── Primitives ───────────────────────────────────────────────────────────────
 function Card({ children, style = {}, onClick }) {
   return (
     <div onClick={onClick} style={{
@@ -111,15 +108,23 @@ function SkeletonCard({ height = 90 }) {
   );
 }
 
-// ─── Log Sheet (photo upload) ─────────────────────────────────────────────────
+// ─── Log Sheet ────────────────────────────────────────────────────────────────
+// Rendered via a portal at document.body level so it's never clipped by any
+// stacking context created by the sticky header's backdropFilter.
 function LogSheet({ onClose, onSuccess }) {
   const fileRef = useRef(null);
   const [preview,  setPreview]  = useState(null);
   const [base64,   setBase64]   = useState(null);
-  // No default mealType - user must pick
   const [mealType, setMealType] = useState(null);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(null);
+
+  // Lock body scroll while sheet is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
 
   function handleFile(file) {
     if (!file) return;
@@ -157,14 +162,40 @@ function LogSheet({ onClose, onSuccess }) {
 
   const canSubmit = base64 && mealType && !loading;
 
+  // Use a high z-index that beats any stacking context on the page.
+  // 2147483647 is the max, 9999 is fine for this app.
+  const SHEET_Z = 9999;
+
   return (
     <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 40, backdropFilter: "blur(3px)" }} />
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed", inset: 0,
+          background: "rgba(0,0,0,0.45)",
+          zIndex: SHEET_Z,
+          backdropFilter: "blur(3px)",
+          WebkitBackdropFilter: "blur(3px)",
+        }}
+      />
+
+      {/* Sheet panel */}
       <div style={{
-        position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
-        width: "100%", maxWidth: 430, background: "#fafaf8",
-        borderRadius: "24px 24px 0 0", padding: "1.5rem 1.25rem 2.5rem",
-        zIndex: 50, boxShadow: "0 -4px 40px rgba(0,0,0,0.12)",
+        position: "fixed",
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100%",
+        maxWidth: 430,
+        background: "#fafaf8",
+        borderRadius: "24px 24px 0 0",
+        padding: "1.5rem 1.25rem 2.5rem",
+        zIndex: SHEET_Z + 1,   // one above the backdrop
+        boxShadow: "0 -4px 40px rgba(0,0,0,0.18)",
+        maxHeight: "90dvh",
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
       }}>
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
         <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>Log a meal</h2>
@@ -198,7 +229,7 @@ function LogSheet({ onClose, onSuccess }) {
         </div>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
 
-        {/* Meal type - no default, must tap one */}
+        {/* Meal type */}
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#aaa", marginBottom: 8 }}>
           What meal is this?
         </p>
@@ -252,14 +283,22 @@ function LogSheet({ onClose, onSuccess }) {
 
 // ─── Result Sheet ─────────────────────────────────────────────────────────────
 function ResultSheet({ log, onClose }) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  const SHEET_Z = 9999;
+
   return (
     <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 40, backdropFilter: "blur(3px)" }} />
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: SHEET_Z, backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)" }} />
       <div style={{
         position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
         width: "100%", maxWidth: 430, background: "#fafaf8",
         borderRadius: "24px 24px 0 0", padding: "1.5rem 1.25rem 2.5rem",
-        zIndex: 50, boxShadow: "0 -4px 40px rgba(0,0,0,0.12)",
+        zIndex: SHEET_Z + 1, boxShadow: "0 -4px 40px rgba(0,0,0,0.18)",
         maxHeight: "80dvh", overflowY: "auto",
       }}>
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
@@ -320,7 +359,7 @@ function ResultSheet({ log, onClose }) {
   );
 }
 
-// ─── Meal card (matching tracking page style) ─────────────────────────────────
+// ─── Meal Card ────────────────────────────────────────────────────────────────
 function MealCard({ log, index, onDelete }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const date = new Date(log.date);
@@ -337,7 +376,6 @@ function MealCard({ log, index, onDelete }) {
 
   return (
     <Card style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem 1.1rem" }}>
-      {/* Date block - same style as tracking page */}
       <div style={{
         width: 44, height: 44, borderRadius: 13,
         background: index === 0 ? "#1a1a1a" : "#f4f2ed",
@@ -353,7 +391,6 @@ function MealCard({ log, index, onDelete }) {
         </span>
       </div>
 
-      {/* Meal info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 16 }}>{mealEmoji(log.mealType)}</span>
@@ -370,14 +407,12 @@ function MealCard({ log, index, onDelete }) {
         <p style={{ fontSize: 10, color: "#ccc", marginTop: 2 }}>{timeStr(log.date)}</p>
       </div>
 
-      {/* Calories */}
       <div style={{ textAlign: "right", flexShrink: 0 }}>
         <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>{fmt(log.totals?.calories ?? 0)}</p>
         <p style={{ fontSize: 10, color: "#bbb" }}>kcal</p>
         <p style={{ fontSize: 10, color: "#ff6b35", marginTop: 2 }}>{fmt(log.totals?.protein ?? 0)}g prot</p>
       </div>
 
-      {/* Delete - confirm style matching tracking page */}
       <button
         onClick={handleDelete}
         style={{
@@ -407,14 +442,12 @@ export default function NutritionPage() {
   const [result,  setResult]  = useState(null);
   const [selDate, setSelDate] = useState(todayISO());
 
-  // Auth guard
   useEffect(() => {
     if (status === "loading") return;
     if (status === "unauthenticated") { router.replace("/"); return; }
     if (session && !session.user?.hasIntro) { router.replace("/v1/StartersIntro"); return; }
   }, [status, session, router]);
 
-  // Fetch logs - vis resets on date change so animation re-fires
   const fetchLogs = useCallback(async (date) => {
     setLoading(true);
     setVis(false);
@@ -425,7 +458,6 @@ export default function NutritionPage() {
     } catch (e) { console.error(e); }
     finally {
       setLoading(false);
-      // Small delay so the fade-in fires after content renders
       requestAnimationFrame(() => setTimeout(() => setVis(true), 40));
     }
   }, []);
@@ -455,13 +487,13 @@ export default function NutritionPage() {
     setLogs((prev) => prev.filter((l) => l._id !== id));
   }
 
-function shiftDate(days) {
-  const [y, m, d] = selDate.split("-").map(Number);
-  const date = new Date(y, m - 1, d); // local midnight, no timezone shift
-  date.setDate(date.getDate() + days);
-  const iso = toLocalISO(date);
-  if (iso <= todayISO()) setSelDate(iso);
-}
+  function shiftDate(days) {
+    const [y, m, d] = selDate.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + days);
+    const iso = toLocalISO(date);
+    if (iso <= todayISO()) setSelDate(iso);
+  }
 
   function dateLabel() {
     if (selDate === todayISO()) return "Today";
@@ -485,8 +517,16 @@ function shiftDate(days) {
         button { cursor: pointer; }
       `}</style>
 
-      {/* ── Header ── */}
-      <header style={S.header}>
+      {/* ── Header — NO backdropFilter (avoids stacking context that clips sheets) ── */}
+      <header style={{
+        ...S.header,
+        /* Replace blur with a fully opaque background so we can drop
+           backdropFilter entirely — this prevents a new CSS stacking context
+           that would cause the header to render above fixed sheets. */
+        background: "#fafaf8",
+        backdropFilter: "none",
+        WebkitBackdropFilter: "none",
+      }}>
         <div>
           <p style={S.greeting}>Good {getGreeting()}</p>
           <h1 style={S.name}>{firstName} 🥗</h1>
@@ -506,8 +546,6 @@ function shiftDate(days) {
         transform: vis ? "translateY(0)" : "translateY(10px)",
         transition: "opacity 0.38s ease, transform 0.38s ease",
       }}>
-
-        {/* Date nav */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <button onClick={() => shiftDate(-1)} style={S.navBtn}>‹</button>
           <p style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" }}>{dateLabel()}</p>
@@ -527,7 +565,6 @@ function shiftDate(days) {
           </div>
         ) : (
           <>
-            {/* Calorie summary */}
             <Card style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
                 <div>
@@ -549,12 +586,10 @@ function shiftDate(days) {
                 </span>
               </div>
 
-              {/* Progress bar */}
               <div style={{ height: 8, background: "#f0ede6", borderRadius: 99, overflow: "hidden", marginBottom: "1.25rem" }}>
                 <div style={{ height: "100%", width: `${calPct}%`, background: calPct >= 90 ? "#e53e3e" : "#ff6b35", borderRadius: 99, transition: "width 0.6s ease" }} />
               </div>
 
-              {/* Macro rings */}
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <MacroRing value={round1(todayTotals.protein)} max={GOALS.protein} color="#ff6b35" label="Protein" />
                 <MacroRing value={round1(todayTotals.carbs)}   max={GOALS.carbs}   color="#1a1a1a" label="Carbs"   />
@@ -563,7 +598,6 @@ function shiftDate(days) {
               </div>
             </Card>
 
-            {/* Meals list */}
             <SectionLabel>Meals logged</SectionLabel>
 
             {logs.length === 0 ? (
@@ -593,6 +627,7 @@ function shiftDate(days) {
         )}
       </main>
 
+      {/* Sheets render last in the tree — above everything */}
       {showLog && <LogSheet onClose={() => setShowLog(false)} onSuccess={handleSuccess} />}
       {result   && <ResultSheet log={result} onClose={() => setResult(null)} />}
     </div>
@@ -610,8 +645,6 @@ const S = {
     display: "flex", justifyContent: "space-between", alignItems: "center",
     padding: "1.2rem 1.25rem 0.8rem",
     position: "sticky", top: 0,
-    background: "rgba(250,250,248,0.92)",
-    backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
     borderBottom: "1px solid rgba(232,229,222,0.5)", zIndex: 10,
   },
   greeting: { fontSize: 12, color: "#aaa", fontWeight: 400 },
