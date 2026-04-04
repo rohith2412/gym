@@ -214,7 +214,7 @@ function PlanView({ plan, onRegen, isLoading, onBack, onSave, isSaved, saving })
         <button onClick={onRegen} disabled={isLoading} style={{ flex:1, padding:"0.7rem", background:"#fff", border:"1px solid #e8e5de", borderRadius:12, fontSize:13, fontWeight:700, color:"#ff6b35", fontFamily:"inherit", cursor:"pointer", opacity:isLoading?0.5:1 }}>
           {isLoading ? "…" : "🔄 Regenerate"}
         </button>
-        {/* Save button — only shown when plan is not yet saved */}
+        {/* Save button - only shown when plan is not yet saved */}
         {!isSaved ? (
           <button
             onClick={onSave}
@@ -380,7 +380,7 @@ function ChatView({ extra, intro }) {
       role:"assistant",
       content: intro
         ? `Hey! I'm your AI trainer. I can see you're ${intro.age ? `${intro.age} years old` : "getting started"} and your goal is ${intro.fitnessGoal || "to improve your fitness"}. What do you want to work on today?`
-        : "Hey! I'm your AI personal trainer. Ask me anything about training, nutrition, recovery or technique — I'm here to help.",
+        : "Hey! I'm your AI personal trainer. Ask me anything about training, nutrition, recovery or technique - I'm here to help.",
     },
   ]);
   const [input,   setInput]   = useState("");
@@ -736,7 +736,7 @@ export default function AITrainerClient() {
           </div>
         </div>
 
-        {/* Tabs — hide when viewing a plan in either tab */}
+        {/* Tabs - hide when viewing a plan in either tab */}
         {!showPlan && !viewingSaved && (
           <div style={{ display:"flex", gap:4 }}>
             {[["plan","📋 Plan"],["saved","🔖 Saved"],["chat","💬 Chat"]].map(([key,label]) => (
@@ -811,7 +811,7 @@ export default function AITrainerClient() {
                   { emoji:"🏋️", title:"Exercise breakdown",   desc:"Sets, reps, rest periods and tempo for every exercise" },
                   { emoji:"📈", title:"Progression system",   desc:"How to add weight and intensity over time" },
                   { emoji:"🥗", title:"Nutrition guidelines", desc:"What to eat to support your specific goal" },
-                  { emoji:"🔥", title:"Warmup & cooldown",    desc:"Built into every training day — no skipping" },
+                  { emoji:"🔥", title:"Warmup & cooldown",    desc:"Built into every training day - no skipping" },
                 ].map((f,i) => (
                   <Card key={i} style={{ display:"flex", gap:12, alignItems:"flex-start", padding:"0.9rem 1.1rem" }}>
                     <span style={{ fontSize:20, flexShrink:0 }}>{f.emoji}</span>

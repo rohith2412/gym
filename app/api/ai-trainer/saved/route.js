@@ -1,6 +1,6 @@
 // app/api/ai-trainer/saved/route.js
-// GET  /api/ai-trainer/saved        — list all saved plans for the user
-// POST /api/ai-trainer/saved        — save a new plan
+// GET  /api/ai-trainer/saved        - list all saved plans for the user
+// POST /api/ai-trainer/saved        - save a new plan
 
 import { connectdb }        from "@/lib/connectdb";
 import SavedPlan            from "@/models/savedPlanModel";

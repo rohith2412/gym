@@ -13,7 +13,7 @@ function calcCalorieRange(cal) {
   return "700+";
 }
 
-// ─── GET /api/recipes — browse library ───────────────────────────────────────
+// ─── GET /api/recipes - browse library ───────────────────────────────────────
 export async function GET(req) {
   try {
     await connectdb();
@@ -44,7 +44,7 @@ export async function GET(req) {
   }
 }
 
-// ─── POST /api/recipes — ingredient-based match or AI generate ────────────────
+// ─── POST /api/recipes - ingredient-based match or AI generate ────────────────
 // Body: {
 //   ingredients: string[],   // e.g. ["chicken", "eggs", "spinach"]
 //   goal?: string,
@@ -72,7 +72,7 @@ export async function POST(req) {
       const regexes = ingredients.map((i) => new RegExp(i.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
       dbQuery["ingredients.item"] = { $in: regexes };
 
-      // Score by how many ingredients match — get top 20 candidates then score
+      // Score by how many ingredients match - get top 20 candidates then score
       const candidates = await Recipe.find(dbQuery).limit(50).lean();
 
       if (candidates.length > 0) {

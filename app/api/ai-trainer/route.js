@@ -62,7 +62,7 @@ Return ONLY valid JSON:
   "days": [
     {
       "day": "Monday",
-      "label": "string (e.g. 'Push Day — Chest & Shoulders')",
+      "label": "string (e.g. 'Push Day - Chest & Shoulders')",
       "focus": "string (muscle groups)",
       "restDay": false,
       "warmup": "string (2-3 sentence warmup description)",
@@ -112,9 +112,9 @@ Rules:
       const systemPrompt = `You are an elite AI personal trainer with expertise in strength training, nutrition, recovery and sports science.
 
 Your athlete's profile:
-${userCtx || "Profile not provided — ask the user for details if needed."}
+${userCtx || "Profile not provided - ask the user for details if needed."}
 
-Personality: Direct, motivating, evidence-based. Give specific actionable advice. Use numbers and data when relevant. Never give vague answers. Keep responses concise — 2-4 short paragraphs max. Use occasional line breaks for readability. Do NOT use markdown headers or bullet lists with ** symbols — use plain text with line breaks only.`;
+Personality: Direct, motivating, evidence-based. Give specific actionable advice. Use numbers and data when relevant. Never give vague answers. Keep responses concise - 2-4 short paragraphs max. Use occasional line breaks for readability. Do NOT use markdown headers or bullet lists with ** symbols - use plain text with line breaks only.`;
 
       const aiMessages = [
         { role: "system", content: systemPrompt },

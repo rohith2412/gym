@@ -1,6 +1,7 @@
 // app/layout.js - server component (no "use client")
 // metadata lives here, interactive logic moved to ClientLayout
 
+import Dock from "@/components/Dock";
 import ClientLayout from "./ClientLayout";
 import "./globals.css";
 import { Ubuntu } from "next/font/google";
@@ -83,6 +84,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={ubuntu.className}>
         <ClientLayout>{children}</ClientLayout>
+        <Dock />
       </body>
     </html>
   );

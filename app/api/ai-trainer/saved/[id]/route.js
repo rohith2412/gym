@@ -1,5 +1,5 @@
 // app/api/ai-trainer/saved/[id]/route.js
-// DELETE /api/ai-trainer/saved/:id  — remove a saved plan (owner only)
+// DELETE /api/ai-trainer/saved/:id  - remove a saved plan (owner only)
 
 import { connectdb }        from "@/lib/connectdb";
 import SavedPlan            from "@/models/savedPlanModel";
