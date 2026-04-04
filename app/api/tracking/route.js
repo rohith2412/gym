@@ -35,7 +35,7 @@ export async function POST(req) {
   }
 }
 
-// GET — fetch all workout logs for the user (newest first)
+// GET - fetch all workout logs for the user (newest first)
 export async function GET(req) {
   try {
     await connectdb();
@@ -59,7 +59,7 @@ export async function GET(req) {
   }
 }
 
-// DELETE — remove a single workout log by ID
+// DELETE - remove a single workout log by ID
 export async function DELETE(req) {
   try {
     await connectdb();

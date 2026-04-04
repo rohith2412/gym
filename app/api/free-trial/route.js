@@ -7,7 +7,7 @@ import userIntroModel       from "@/models/userIntroModel";
 import { getServerSession } from "next-auth";
 import { authOptions }      from "@/app/api/auth/[...nextauth]/route";
 
-// GET — has this user already used their free trial?
+// GET - has this user already used their free trial?
 export async function GET() {
   try {
     await connectdb();
@@ -22,7 +22,7 @@ export async function GET() {
   }
 }
 
-// POST — mark free trial as consumed
+// POST - mark free trial as consumed
 export async function POST() {
   try {
     await connectdb();

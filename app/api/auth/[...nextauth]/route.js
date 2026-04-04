@@ -58,7 +58,7 @@ const authOptions = {
           token.isNewUserChecked = true;
         }
 
-        // Check if the user has completed intro — re-check on every jwt call
+        // Check if the user has completed intro - re-check on every jwt call
         // so it updates immediately after they submit the intro form.
         const introData = await userIntroModel.findOne({ userId: dbUser._id.toString() });
         token.hasIntro = !!introData;

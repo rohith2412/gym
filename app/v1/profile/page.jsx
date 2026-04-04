@@ -272,7 +272,7 @@ export default function ProfilePage() {
 
   const [intro, setIntro]               = useState(null);
   const [loadingIntro, setLoadingIntro] = useState(true);
-  const [workoutStats, setWorkoutStats] = useState({ sessions: 0, totalVol: 0, topExercise: "—" });
+  const [workoutStats, setWorkoutStats] = useState({ sessions: 0, totalVol: 0, topExercise: "-" });
   const [showEdit, setShowEdit]         = useState(false);
   const [signingOut, setSigningOut]     = useState(false);
 
@@ -305,7 +305,7 @@ export default function ProfilePage() {
           log.exercises.forEach((ex) => { freq[ex.name] = (freq[ex.name] || 0) + 1; })
         );
         const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
-        setWorkoutStats({ sessions, totalVol, topExercise: top ? top[0] : "—" });
+        setWorkoutStats({ sessions, totalVol, topExercise: top ? top[0] : "-" });
       })
       .catch(() => {});
   }, [session?.user?.id]);

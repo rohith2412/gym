@@ -87,7 +87,7 @@ Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if u
       ],
     });
 
-    // ── Parse — json_object mode means this rarely fails, but still guard ─────
+    // ── Parse - json_object mode means this rarely fails, but still guard ─────
     let parsed;
     try {
       parsed = JSON.parse(aiResponse.choices[0].message.content || "{}");
@@ -97,7 +97,7 @@ Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if u
 
     const foods = parsed.foods || [];
 
-    // ── Save via create() — avoids .save() triggering any cached hooks ─────────
+    // ── Save via create() - avoids .save() triggering any cached hooks ─────────
     const doc = {
       userId:   session.user.id,
       date:     date ? new Date(date) : new Date(),

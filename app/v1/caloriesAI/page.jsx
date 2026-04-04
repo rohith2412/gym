@@ -116,7 +116,7 @@ function LogSheet({ onClose, onSuccess }) {
   const fileRef = useRef(null);
   const [preview,  setPreview]  = useState(null);
   const [base64,   setBase64]   = useState(null);
-  // No default mealType — user must pick
+  // No default mealType - user must pick
   const [mealType, setMealType] = useState(null);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(null);
@@ -198,7 +198,7 @@ function LogSheet({ onClose, onSuccess }) {
         </div>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
 
-        {/* Meal type — no default, must tap one */}
+        {/* Meal type - no default, must tap one */}
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#aaa", marginBottom: 8 }}>
           What meal is this?
         </p>
@@ -337,7 +337,7 @@ function MealCard({ log, index, onDelete }) {
 
   return (
     <Card style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem 1.1rem" }}>
-      {/* Date block — same style as tracking page */}
+      {/* Date block - same style as tracking page */}
       <div style={{
         width: 44, height: 44, borderRadius: 13,
         background: index === 0 ? "#1a1a1a" : "#f4f2ed",
@@ -377,7 +377,7 @@ function MealCard({ log, index, onDelete }) {
         <p style={{ fontSize: 10, color: "#ff6b35", marginTop: 2 }}>{fmt(log.totals?.protein ?? 0)}g prot</p>
       </div>
 
-      {/* Delete — confirm style matching tracking page */}
+      {/* Delete - confirm style matching tracking page */}
       <button
         onClick={handleDelete}
         style={{
@@ -414,7 +414,7 @@ export default function NutritionPage() {
     if (session && !session.user?.hasIntro) { router.replace("/v1/StartersIntro"); return; }
   }, [status, session, router]);
 
-  // Fetch logs — vis resets on date change so animation re-fires
+  // Fetch logs - vis resets on date change so animation re-fires
   const fetchLogs = useCallback(async (date) => {
     setLoading(true);
     setVis(false);

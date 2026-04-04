@@ -1,12 +1,12 @@
 // app/api/user-intro/route.js
-// Replace your entire existing file with this — adds GET alongside the POST
+// Replace your entire existing file with this - adds GET alongside the POST
 
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// GET /api/user-intro — fetch the current user's intro data
+// GET /api/user-intro - fetch the current user's intro data
 export async function GET() {
   try {
     await connectdb();
@@ -25,7 +25,7 @@ export async function GET() {
   }
 }
 
-// POST /api/user-intro — create or update the current user's intro data
+// POST /api/user-intro - create or update the current user's intro data
 export async function POST(req) {
   try {
     await connectdb();

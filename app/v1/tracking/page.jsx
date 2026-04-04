@@ -157,7 +157,7 @@ function DeltaBadge({ delta, neutral }) {
   if (delta === null || delta === undefined)
     return <span style={{ ...B.base, ...B.neutral }}>1st</span>;
   if (neutral || delta === 0)
-    return <span style={{ ...B.base, ...B.neutral }}>— 0</span>;
+    return <span style={{ ...B.base, ...B.neutral }}>- 0</span>;
   const up = delta > 0;
   return (
     <span style={{ ...B.base, ...(up ? B.up : B.down) }}>
@@ -445,7 +445,7 @@ function ProgressScreen({ logs }) {
 }
 
 // ─── EXERCISE PICKER SHEET ────────────────────────────────────────────────────
-// NOTE: No useScrollLock here — LogSheet already holds the lock.
+// NOTE: No useScrollLock here - LogSheet already holds the lock.
 // Adding a second lock caused the body position to reset on picker close.
 function ExercisePicker({ muscleGroup, alreadyAdded, onConfirm, onClose }) {
   const list = EXERCISE_LIBRARY[muscleGroup] || [];
@@ -456,7 +456,7 @@ function ExercisePicker({ muscleGroup, alreadyAdded, onConfirm, onClose }) {
     );
 
   return (
-    // zIndex 10000 — one layer above LogSheet (9999)
+    // zIndex 10000 - one layer above LogSheet (9999)
     <div style={{ ...OVERLAY, zIndex: 10000 }} onClick={onClose}>
       <div style={PANEL} onClick={(e) => e.stopPropagation()}>
         <div style={HANDLE} />
@@ -678,7 +678,7 @@ function LogSheet({ onClose, onSaved }) {
                 {exercises.length === 0 && (
                   <Card style={{ textAlign: "center", padding: "1.4rem" }}>
                     <p style={{ fontSize: 13, color: "#aaa", margin: 0 }}>
-                      No exercises yet — tap a muscle group above
+                      No exercises yet - tap a muscle group above
                     </p>
                   </Card>
                 )}
@@ -1001,7 +1001,7 @@ export default function TrackingPage() {
           )}
         </main>
 
-        {/* ── FAB — hidden when any sheet is open so it never bleeds through overlays ── */}
+        {/* ── FAB - hidden when any sheet is open so it never bleeds through overlays ── */}
         {!showLog && (
         <div style={{
           position: "sticky", bottom: 0,

@@ -1,4 +1,4 @@
-// app/ClientLayout.jsx — client component
+// app/ClientLayout.jsx - client component
 // Handles SessionProvider + mobile-only gate
 
 "use client";

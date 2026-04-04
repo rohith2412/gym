@@ -18,7 +18,7 @@ const features = [
   {
     icon: "🎯",
     title: "Goal-First Coaching",
-    desc: "Whether it's fat loss, muscle, or performance — your plan is built backwards from the result.",
+    desc: "Whether it's fat loss, muscle, or performance - your plan is built backwards from the result.",
   },
   {
     icon: "🔄",
@@ -186,7 +186,7 @@ export default function LandingPage() {
 
         <p style={S.heroSub}>
           AI-powered training that adapts to your body, your life, and your
-          goals — from day one to your best ever.
+          goals - from day one to your best ever.
         </p>
 
         <div style={S.heroBtns}>
@@ -230,7 +230,7 @@ export default function LandingPage() {
               "CONSISTENCY",
             ].map((w, i) => (
               <span key={`${rep}-${i}`} style={S.tickerItem}>
-                {w} <span style={{ color: "#d4d0c8" }}>—</span>
+                {w} <span style={{ color: "#d4d0c8" }}>-</span>
               </span>
             )),
           )}

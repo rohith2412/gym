@@ -26,7 +26,7 @@ const ProfilePicture = ({ size = 36 }) => {
     );
   }
 
-  // fallback — initial avatar
+  // fallback - initial avatar
   return (
     <div style={{
       width: size,
