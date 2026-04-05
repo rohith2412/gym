@@ -1002,15 +1002,10 @@ export default function TrackingPage() {
 
         {/* ── Sticky header — everything up to and including the tabs lives here ── */}
         <header style={{
-          padding: "1.2rem 1.25rem 0",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          background: "rgba(250,250,248,0.92)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(232,229,222,0.5)",
-        }}>
+  padding: "1.2rem 1.25rem 0",
+  background: "#fafaf8",
+  borderBottom: "1px solid rgba(232,229,222,0.5)",
+}}>
 
           {/* Title row */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.9rem" }}>
