@@ -2,8 +2,9 @@ import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req) {
-  // ← Initialize inside the function
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const body = await req.text();
@@ -11,8 +12,13 @@ export async function POST(req) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(
+      body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (e) {
+    console.error("Webhook signature error:", e.message);
     return new Response(`Webhook error: ${e.message}`, { status: 400 });
   }
 
@@ -20,7 +26,11 @@ export async function POST(req) {
 
   async function syncSubscription(sub) {
     const userId = sub.metadata?.userId;
-    if (!userId) return;
+    if (!userId) {
+      console.error("No userId in subscription metadata:", sub.id);
+      return;
+    }
+    console.log("Syncing subscription for userId:", userId, "status:", sub.status);
     await userIntroModel.findOneAndUpdate(
       { userId },
       {
@@ -33,16 +43,58 @@ export async function POST(req) {
     );
   }
 
+  console.log("Webhook event received:", event.type);
+
   switch (event.type) {
+
+    // ── Fires immediately when checkout payment succeeds ──────────────────
+    case "checkout.session.completed": {
+      const checkoutSession = event.data.object;
+      // Only handle subscription checkouts
+      if (checkoutSession.mode !== "subscription") break;
+
+      const userId = checkoutSession.metadata?.userId;
+      if (!userId) break;
+
+      // Fetch the full subscription object to get all fields
+      const subscription = await stripe.subscriptions.retrieve(
+        checkoutSession.subscription
+      );
+
+      await userIntroModel.findOneAndUpdate(
+        { userId },
+        {
+          stripeSubscriptionId: subscription.id,
+          subscriptionStatus:   subscription.status,
+          isSubscribed:         subscription.status === "active",
+          currentPeriodEnd:     new Date(subscription.current_period_end * 1000),
+          stripeCustomerId:     checkoutSession.customer,
+        },
+        { upsert: true }
+      );
+      console.log("Checkout completed — user subscribed:", userId);
+      break;
+    }
+
+    // ── Subscription lifecycle events ─────────────────────────────────────
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted":
       await syncSubscription(event.data.object);
       break;
-    case "invoice.payment_failed":
-      const sub = await stripe.subscriptions.retrieve(event.data.object.subscription);
-      await syncSubscription(sub);
+
+    // ── Payment failed ────────────────────────────────────────────────────
+    case "invoice.payment_failed": {
+      const invoice = event.data.object;
+      if (invoice.subscription) {
+        const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+        await syncSubscription(sub);
+      }
       break;
+    }
+
+    default:
+      console.log("Unhandled event type:", event.type);
   }
 
   return Response.json({ received: true });

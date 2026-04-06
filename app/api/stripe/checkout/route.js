@@ -4,14 +4,13 @@ import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
-const NEXTAUTH_URL="https://yourpocketgym.com"
+export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(req) {
   try {
-    // ← Initialize inside the function, not at module level
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
     await connectdb();
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
@@ -34,20 +33,28 @@ export async function POST() {
       );
     }
 
+    // Build base URL — try env first, then derive from request headers
+    const host    = req.headers.get("host");
+    const proto   = host?.includes("localhost") ? "http" : "https";
+    const baseUrl = process.env.NEXTAUTH_URL || `${proto}://${host}`;
+
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer:   customerId,
-      mode:       "subscription",
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: `${process.env.NEXTAUTH_URL}/v1/pricing?success=true`,
-      cancel_url:  `${process.env.NEXTAUTH_URL}/v1/pricing?canceled=true`,
+      customer:    customerId,
+      mode:        "subscription",
+      line_items:  [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      success_url: `${baseUrl}/v1/pricing?success=true`,
+      cancel_url:  `${baseUrl}/v1/pricing?canceled=true`,
+      // Store userId in metadata so webhook can find the user
       subscription_data: {
         metadata: { userId: session.user.id },
       },
+      // Also store on the session itself as backup
+      metadata: { userId: session.user.id },
     });
 
     return Response.json({ success: true, url: checkoutSession.url });
   } catch (e) {
-    console.error(e);
+    console.error("Checkout error:", e);
     return Response.json({ success: false, error: e.message }, { status: 500 });
   }
 }

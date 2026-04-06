@@ -4,12 +4,13 @@ import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function POST() {
   try {
-    // ← Initialize inside the function, not at module level
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
     await connectdb();
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
@@ -31,7 +32,7 @@ export async function POST() {
 
     return Response.json({ success: true });
   } catch (e) {
-    console.error(e);
+    console.error("Cancel error:", e);
     return Response.json({ success: false, error: e.message }, { status: 500 });
   }
 }
