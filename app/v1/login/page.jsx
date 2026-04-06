@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session?.user) {
-      router.replace("/v1/dashboard");
+      router.replace("/v1/tracking");
     }
   }, [session, router]);
 

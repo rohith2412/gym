@@ -222,9 +222,7 @@ const e = {
     display: "flex", alignItems: "center", justifyContent: "space-between",
     padding: "14px 20px 12px", borderBottom: "1px solid #e8e5de", flexShrink: 0,
   },
-  headTitle: {
-    fontSize: 16, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em",
-  },
+  headTitle: { fontSize: 16, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" },
   closeBtn: {
     border: "none", background: "none", fontSize: 14, color: "#bbb",
     cursor: "pointer", fontFamily: "inherit", padding: "4px 8px",
@@ -270,11 +268,13 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [intro, setIntro]               = useState(null);
-  const [loadingIntro, setLoadingIntro] = useState(true);
-  const [workoutStats, setWorkoutStats] = useState({ sessions: 0, totalVol: 0, topExercise: "-" });
-  const [showEdit, setShowEdit]         = useState(false);
-  const [signingOut, setSigningOut]     = useState(false);
+  const [intro,         setIntro]         = useState(null);
+  const [loadingIntro,  setLoadingIntro]  = useState(true);
+  const [workoutStats,  setWorkoutStats]  = useState({ sessions: 0, totalVol: 0, topExercise: "-" });
+  const [showEdit,      setShowEdit]      = useState(false);
+  const [signingOut,    setSigningOut]    = useState(false);
+  const [canceling,     setCanceling]     = useState(false);
+  const [cancelConfirm, setCancelConfirm] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/");
@@ -315,6 +315,27 @@ export default function ProfilePage() {
     await signOut({ callbackUrl: "/" });
   };
 
+  async function handleCancelSubscription() {
+    if (!cancelConfirm) {
+      setCancelConfirm(true);
+      setTimeout(() => setCancelConfirm(false), 4000);
+      return;
+    }
+    setCanceling(true);
+    try {
+      const res  = await fetch("/api/stripe/cancel", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setIntro(prev => ({ ...prev, subscriptionStatus: "canceling", isSubscribed: false }));
+        setCancelConfirm(false);
+      } else {
+        alert("Error: " + json.error);
+      }
+    } finally {
+      setCanceling(false);
+    }
+  }
+
   if (status === "loading" || loadingIntro) {
     return (
       <div style={S.root}>
@@ -345,11 +366,24 @@ export default function ProfilePage() {
 
       <main style={S.main}>
 
-        {/* ── Hero ── */}
+        {/* ── Hero card — name + PRO badge ── */}
         <Card style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
           <Avatar src={user?.photo || user?.image} name={user?.name} size={64} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={S.heroName}>{user?.name ?? "Athlete"}</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <h1 style={S.heroName}>{user?.name ?? "Athlete"}</h1>
+              {/* ── PRO badge — lives here, inside the hero card ── */}
+              {intro?.isSubscribed && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700, color: "#ff6b35",
+                  background: "rgba(255,107,53,0.1)", borderRadius: 99,
+                  padding: "0.2rem 0.6rem", letterSpacing: "0.06em",
+                  flexShrink: 0,
+                }}>
+                  ⚡ PRO
+                </span>
+              )}
+            </div>
             <p style={S.heroEmail}>{user?.email}</p>
             <div style={S.heroPills}>
               {intro?.gender && (
@@ -364,6 +398,73 @@ export default function ProfilePage() {
             </div>
           </div>
         </Card>
+
+        {/* ── Subscription status banner ── */}
+        {intro?.isSubscribed && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: "linear-gradient(135deg, rgba(255,107,53,0.08), rgba(245,158,11,0.08))",
+            border: "1px solid rgba(255,107,53,0.2)",
+            borderRadius: 16, padding: "0.85rem 1.1rem", marginBottom: 10,
+          }}>
+            <span style={{ fontSize: 20 }}>⚡</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#ff6b35" }}>Pro subscriber</p>
+              <p style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
+                All features unlocked · Cancel anytime below
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/v1/pricing")}
+              style={{
+                fontSize: 11, fontWeight: 700, color: "#ff6b35",
+                background: "rgba(255,107,53,0.1)", border: "none",
+                borderRadius: 99, padding: "0.3rem 0.7rem",
+                fontFamily: "inherit", cursor: "pointer", flexShrink: 0,
+              }}
+            >
+              Details
+            </button>
+          </div>
+        )}
+
+        {/* ── Upgrade banner (not subscribed) ── */}
+        {intro && !intro.isSubscribed && intro.subscriptionStatus !== "canceling" && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: "#1a1a1a", borderRadius: 16,
+            padding: "0.85rem 1.1rem", marginBottom: 10, cursor: "pointer",
+          }}
+            onClick={() => router.push("/v1/pricing")}
+          >
+            <span style={{ fontSize: 20 }}>🔒</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Unlock Pro features</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                AI trainer, nutrition tracking, recipes & more
+              </p>
+            </div>
+            <span style={{
+              fontSize: 12, fontWeight: 700, color: "#ff6b35",
+              background: "rgba(255,107,53,0.15)", borderRadius: 99,
+              padding: "0.3rem 0.7rem", flexShrink: 0,
+            }}>$9.99/mo →</span>
+          </div>
+        )}
+
+        {/* ── Canceling notice ── */}
+        {intro?.subscriptionStatus === "canceling" && (
+          <div style={{
+            background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)",
+            borderRadius: 14, padding: "0.85rem 1.1rem", marginBottom: 10,
+            display: "flex", gap: 8, alignItems: "flex-start",
+          }}>
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <p style={{ fontSize: 12, color: "#d97706", fontWeight: 600, lineHeight: 1.5 }}>
+              Your subscription is canceled. Pro access continues until the end of your billing period.
+            </p>
+          </div>
+        )}
 
         {/* ── Activity stats ── */}
         {workoutStats.sessions > 0 && (
@@ -414,11 +515,8 @@ export default function ProfilePage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                   <p style={S.statLabel}>BMI</p>
                   <span style={{
-                    fontSize: 10, fontWeight: 700, padding: "3px 9px",
-                    borderRadius: 99,
-                    background: bmiInfo.color + "18",
-                    color: bmiInfo.color,
-                    letterSpacing: "0.05em",
+                    fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 99,
+                    background: bmiInfo.color + "18", color: bmiInfo.color, letterSpacing: "0.05em",
                   }}>
                     {bmiInfo.label}
                   </span>
@@ -426,7 +524,6 @@ export default function ProfilePage() {
                 <p style={{ fontSize: 26, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.05em", lineHeight: 1, marginBottom: 10 }}>
                   {bmiVal}
                 </p>
-                {/* BMI bar */}
                 <div style={{ display: "flex", height: 6, borderRadius: 99, overflow: "visible", position: "relative", gap: 2 }}>
                   {[
                     { w: 22, color: "#93c5fd" },
@@ -441,8 +538,7 @@ export default function ProfilePage() {
                     left: `${Math.min(96, Math.max(2, ((parseFloat(bmiVal) - 10) / 30) * 100))}%`,
                     top: "50%", transform: "translate(-50%, -50%)",
                     width: 12, height: 12, borderRadius: "50%",
-                    background: bmiInfo.color,
-                    border: "2px solid #fff",
+                    background: bmiInfo.color, border: "2px solid #fff",
                     boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
                   }} />
                 </div>
@@ -481,7 +577,7 @@ export default function ProfilePage() {
           </>
         )}
 
-        {/* No intro state */}
+        {/* ── No intro state ── */}
         {!intro && !loadingIntro && (
           <Card style={{ textAlign: "center", padding: "2rem 1.5rem", marginBottom: 10 }}>
             <p style={{ fontSize: 28, marginBottom: 8 }}>📋</p>
@@ -498,11 +594,50 @@ export default function ProfilePage() {
         {/* ── Account ── */}
         <SectionLabel>Account</SectionLabel>
         <Card style={{ padding: 0, overflow: "hidden", marginBottom: 10 }}>
+
+          {/* Edit profile */}
           <button style={S.menuRow} onClick={() => intro && setShowEdit(true)}>
             <span style={S.menuIcon}>✏️</span>
             <span style={S.menuLabel}>Edit fitness profile</span>
             <span style={S.menuChevron}>›</span>
           </button>
+
+          {/* Manage subscription / upgrade */}
+          <div style={S.menuDivider} />
+          <button style={S.menuRow} onClick={() => router.push("/v1/pricing")}>
+            <span style={S.menuIcon}>💳</span>
+            <span style={S.menuLabel}>
+              {intro?.isSubscribed ? "Manage subscription" : "Upgrade to Pro"}
+            </span>
+            {intro?.isSubscribed
+              ? <span style={{ fontSize: 10, fontWeight: 700, color: "#ff6b35", background: "rgba(255,107,53,0.1)", borderRadius: 99, padding: "0.2rem 0.55rem" }}>PRO</span>
+              : <span style={{ fontSize: 10, fontWeight: 700, color: "#aaa", background: "#f4f2ed", borderRadius: 99, padding: "0.2rem 0.55rem" }}>FREE</span>
+            }
+          </button>
+
+          {/* Cancel subscription — only shown when subscribed */}
+          {intro?.isSubscribed && (
+            <>
+              <div style={S.menuDivider} />
+              <button
+                style={{ ...S.menuRow, opacity: canceling ? 0.5 : 1 }}
+                onClick={handleCancelSubscription}
+                disabled={canceling}
+              >
+                <span style={S.menuIcon}>🚫</span>
+                <span style={{ ...S.menuLabel, color: cancelConfirm ? "#ef4444" : "#888" }}>
+                  {canceling
+                    ? "Canceling…"
+                    : cancelConfirm
+                    ? "Tap again to confirm"
+                    : "Cancel subscription"}
+                </span>
+                <span style={S.menuChevron}>›</span>
+              </button>
+            </>
+          )}
+
+          {/* Sign out */}
           <div style={S.menuDivider} />
           <button
             style={{ ...S.menuRow, opacity: signingOut ? 0.5 : 1 }}
@@ -515,6 +650,7 @@ export default function ProfilePage() {
             </span>
             <span style={S.menuChevron}>›</span>
           </button>
+
         </Card>
 
         <p style={S.version}>YourPocketGym · v1.0</p>
@@ -549,12 +685,9 @@ const GLOBAL_STYLES = `
 const S = {
   root: {
     fontFamily: "'Plus Jakarta Sans', sans-serif",
-    background: "#fafaf8",
-    minHeight: "100dvh",
-    maxWidth: 430,
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
+    background: "#fafaf8", minHeight: "100dvh",
+    maxWidth: 430, margin: "0 auto",
+    display: "flex", flexDirection: "column",
   },
   spinner: {
     width: 22, height: 22, borderRadius: "50%",
@@ -577,20 +710,10 @@ const S = {
     fontSize: 18, color: "#1a1a1a", lineHeight: 1,
     boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
   },
-  headerTitle: {
-    fontSize: 16, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em",
-  },
-  main: {
-    padding: "1rem 1.25rem 2.5rem",
-    flex: 1,
-  },
-  heroName: {
-    fontSize: 18, fontWeight: 800, color: "#1a1a1a",
-    letterSpacing: "-0.04em", lineHeight: 1.1,
-  },
-  heroEmail: {
-    fontSize: 12, color: "#aaa", marginTop: 2, fontWeight: 400,
-  },
+  headerTitle: { fontSize: 16, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" },
+  main: { padding: "1rem 1.25rem 2.5rem", flex: 1 },
+  heroName: { fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em", lineHeight: 1.1 },
+  heroEmail: { fontSize: 12, color: "#aaa", marginTop: 2, fontWeight: 400 },
   heroPills: { display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" },
   pill: {
     fontSize: 11, padding: "3px 9px", borderRadius: 99,
@@ -598,34 +721,24 @@ const S = {
     color: "#666", fontWeight: 500, textTransform: "capitalize",
   },
   statIcon: { fontSize: 18, display: "block", marginBottom: 6 },
-  statValue: {
-    fontSize: 22, fontWeight: 800, color: "#1a1a1a",
-    letterSpacing: "-0.04em", lineHeight: 1,
-  },
+  statValue: { fontSize: 22, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.04em", lineHeight: 1 },
   statUnit: { fontSize: 11, fontWeight: 400, color: "#aaa" },
-  statLabel: {
-    fontSize: 11, fontWeight: 700, color: "#aaa",
-    letterSpacing: "0.08em", textTransform: "uppercase",
-  },
+  statLabel: { fontSize: 11, fontWeight: 700, color: "#aaa", letterSpacing: "0.08em", textTransform: "uppercase" },
   ctaBtn: {
     width: "100%", padding: "0.85rem",
     background: "#1a1a1a", color: "#fafaf8",
-    border: "none", borderRadius: 14,
-    fontSize: 14, fontWeight: 700,
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    letterSpacing: "0.01em",
+    border: "none", borderRadius: 14, fontSize: 14, fontWeight: 700,
+    fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: "0.01em",
   },
   menuRow: {
     width: "100%", display: "flex", alignItems: "center", gap: 12,
     padding: "1rem 1.25rem", background: "none", border: "none",
     fontFamily: "'Plus Jakarta Sans', sans-serif", textAlign: "left",
+    cursor: "pointer",
   },
   menuIcon: { fontSize: 16, flexShrink: 0 },
   menuLabel: { flex: 1, fontSize: 14, fontWeight: 500, color: "#1a1a1a" },
   menuChevron: { fontSize: 18, color: "#ddd", fontWeight: 300 },
   menuDivider: { height: 1, background: "#e8e5de", margin: "0 1.25rem" },
-  version: {
-    textAlign: "center", fontSize: 10, color: "#ccc",
-    fontWeight: 500, marginTop: 24, letterSpacing: "0.1em",
-  },
+  version: { textAlign: "center", fontSize: 10, color: "#ccc", fontWeight: 500, marginTop: 24, letterSpacing: "0.1em" },
 };

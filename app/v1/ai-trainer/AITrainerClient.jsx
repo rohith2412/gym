@@ -4,6 +4,7 @@ import { useSession }    from "next-auth/react";
 import { useRouter }     from "next/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
 import ProfilePicture    from "@/components/ProfilePicture";
+import PaywallOverlay from "@/components/PaywallOverlay";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const EQUIPMENT_OPTIONS = [
@@ -609,6 +610,15 @@ export default function AITrainerClient() {
 
   const [vis, setVis] = useState(false);
 
+    const [isSubscribed, setIsSubscribed] = useState(null); // null = loading
+
+useEffect(() => {
+  if (status !== "authenticated") return;
+  fetch("/api/user-intro")
+    .then(r => r.json())
+    .then(d => setIsSubscribed(d.data?.isSubscribed ?? false));
+}, [status]);
+
   // Auth guard
   useEffect(() => {
     if (status === "loading") return;
@@ -708,6 +718,7 @@ export default function AITrainerClient() {
   const activeSavedPlan = viewingSaved?.plan;
 
   return (
+    <div style={{ position: "relative" }}>
     <div style={{ fontFamily:"'Plus Jakarta Sans', sans-serif", background:"#fafaf8", minHeight:"100dvh", maxWidth:430, margin:"0 auto", display:"flex", flexDirection:"column" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -897,5 +908,7 @@ export default function AITrainerClient() {
         />
       )}
     </div>
+    {isSubscribed === false && <PaywallOverlay />}
+  </div>
   );
 }

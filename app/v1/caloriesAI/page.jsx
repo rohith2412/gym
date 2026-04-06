@@ -4,6 +4,9 @@ import { useSession } from "next-auth/react";
 import { useRouter }  from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
 import ProfilePicture from "@/components/ProfilePicture";
+import PaywallOverlay from "@/components/PaywallOverlay";
+
+
 
 function toLocalISO(date = new Date()) {
   const y = date.getFullYear();
@@ -26,6 +29,8 @@ function sumMacros(logs) {
 }
 function round1(n) { return Math.round(n * 10) / 10; }
 function fmt(n)    { return Math.round(n); }
+
+
 
 function mealEmoji(type) {
   return { breakfast: "🥞", lunch: "🥗", dinner: "🍜", snack: "🫐" }[type] ?? "🍽️";
@@ -441,6 +446,14 @@ export default function NutritionPage() {
   const [showLog, setShowLog] = useState(false);
   const [result,  setResult]  = useState(null);
   const [selDate, setSelDate] = useState(todayISO());
+  const [isSubscribed, setIsSubscribed] = useState(null); // null = loading
+
+useEffect(() => {
+  if (status !== "authenticated") return;
+  fetch("/api/user-intro")
+    .then(r => r.json())
+    .then(d => setIsSubscribed(d.data?.isSubscribed ?? false));
+}, [status]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -506,6 +519,8 @@ export default function NutritionPage() {
   const calPct = Math.min((todayTotals.calories / GOALS.calories) * 100, 100);
 
   return (
+    <div style={{ position: "relative" }}>
+
     <div style={S.root}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -630,6 +645,9 @@ export default function NutritionPage() {
       {/* Sheets render last in the tree — above everything */}
       {showLog && <LogSheet onClose={() => setShowLog(false)} onSuccess={handleSuccess} />}
       {result   && <ResultSheet log={result} onClose={() => setResult(null)} />}
+    </div>
+    {isSubscribed === false && <PaywallOverlay />}
+
     </div>
   );
 }

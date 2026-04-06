@@ -11,7 +11,7 @@ const LoginButton = () => {
 
   useEffect(() => {
     if (session) {
-      router.push("/v1/dashboard");
+      router.push("/v1/tracking");
     }
   }, [session, router]);
 
