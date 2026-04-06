@@ -1,11 +1,11 @@
-// app/api/stripe/webhook/route.js
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function POST(req) {
+  // ← Initialize inside the function
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
   const body = await req.text();
   const sig  = req.headers.get("stripe-signature");
 
@@ -47,6 +47,3 @@ export async function POST(req) {
 
   return Response.json({ received: true });
 }
-
-// Disable body parsing — Stripe needs raw body
-export const config = { api: { bodyParser: false } };

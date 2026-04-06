@@ -1,14 +1,14 @@
-// app/api/stripe/cancel/route.js
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function POST() {
   try {
+    // ← Initialize inside the function, not at module level
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
     await connectdb();
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -20,7 +20,6 @@ export async function POST() {
       return Response.json({ success: false, error: "No active subscription" }, { status: 400 });
     }
 
-    // Cancel at period end (not immediately)
     await stripe.subscriptions.update(intro.stripeSubscriptionId, {
       cancel_at_period_end: true,
     });
