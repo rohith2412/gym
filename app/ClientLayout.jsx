@@ -20,7 +20,7 @@ export default function ClientLayout({ children }) {
   const hideDock = [
     "/",
     "/v1/blog/caloriesAI",
-    "app/v1/StartersIntro",
+    "/v1/StartersIntro",
     "/v1/login",
     "/v1/profile",
   ].includes(pathname);
