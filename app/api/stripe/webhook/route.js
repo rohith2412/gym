@@ -1,116 +1,81 @@
+import Stripe from "stripe";
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
-import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
-//isSubscribed
+
 export async function POST(req) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
   const body = await req.text();
-  const sig  = req.headers.get("stripe-signature");
+  const sig = req.headers.get("stripe-signature");
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (e) {
     console.error("Webhook signature error:", e.message);
     return new Response(`Webhook error: ${e.message}`, { status: 400 });
   }
 
-  await connectdb();
+  if (event.type === "checkout.session.completed") {
+    try {
+      const session = event.data.object;
+      const userId = session.metadata?.userId;
 
-async function syncSubscription(sub) {
-  let userId = sub.metadata?.userId;
+      console.log("Payment received for userId:", userId);
 
-  // Fallback: find user by stripeCustomerId stored in your DB
-  if (!userId && sub.customer) {
-    const existing = await userIntroModel.findOne({
-      stripeCustomerId: sub.customer,
-    });
-    userId = existing?.userId;
-  }
+      if (!userId) {
+        console.error("No userId in metadata");
+        return Response.json({ received: true });
+      }
 
-  if (!userId) {
-    console.error("No userId found for subscription:", sub.id, "customer:", sub.customer);
-    return;
-  }
-
-  console.log("Syncing subscription for userId:", userId, "status:", sub.status);
-  await userIntroModel.findOneAndUpdate(
-    { userId },
-    {
-      stripeCustomerId:     sub.customer,   // also persist this
-      stripeSubscriptionId: sub.id,
-      subscriptionStatus:   sub.status,
-      isSubscribed:         sub.status === "active",
-      currentPeriodEnd:     new Date(sub.current_period_end * 1000),
-    },
-    { upsert: true }
-  );
-}
-
-  console.log("Webhook event received:", event.type);
-
-  switch (event.type) {
-
-    // ── Fires immediately when checkout payment succeeds ──────────────────
-    case "checkout.session.completed": {
-      const checkoutSession = event.data.object;
-
-        console.log("CHECKOUT SESSION FULL:", JSON.stringify(checkoutSession, null, 2));
-        console.log("metadata:", checkoutSession.metadata);
-        console.log("subscription_data metadata:", checkoutSession.subscription_data);
-        
-      // Only handle subscription checkouts
-      if (checkoutSession.mode !== "subscription") break;
-
-      const userId = checkoutSession.metadata?.userId;
-      if (!userId) break;
-
-      // Fetch the full subscription object to get all fields
-      const subscription = await stripe.subscriptions.retrieve(
-        checkoutSession.subscription
-      );
-
+      await connectdb();
       await userIntroModel.findOneAndUpdate(
         { userId },
         {
-          stripeSubscriptionId: subscription.id,
-          subscriptionStatus:   subscription.status,
-          isSubscribed:         subscription.status === "active",
-          currentPeriodEnd:     new Date(subscription.current_period_end * 1000),
-          stripeCustomerId:     checkoutSession.customer,
+          isSubscribed: true,
+          stripeCustomerId: session.customer,
+          stripeSubscriptionId: session.subscription,
+          subscriptionStatus: "active",
         },
         { upsert: true }
       );
-      console.log("Checkout completed — user subscribed:", userId);
-      break;
+
+      console.log("isSubscribed set to true for:", userId);
+    } catch (err) {
+      console.error("Error updating user:", err.message);
+      return new Response("Server error", { status: 500 });
     }
+  }
 
-    // ── Subscription lifecycle events ─────────────────────────────────────
-    case "customer.subscription.created":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted":
-      await syncSubscription(event.data.object);
-      break;
+  // Handle cancellations / failed payments
+  if (event.type === "customer.subscription.deleted" || 
+      event.type === "customer.subscription.updated") {
+    try {
+      const sub = event.data.object;
+      const customerId = sub.customer;
 
-    // ── Payment failed ────────────────────────────────────────────────────
-    case "invoice.payment_failed": {
-      const invoice = event.data.object;
-      if (invoice.subscription) {
-        const sub = await stripe.subscriptions.retrieve(invoice.subscription);
-        await syncSubscription(sub);
+      await connectdb();
+      const user = await userIntroModel.findOne({ stripeCustomerId: customerId });
+      if (!user) {
+        console.error("No user found for customerId:", customerId);
+        return Response.json({ received: true });
       }
-      break;
-    }
 
-    default:
-      console.log("Unhandled event type:", event.type);
+      const isActive = sub.status === "active";
+      await userIntroModel.findOneAndUpdate(
+        { stripeCustomerId: customerId },
+        {
+          isSubscribed: isActive,
+          subscriptionStatus: sub.status,
+        }
+      );
+
+      console.log("Subscription updated for customerId:", customerId, "status:", sub.status);
+    } catch (err) {
+      console.error("Error updating subscription:", err.message);
+      return new Response("Server error", { status: 500 });
+    }
   }
 
   return Response.json({ received: true });
