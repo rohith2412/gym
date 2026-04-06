@@ -61,6 +61,11 @@ async function syncSubscription(sub) {
     // ── Fires immediately when checkout payment succeeds ──────────────────
     case "checkout.session.completed": {
       const checkoutSession = event.data.object;
+
+        console.log("CHECKOUT SESSION FULL:", JSON.stringify(checkoutSession, null, 2));
+        console.log("metadata:", checkoutSession.metadata);
+        console.log("subscription_data metadata:", checkoutSession.subscription_data);
+        
       // Only handle subscription checkouts
       if (checkoutSession.mode !== "subscription") break;
 

@@ -12,6 +12,7 @@ export async function POST(req) {
     await connectdb();
 
     const session = await getServerSession(authOptions);
+    console.log("SESSION IN CHECKOUT:", JSON.stringify(session, null, 2)); 
     if (!session?.user?.id) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
     }
