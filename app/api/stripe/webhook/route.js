@@ -3,7 +3,7 @@ import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
-
+//isSubscribed
 export async function POST(req) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -24,24 +24,35 @@ export async function POST(req) {
 
   await connectdb();
 
-  async function syncSubscription(sub) {
-    const userId = sub.metadata?.userId;
-    if (!userId) {
-      console.error("No userId in subscription metadata:", sub.id);
-      return;
-    }
-    console.log("Syncing subscription for userId:", userId, "status:", sub.status);
-    await userIntroModel.findOneAndUpdate(
-      { userId },
-      {
-        stripeSubscriptionId: sub.id,
-        subscriptionStatus:   sub.status,
-        isSubscribed:         sub.status === "active",
-        currentPeriodEnd:     new Date(sub.current_period_end * 1000),
-      },
-      { upsert: true }
-    );
+async function syncSubscription(sub) {
+  let userId = sub.metadata?.userId;
+
+  // Fallback: find user by stripeCustomerId stored in your DB
+  if (!userId && sub.customer) {
+    const existing = await userIntroModel.findOne({
+      stripeCustomerId: sub.customer,
+    });
+    userId = existing?.userId;
   }
+
+  if (!userId) {
+    console.error("No userId found for subscription:", sub.id, "customer:", sub.customer);
+    return;
+  }
+
+  console.log("Syncing subscription for userId:", userId, "status:", sub.status);
+  await userIntroModel.findOneAndUpdate(
+    { userId },
+    {
+      stripeCustomerId:     sub.customer,   // also persist this
+      stripeSubscriptionId: sub.id,
+      subscriptionStatus:   sub.status,
+      isSubscribed:         sub.status === "active",
+      currentPeriodEnd:     new Date(sub.current_period_end * 1000),
+    },
+    { upsert: true }
+  );
+}
 
   console.log("Webhook event received:", event.type);
 

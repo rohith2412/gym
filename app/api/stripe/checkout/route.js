@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
-
+//isSubscribed
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
