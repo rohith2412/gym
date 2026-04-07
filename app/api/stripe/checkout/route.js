@@ -1,9 +1,10 @@
+// app/api/checkout/route.js
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import Stripe from "stripe";
-//isSubscribed
+
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
@@ -12,7 +13,8 @@ export async function POST(req) {
     await connectdb();
 
     const session = await getServerSession(authOptions);
-    console.log("SESSION IN CHECKOUT:", JSON.stringify(session, null, 2)); 
+    console.log("SESSION IN CHECKOUT:", JSON.stringify(session, null, 2));
+
     if (!session?.user?.id) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -45,11 +47,9 @@ export async function POST(req) {
       line_items:  [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
       success_url: `${baseUrl}/v1/pricing?success=true`,
       cancel_url:  `${baseUrl}/v1/pricing?canceled=true`,
-      // Store userId in metadata so webhook can find the user
       subscription_data: {
         metadata: { userId: session.user.id },
       },
-      // Also store on the session itself as backup
       metadata: { userId: session.user.id },
     });
 
