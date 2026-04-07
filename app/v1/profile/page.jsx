@@ -30,6 +30,14 @@ const EXP_MAP = {
   advanced:     { icon: "🎯", label: "Advanced"     },
 };
 
+// ── Format date helper ────────────────────────────────────────────────────────
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+};
+
 // ── Avatar ────────────────────────────────────────────────────────────────────
 function Avatar({ src, name, size = 68 }) {
   const [err, setErr] = useState(false);
@@ -353,6 +361,12 @@ export default function ProfilePage() {
   const goal    = intro?.fitnessGoal     ? GOAL_MAP[intro.fitnessGoal]     : null;
   const exp     = intro?.experienceLevel ? EXP_MAP[intro.experienceLevel]  : null;
 
+  // ── Subscription expiry display ───────────────────────────────────────────
+  const expiryDate    = intro?.currentPeriodEnd ? formatDate(intro.currentPeriodEnd) : null;
+  const daysRemaining = intro?.currentPeriodEnd
+    ? Math.max(0, Math.ceil((new Date(intro.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
+
   return (
     <div style={S.root}>
       <style>{GLOBAL_STYLES}</style>
@@ -372,7 +386,6 @@ export default function ProfilePage() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <h1 style={S.heroName}>{user?.name ?? "Athlete"}</h1>
-              {/* ── PRO badge — lives here, inside the hero card ⚡ ── */}
               {intro?.isSubscribed && (
                 <span style={{
                   fontSize: 10, fontWeight: 700, color: "#ff6b35",
@@ -411,7 +424,9 @@ export default function ProfilePage() {
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: "#ff6b35" }}>Pro subscriber</p>
               <p style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
-                All features unlocked · Cancel anytime below
+                {expiryDate
+                  ? `Renews · ${expiryDate}`
+                  : "All features unlocked · Cancel anytime below"}
               </p>
             </div>
             <button
@@ -607,7 +622,7 @@ export default function ProfilePage() {
           <button style={S.menuRow} onClick={() => router.push("/v1/pricing")}>
             <span style={S.menuIcon}>💳</span>
             <span style={S.menuLabel}>
-              {intro?.isSubscribed ? "Manage subscription" : "Upgrade to Pro"}
+              {intro?.isSubscribed ? "View subscription" : "Upgrade to Pro"}
             </span>
             {intro?.isSubscribed
               ? <span style={{ fontSize: 10, fontWeight: 700, color: "#ff6b35", background: "rgba(255,107,53,0.1)", borderRadius: 99, padding: "0.2rem 0.55rem" }}>PRO</span>
@@ -615,12 +630,41 @@ export default function ProfilePage() {
             }
           </button>
 
-          {/* Cancel subscription — only shown when subscribed */}
-          {/* {intro?.isSubscribed && (
+          {/* ── Cancel subscription — shown when subscribed ── */}
+          {intro?.isSubscribed && (
             <>
               <div style={S.menuDivider} />
+
+              {/* Expiry info row — appears immediately when user taps cancel once */}
+              {cancelConfirm && expiryDate && (
+                <div style={{
+                  margin: "0 1.25rem",
+                  background: "rgba(239,68,68,0.06)",
+                  border: "1px solid rgba(239,68,68,0.18)",
+                  borderRadius: 12,
+                  padding: "0.75rem 1rem",
+                  marginTop: 10,
+                }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "#ef4444", marginBottom: 4 }}>
+                    ⚠️ You'll lose Pro access on:
+                  </p>
+                  <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>
+                    {expiryDate}
+                  </p>
+                  <p style={{ fontSize: 11, color: "#aaa", marginTop: 3 }}>
+                    {daysRemaining === 0
+                      ? "Access expires today"
+                      : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} of Pro remaining`}
+                  </p>
+                </div>
+              )}
+
               <button
-                style={{ ...S.menuRow, opacity: canceling ? 0.5 : 1 }}
+                style={{
+                  ...S.menuRow,
+                  opacity: canceling ? 0.5 : 1,
+                  marginTop: cancelConfirm ? 4 : 0,
+                }}
                 onClick={handleCancelSubscription}
                 disabled={canceling}
               >
@@ -629,13 +673,13 @@ export default function ProfilePage() {
                   {canceling
                     ? "Canceling…"
                     : cancelConfirm
-                    ? "Tap again to confirm"
+                    ? "Tap again to confirm cancel"
                     : "Cancel subscription"}
                 </span>
                 <span style={S.menuChevron}>›</span>
               </button>
             </>
-          )} */}
+          )}
 
           {/* Sign out */}
           <div style={S.menuDivider} />

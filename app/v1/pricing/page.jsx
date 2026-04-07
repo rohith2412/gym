@@ -127,47 +127,7 @@ function PricingContent() {
               <p style={{ fontSize: 14, fontWeight: 700, color: "#4ade80" }}>✓ You're on Pro</p>
             </div>
 
-            {/* Cancel button */}
-            {!cancelConfirm ? (
-              <button
-                onClick={handleCancel}
-                style={{
-                  background: "transparent",
-                  width: "100%", padding: "0.75rem",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: 14,
-                  fontSize: 13, fontWeight: 600,
-                  color: "rgba(255,255,255,0.45)",
-                  fontFamily: "inherit", cursor: "pointer",
-                }}
-              >
-                Cancel subscription
-              </button>
-            ) : (
-              /* Confirmation step */
-              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "1rem", display: "flex", flexDirection: "column", gap: 10 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "#f87171", textAlign: "center" }}>
-                  Are you sure? You'll lose all Pro features.
-                </p>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    onClick={() => setCancelConfirm(false)}
-                    style={{ flex: 1, padding: "0.7rem", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "inherit", cursor: "pointer" }}
-                  >
-                    Keep Pro
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    disabled={canceling}
-                    style={{ flex: 1, padding: "0.7rem", background: "rgba(239,68,68,0.8)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "inherit", cursor: canceling ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-                  >
-                    {canceling ? (
-                      <span style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
-                    ) : "Yes, cancel"}
-                  </button>
-                </div>
-              </div>
-            )}
+        
           </div>
         ) : (
           <button
