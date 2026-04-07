@@ -4,9 +4,9 @@ import userIntroModel from "@/models/userIntroModel";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+export async function POST(req) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
@@ -18,39 +18,34 @@ export async function POST(req) {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (e) {
-    console.error("Webhook signature error:", e.message);
-    return new Response(`Webhook error: ${e.message}`, { status: 400 });
+  } catch (err) {
+    console.error("Webhook signature error:", err.message);
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
   // =========================
-  // PAYMENT SUCCESS
+  // 1. CHECKOUT SUCCESS
   // =========================
   if (event.type === "checkout.session.completed") {
     try {
       const session = event.data.object;
-      const userId = session.metadata?.userId;
-
-      console.log("Payment received for userId:", userId);
-
-      if (!userId) {
-        console.error("No userId in metadata");
-        return Response.json({ received: true });
-      }
 
       await connectdb();
 
-      let currentPeriodEnd = null;
+      const userId = session.metadata?.userId;
 
-      // ✅ Fetch subscription for period end
+      if (!userId) {
+        console.error("Missing userId in metadata");
+        return Response.json({ received: true });
+      }
+
+      let subscriptionData = null;
+
+      // ✅ Fetch subscription properly
       if (session.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(
+        subscriptionData = await stripe.subscriptions.retrieve(
           session.subscription
         );
-
-        currentPeriodEnd = subscription.current_period_end
-          ? new Date(subscription.current_period_end * 1000)
-          : null;
       }
 
       await userIntroModel.findOneAndUpdate(
@@ -59,25 +54,29 @@ export async function POST(req) {
           isSubscribed: true,
           stripeCustomerId: session.customer,
           stripeSubscriptionId: session.subscription,
-          subscriptionStatus: "active",
-          currentPeriodEnd,
+          subscriptionStatus: subscriptionData?.status || "active",
+
+          currentPeriodEnd: subscriptionData?.current_period_end
+            ? new Date(subscriptionData.current_period_end * 1000)
+            : null,
         },
         { upsert: true }
       );
 
-      console.log("User upgraded to premium:", userId);
+      console.log("User subscribed:", userId);
     } catch (err) {
-      console.error("Error updating user:", err.message);
+      console.error("Checkout webhook error:", err.message);
       return new Response("Server error", { status: 500 });
     }
   }
 
   // =========================
-  // SUBSCRIPTION UPDATES
+  // 2. SUBSCRIPTION SYNC (IMPORTANT)
   // =========================
   if (
-    event.type === "customer.subscription.deleted" ||
-    event.type === "customer.subscription.updated"
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
   ) {
     try {
       const sub = event.data.object;
@@ -85,36 +84,23 @@ export async function POST(req) {
 
       await connectdb();
 
-      const user = await userIntroModel.findOne({
-        stripeCustomerId: customerId,
-      });
-
-      if (!user) {
-        console.error("No user found for customerId:", customerId);
-        return Response.json({ received: true });
-      }
-
-      const isActive = sub.status === "active";
-
       await userIntroModel.findOneAndUpdate(
         { stripeCustomerId: customerId },
         {
-          isSubscribed: isActive,
+          isSubscribed: sub.status === "active",
           subscriptionStatus: sub.status,
+          stripeSubscriptionId: sub.id,
+
           currentPeriodEnd: sub.current_period_end
             ? new Date(sub.current_period_end * 1000)
             : null,
-        }
+        },
+        { upsert: true }
       );
 
-      console.log(
-        "Subscription updated:",
-        customerId,
-        "status:",
-        sub.status
-      );
+      console.log("Subscription synced:", customerId, sub.status);
     } catch (err) {
-      console.error("Error updating subscription:", err.message);
+      console.error("Subscription webhook error:", err.message);
       return new Response("Server error", { status: 500 });
     }
   }
