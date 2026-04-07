@@ -52,7 +52,7 @@ export default function PaywallOverlay() {
             cursor: "pointer", marginBottom: 10,
           }}
         >
-          ✨ Upgrade to Pro — $9.99/mo
+          ✨ Upgrade to Pro — $12/mo
         </button>
 
         <p style={{ fontSize: 12, color: "#bbb" }}>Tracking is always free. Cancel anytime.</p>

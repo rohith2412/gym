@@ -34,7 +34,7 @@ export default function IntroPage() {
     }
 
     if (session?.user?.hasIntro) {
-      router.replace("/v1/dashboard");
+      router.replace("/v1/tracking");
     }
   }, [status, session, router]);
 
@@ -63,7 +63,7 @@ export default function IntroPage() {
       if (data.success) {
         setDone(true);
         await update(); // refresh session so hasIntro becomes true
-        setTimeout(() => router.push("/v1/dashboard"), 2000);
+        setTimeout(() => router.push("/v1/tracking"), 2000);
       } else {
         alert("Something went wrong: " + data.error);
       }
@@ -112,7 +112,7 @@ export default function IntroPage() {
           <div style={styles.doneWrap}>
             <div style={styles.doneIcon}>✓</div>
             <h2 style={styles.doneTitle}>All set!</h2>
-            <p style={styles.doneSub}>Redirecting to your dashboard…</p>
+            <p style={styles.doneSub}>Redirecting to your tracking…</p>
             <div style={styles.chips}>
               {[
                 summaryLabels.gender[form.gender],

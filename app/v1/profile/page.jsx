@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers ⚡ ───────────────────────────────────────────────────────────────────
 const calcBmi = (weight, height) => {
   if (!weight || !height) return null;
   return (weight / Math.pow(height / 100, 2)).toFixed(1);
@@ -372,7 +372,7 @@ export default function ProfilePage() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <h1 style={S.heroName}>{user?.name ?? "Athlete"}</h1>
-              {/* ── PRO badge — lives here, inside the hero card ── */}
+              {/* ── PRO badge — lives here, inside the hero card ⚡ ── */}
               {intro?.isSubscribed && (
                 <span style={{
                   fontSize: 10, fontWeight: 700, color: "#ff6b35",
@@ -380,7 +380,7 @@ export default function ProfilePage() {
                   padding: "0.2rem 0.6rem", letterSpacing: "0.06em",
                   flexShrink: 0,
                 }}>
-                  ⚡ PRO
+                   PRO
                 </span>
               )}
             </div>
@@ -407,7 +407,7 @@ export default function ProfilePage() {
             border: "1px solid rgba(255,107,53,0.2)",
             borderRadius: 16, padding: "0.85rem 1.1rem", marginBottom: 10,
           }}>
-            <span style={{ fontSize: 20 }}>⚡</span>
+            <span style={{ fontSize: 20 }}></span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: "#ff6b35" }}>Pro subscriber</p>
               <p style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
@@ -448,7 +448,7 @@ export default function ProfilePage() {
               fontSize: 12, fontWeight: 700, color: "#ff6b35",
               background: "rgba(255,107,53,0.15)", borderRadius: 99,
               padding: "0.3rem 0.7rem", flexShrink: 0,
-            }}>$9.99/mo →</span>
+            }}>$12/mo →</span>
           </div>
         )}
 
@@ -616,7 +616,7 @@ export default function ProfilePage() {
           </button>
 
           {/* Cancel subscription — only shown when subscribed */}
-          {intro?.isSubscribed && (
+          {/* {intro?.isSubscribed && (
             <>
               <div style={S.menuDivider} />
               <button
@@ -635,7 +635,7 @@ export default function ProfilePage() {
                 <span style={S.menuChevron}>›</span>
               </button>
             </>
-          )}
+          )} */}
 
           {/* Sign out */}
           <div style={S.menuDivider} />

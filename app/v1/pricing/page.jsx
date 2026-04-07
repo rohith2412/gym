@@ -28,9 +28,11 @@ function PricingContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
 
-  const [loading,       setLoading]       = useState(false);
-  const [subscribed,    setSubscribed]    = useState(false);
+  const [loading,        setLoading]        = useState(false);
+  const [canceling,      setCanceling]      = useState(false);
+  const [subscribed,     setSubscribed]     = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
+  const [cancelConfirm,  setCancelConfirm]  = useState(false);
 
   const success  = searchParams.get("success")  === "true";
   const canceled = searchParams.get("canceled") === "true";
@@ -56,6 +58,26 @@ function PricingContent() {
     }
   }
 
+  async function handleCancel() {
+    if (!cancelConfirm) {
+      setCancelConfirm(true);
+      return;
+    }
+    setCanceling(true);
+    try {
+      const res  = await fetch("/api/stripe/cancel", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setSubscribed(false);
+        setCancelConfirm(false);
+      } else {
+        alert("Error: " + json.error);
+      }
+    } finally {
+      setCanceling(false);
+    }
+  }
+
   return (
     <main style={{ padding: "1.25rem 1.25rem 3rem", flex: 1, display: "flex", flexDirection: "column", gap: 16 }}>
 
@@ -71,7 +93,7 @@ function PricingContent() {
       )}
       {canceled && (
         <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 14, padding: "1rem 1.1rem" }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: "#d97706" }}>Payment canceled — you can try again any time.</p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "#d97706" }}>Payment canceled - you can try again any time.</p>
         </div>
       )}
 
@@ -82,22 +104,15 @@ function PricingContent() {
           Your pocket gym,<br />fully unlocked
         </h2>
         <p style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7 }}>
-          Everything you need to train smarter, eat better, and hit your goals — powered by AI.
+          Everything you need to train smarter, eat better, and hit your goals - powered by AI.
         </p>
       </div>
 
       {/* Price card */}
       <div style={{ background: "#1a1a1a", borderRadius: 24, padding: "1.5rem", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: "rgba(255,107,53,0.15)" }} />
-        <div style={{ position: "absolute", bottom: -20, left: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(99,102,241,0.1)" }} />
-
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#ff6b35", background: "rgba(255,107,53,0.15)", borderRadius: 99, padding: "0.25rem 0.7rem", display: "inline-block", marginBottom: 12 }}>
-          Pro Plan
-        </span>
-
         <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginBottom: 6 }}>
-          <span style={{ fontSize: 48, fontWeight: 800, color: "#fff", letterSpacing: "-0.06em", lineHeight: 1 }}>$9</span>
-          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>.99 / month</span>
+          <span style={{ fontSize: 48, fontWeight: 800, color: "#fff", letterSpacing: "-0.06em", lineHeight: 1 }}>$12</span>
+          <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}> / month</span>
         </div>
         <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 20 }}>Cancel anytime. No hidden fees.</p>
 
@@ -106,16 +121,61 @@ function PricingContent() {
             <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
           </div>
         ) : subscribed ? (
-          <div style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 14, padding: "0.9rem", textAlign: "center" }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: "#4ade80" }}>✓ You're on Pro</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Active badge */}
+            <div style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 14, padding: "0.9rem", textAlign: "center" }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "#4ade80" }}>✓ You're on Pro</p>
+            </div>
+
+            {/* Cancel button */}
+            {!cancelConfirm ? (
+              <button
+                onClick={handleCancel}
+                style={{
+                  background: "transparent",
+                  width: "100%", padding: "0.75rem",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 14,
+                  fontSize: 13, fontWeight: 600,
+                  color: "rgba(255,255,255,0.45)",
+                  fontFamily: "inherit", cursor: "pointer",
+                }}
+              >
+                Cancel subscription
+              </button>
+            ) : (
+              /* Confirmation step */
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 14, padding: "1rem", display: "flex", flexDirection: "column", gap: 10 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#f87171", textAlign: "center" }}>
+                  Are you sure? You'll lose all Pro features.
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    onClick={() => setCancelConfirm(false)}
+                    style={{ flex: 1, padding: "0.7rem", background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 600, color: "#fff", fontFamily: "inherit", cursor: "pointer" }}
+                  >
+                    Keep Pro
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    disabled={canceling}
+                    style={{ flex: 1, padding: "0.7rem", background: "rgba(239,68,68,0.8)", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "inherit", cursor: canceling ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  >
+                    {canceling ? (
+                      <span style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                    ) : "Yes, cancel"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <button
             onClick={handleSubscribe}
             disabled={loading}
             style={{
+              background: "#e55a25",
               width: "100%", padding: "1rem",
-              background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg,#ff6b35,#f59e0b)",
               border: "none", borderRadius: 14,
               fontSize: 15, fontWeight: 700, color: "#fff",
               fontFamily: "inherit", cursor: loading ? "not-allowed" : "pointer",
@@ -127,7 +187,7 @@ function PricingContent() {
                 <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
                 Redirecting to Stripe…
               </>
-            ) : "✨ Start Pro — $9.99/mo"}
+            ) : "Start Pro - $12/mo"}
           </button>
         )}
       </div>
@@ -163,7 +223,7 @@ function PricingContent() {
   );
 }
 
-// ── Page shell — wraps content in Suspense so useSearchParams works ───────────
+// ── Page shell ────────────────────────────────────────────────────────────────
 export default function PricingPage() {
   const router = useRouter();
 
@@ -199,7 +259,6 @@ export default function PricingPage() {
         <h1 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>Upgrade to Pro</h1>
       </header>
 
-      {/* Suspense boundary required by Next.js for useSearchParams */}
       <Suspense fallback={
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid #e8e5de", borderTopColor: "#1a1a1a", animation: "spin 0.7s linear infinite" }} />
