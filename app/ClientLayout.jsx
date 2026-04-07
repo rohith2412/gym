@@ -22,6 +22,7 @@ export default function ClientLayout({ children }) {
     "/v1/blog/caloriesAI",
     "/v1/StartersIntro",
     "/v1/login",
+    "/v1/pricing",
     "/v1/profile",
   ].includes(pathname);
 

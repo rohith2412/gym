@@ -1,6 +1,8 @@
 "use client";
 
 import ProfilePicture from "@/components/ProfilePicture";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -927,6 +929,9 @@ export default function TrackingPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [chartOpen, setChartOpen] = useState(false);
   const chartRef = useRef(null);
+  const { data:session, status } = useSession();
+
+  const router = useRouter();
 
   const deleteLog = async (id) => {
     if (confirmDeleteId !== id) {
@@ -961,6 +966,12 @@ export default function TrackingPage() {
       chartRef.current.style.opacity = "0";
     }
   }, [chartOpen]);
+
+    useEffect(() => {
+    if (status === "loading") return;
+    if (status === "unauthenticated") { router.replace("/"); return; }
+    if (session && !session.user?.hasIntro) { router.replace("/v1/StartersIntro"); return; }
+  }, [status, session, router]);
 
   // ── Week streak derived state ──
   const weekDays = getWeekActivity(logs);

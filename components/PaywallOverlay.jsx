@@ -30,9 +30,15 @@ export default function PaywallOverlay() {
         boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
         textAlign: "center", maxWidth: 340, width: "100%",
       }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+        <div style={S.root}>
+          <span style={S.logoText}>
+            <span style={{ color: "#1a1a1a" }}>Your</span>
+            <span style={{ color: "#ff6b35" }}>Pocket</span>
+            <span style={{ color: "#1a1a1a" }}>Gym</span>
+          </span>
+        </div>
         <h2 style={{
-          fontSize: 22, fontWeight: 800, color: "#1a1a1a",
+          fontSize: 15, fontWeight: 800, color: "#1a1a1a",
           letterSpacing: "-0.04em", lineHeight: 1.2, marginBottom: 8,
         }}>
           Pro feature
@@ -43,16 +49,16 @@ export default function PaywallOverlay() {
 
         <button
           onClick={() => router.push("/v1/pricing")}
-          style={{
-            width: "100%", padding: "0.95rem",
-            background: "linear-gradient(135deg,#ff6b35,#f59e0b)",
-            color: "#fff", border: "none", borderRadius: 14,
-            fontSize: 15, fontWeight: 700,
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            cursor: "pointer", marginBottom: 10,
-          }}
+         style={{
+              background: "#e55a25",
+              width: "100%", padding: "1rem",
+              border: "none", borderRadius: 10,
+              fontSize: 15, fontWeight: 700, color: "#fff",
+              fontFamily: "inherit", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            }}
         >
-          ✨ Upgrade to Pro — $12/mo
+           Upgrade to Pro 
         </button>
 
         <p style={{ fontSize: 12, color: "#bbb" }}>Tracking is always free. Cancel anytime.</p>
@@ -60,3 +66,14 @@ export default function PaywallOverlay() {
     </div>
   );
 }
+
+const S = {
+  root: {
+    marginBottom: "5px",
+  },
+  logoText: {
+    fontSize: 20,
+    fontWeight: 800,
+    letterSpacing: "-0.035em",
+  },
+};
