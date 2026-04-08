@@ -6,7 +6,12 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import ProfilePicture    from "@/components/ProfilePicture";
 import PaywallOverlay from "@/components/PaywallOverlay";
 
-// ─── Constants ──────────────────────────────────────────────────────────────── save
+// ─── Constants ──────────────────────────────────────────────────────────────── save. edit
+
+{/* <div onClick={onClose} style={{ ..., zIndex:40, ... }} />
+<div style={{ ..., zIndex:50, ... }}></div> */}
+
+
 const EQUIPMENT_OPTIONS = [
   "Full gym","Dumbbells only","Barbell & rack","Resistance bands",
   "Bodyweight only","Kettlebells","Cable machine","Home gym",
@@ -249,7 +254,7 @@ function PlanView({ plan, onRegen, isLoading, onBack, onSave, isSaved, saving })
         )}
       </div>
 
-      {/* Plan header */}
+      {/* Plan header zIndex:9998, backdropFilter */}
       <Card style={{ background:"#1a1a1a" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:8 }}>
           <div>
@@ -519,7 +524,7 @@ function ProfileBanner({ intro, extra, onEditExtra }) {
 {/* <a href="/v1/profile">
   <ProfilePicture size={40} />
 </a> */}
-// ─── Extra Detail Form ────────────────────────────────────────────────────────
+// ─── Extra Detail Form zIndex:50, boxShadow ────────────────────────────────────────────────────────
 function ExtraForm({ extra, onChange, onClose }) {
   const [local, setLocal] = useState({ ...extra });
 
@@ -537,8 +542,8 @@ function ExtraForm({ extra, onChange, onClose }) {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.35)", zIndex:40, backdropFilter:"blur(3px)" }} />
-      <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:430, background:"#fafaf8", borderRadius:"24px 24px 0 0", padding:"1.5rem 1.25rem 2.5rem", zIndex:50, boxShadow:"0 -4px 40px rgba(0,0,0,0.12)", maxHeight:"85dvh", overflowY:"auto" }}>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.35)", zIndex:9998, backdropFilter:"blur(3px)" }} />
+      <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:430, background:"#fafaf8", borderRadius:"24px 24px 0 0", padding:"1.5rem 1.25rem 2.5rem", zIndex:9999, boxShadow:"0 -4px 40px rgba(0,0,0,0.12)", maxHeight:"85dvh", overflowY:"auto" }}>
         <div style={{ width:36, height:4, borderRadius:2, background:"#e0ddd6", margin:"0 auto 1.25rem" }} />
         <h2 style={{ fontSize:18, fontWeight:800, color:"#1a1a1a", letterSpacing:"-0.03em", marginBottom:"1.25rem" }}>Personalise your plan</h2>
 
