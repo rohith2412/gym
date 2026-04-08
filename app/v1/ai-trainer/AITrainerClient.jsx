@@ -6,7 +6,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import ProfilePicture    from "@/components/ProfilePicture";
 import PaywallOverlay from "@/components/PaywallOverlay";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Constants ──────────────────────────────────────────────────────────────── save
 const EQUIPMENT_OPTIONS = [
   "Full gym","Dumbbells only","Barbell & rack","Resistance bands",
   "Bodyweight only","Kettlebells","Cable machine","Home gym",
@@ -224,9 +224,11 @@ function PlanView({ plan, onRegen, isLoading, onBack, onSave, isSaved, saving })
               flex:1, padding:"0.7rem", borderRadius:12, fontSize:13, fontWeight:700,
               fontFamily:"inherit", cursor: saving ? "not-allowed" : "pointer",
               border:"none",
-              background: saving ? "#e8e5de" : "linear-gradient(135deg,#ff6b35,#f59e0b)",
+              background: "#e55a25",
               color:"#fff", opacity: saving ? 0.7 : 1,
               display:"flex", alignItems:"center", justifyContent:"center", gap:5,
+
+
             }}
           >
             {saving ? (
