@@ -237,7 +237,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Testimonials ── */}
+      {/* ── Testimonials  ── */}
       <section
         id="results"
         style={{ ...S.sec, background: "#f4f2ed" }}

@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const { data: session } = useSession();
@@ -77,16 +78,12 @@ export default function LoginPage() {
           <img src="/Googlelogo.svg" alt="Google" />
         </button>
 
-        <p
-          style={{
-            fontSize: "11px",
-            color: "#aaa",
-            marginTop: "16px",
-            lineHeight: "1.5",
-          }}
-        >
-          By continuing, you agree to our Terms & Privacy Policy
-        </p>
+<p style={{ fontSize: "11px", color: "#aaa", marginTop: "16px", lineHeight: "1.5" }}>
+  By continuing, you agree to our{" "}
+  <Link href="/legal/terms" style={{ textDecoration: "underline" }} >Terms</Link>{" "}
+  &{" "}
+  <Link href="/legal/privacy" style={{ textDecoration: "underline" }} >Privacy Policy</Link>
+</p>
       </div>
     </div>
   );

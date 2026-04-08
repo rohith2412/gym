@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -615,6 +616,7 @@ export default function ProfilePage() {
             <span style={S.menuIcon}>✏️</span>
             <span style={S.menuLabel}>Edit fitness profile</span>
             <span style={S.menuChevron}>›</span>
+            
           </button>
 
           {/* Manage subscription / upgrade */}
@@ -680,6 +682,23 @@ export default function ProfilePage() {
               </button>
             </>
           )}
+
+          {/* Terms & Policy */}
+<div style={S.menuDivider} />
+
+<Link href="/legal/terms" style={S.menuRow}>
+  <span style={S.menuIcon}>📄</span>
+  <span style={S.menuLabel}>Terms of Service</span>
+  <span style={S.menuChevron}>›</span>
+</Link>
+
+<div style={S.menuDivider} />
+
+<Link href="/legal/privacy" style={S.menuRow}>
+  <span style={S.menuIcon}>🔒</span>
+  <span style={S.menuLabel}>Privacy Policy</span>
+  <span style={S.menuChevron}>›</span>
+</Link>
 
           {/* Sign out */}
           <div style={S.menuDivider} />

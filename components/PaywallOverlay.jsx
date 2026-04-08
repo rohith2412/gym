@@ -35,6 +35,7 @@ export default function PaywallOverlay() {
             <span style={{ color: "#1a1a1a" }}>Your</span>
             <span style={{ color: "#ff6b35" }}>Pocket</span>
             <span style={{ color: "#1a1a1a" }}>Gym</span>
+            <span className="">🔒</span>
           </span>
         </div>
         <h2 style={{

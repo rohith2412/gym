@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const LoginButton = () => {
   const [showGoogleButton, setShowGoogleButton] = useState(false);
@@ -104,16 +105,12 @@ const LoginButton = () => {
 
           {/* Footer */}
           <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
-            <p
-              style={{
-                fontSize: 11,
-                color: "#bbb",
-                lineHeight: 1.6,
-                marginBottom: "0.75rem",
-              }}
-            >
-              By continuing, you agree to our Terms &amp; Privacy Policy
-            </p>
+            <p style={{ fontSize: "11px", color: "#aaa", marginTop: "16px", lineHeight: "1.5" }}>
+  By continuing, you agree to our{" "}
+  <Link href="/legal/terms" style={{ textDecoration: "underline" }} >Terms</Link>{" "}
+  &{" "}
+  <Link href="/legal/privacy" style={{ textDecoration: "underline" }} >Privacy Policy</Link>
+</p>
             <button
               onClick={() => setShowGoogleButton(false)}
               style={{

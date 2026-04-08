@@ -24,6 +24,8 @@ export default function ClientLayout({ children }) {
     "/v1/login",
     "/v1/pricing",
     "/v1/profile",
+    "/legal/terms",
+    "/legal/privacy",
   ].includes(pathname);
 
   // 📱 Mobile-only gate
