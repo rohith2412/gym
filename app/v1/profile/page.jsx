@@ -715,7 +715,9 @@ export default function ProfilePage() {
           </button>
 
         </Card>
-
+  <div style={{ display: "flex", gap: 16, marginBottom: 4 }}>
+    <Link href="/legal/delete-account" style={{ fontSize: 11, color: "#bbb", textDecoration: "underline" }}>Delete Account</Link>
+  </div>
         <p style={S.version}>YourPocketGym · v1.0</p>
       </main>
 
