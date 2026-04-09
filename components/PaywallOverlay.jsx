@@ -1,10 +1,21 @@
-// components/PaywallOverlay.jsx
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+
+const WHITELISTED_EMAILS = [
+  "demo1@gmail.com",
+  "review@yourpocketgym.com", // Google reviewer account
+];
 
 export default function PaywallOverlay() {
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // bypass paywall for whitelisted emails
+  if (WHITELISTED_EMAILS.includes(session?.user?.email)) {
+    return null;
+  }
 
   return (
     <div style={{
@@ -35,7 +46,7 @@ export default function PaywallOverlay() {
             <span style={{ color: "#1a1a1a" }}>Your</span>
             <span style={{ color: "#ff6b35" }}>Pocket</span>
             <span style={{ color: "#1a1a1a" }}>Gym</span>
-            <span className="">🔒</span>
+            <span>🔒</span>
           </span>
         </div>
         <h2 style={{
@@ -50,16 +61,16 @@ export default function PaywallOverlay() {
 
         <button
           onClick={() => router.push("/v1/pricing")}
-         style={{
-              background: "#e55a25",
-              width: "100%", padding: "1rem",
-              border: "none", borderRadius: 10,
-              fontSize: 15, fontWeight: 700, color: "#fff",
-              fontFamily: "inherit", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}
+          style={{
+            background: "#e55a25",
+            width: "100%", padding: "1rem",
+            border: "none", borderRadius: 10,
+            fontSize: 15, fontWeight: 700, color: "#fff",
+            fontFamily: "inherit", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}
         >
-           Upgrade to Pro 
+          Upgrade to Pro
         </button>
 
         <p style={{ fontSize: 12, color: "#bbb" }}>Tracking is always free. Cancel anytime.</p>
@@ -69,9 +80,7 @@ export default function PaywallOverlay() {
 }
 
 const S = {
-  root: {
-    marginBottom: "5px",
-  },
+  root: { marginBottom: "5px" },
   logoText: {
     fontSize: 20,
     fontWeight: 800,
