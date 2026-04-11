@@ -15,8 +15,11 @@ const userIntroSchema = new Schema({
   isSubscribed:        { type: Boolean, default: false },
   stripeCustomerId:    String,
   stripeSubscriptionId:String,
-  subscriptionStatus:  String, // "active" | "canceled" | "past_due" etc.
+  subscriptionStatus:  String,
   currentPeriodEnd:    Date,
+
+  // ── Free trial ────────────────────────────────────────────
+  freeTrialUsed:       { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.models.UserIntro || mongoose.model("UserIntro", userIntroSchema);

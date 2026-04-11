@@ -23,7 +23,7 @@ export const metadata = {
     siteName: "YourPocketGym",
     images: [
       {
-        url: `${BASE_URL}/og-calorie-tracker.png`, // ← create a 1200×630 OG image
+        url: `${BASE_URL}/og-calorie-tracker.png`, // ← create a 1200×630 OG image dashboard
         width: 1200,
         height: 630,
         alt: "AI Calorie Tracker - Snap a photo, get instant macros",

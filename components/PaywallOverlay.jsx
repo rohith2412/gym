@@ -56,7 +56,7 @@ export default function PaywallOverlay() {
           Pro feature
         </h2>
         <p style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7, marginBottom: "1.5rem" }}>
-          Upgrade to Pro to unlock AI training plans, nutrition tracking, recipe finder and more.
+          Upgrade to Pro to unlock AI training plans, calories tracking and recipe finder.
         </p>
 
         <button
@@ -87,3 +87,4 @@ const S = {
     letterSpacing: "-0.035em",
   },
 };
+//nutrition tracking, recipe finder and more

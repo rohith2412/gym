@@ -10,7 +10,7 @@ function mealEmoji(type) {
   return { breakfast: "🥞", lunch: "🥗", dinner: "🍜", snack: "🫐" }[type] ?? "🍽️";
 }
 
-// ─── Login modal ──────────────────────────────────────────────────────────────
+// ─── Login modal ────────────────────────────────────────────────────────────── dashboard start
 function LoginModal({ onClose }) {
   return (
     <>
@@ -257,7 +257,7 @@ function ResultCard({ result, onContinue }) {
             fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: "pointer",
           }}
         >
-          Start tracking  →
+          Track more calories  →
         </button>
       </div>
     </div>
@@ -282,13 +282,18 @@ export default function CaloriesAIClient() {
       .then((json) => {
         setTrialUsed(json.used);
         setTrialChecked(true);
-        if (!json.used) setToolVisible(true);
+        if (json.used) {
+        router.replace("/v1/caloriesAI"); // ← redirect immediately
+      } else {
+        setToolVisible(true);
+      }
+
       });
   }, [status]);
 
   function handleTryFree() {
     if (status === "authenticated") {
-      if (trialUsed) { router.push("/v1/dashboard"); return; }
+      if (trialUsed) { router.push("/v1/tracking"); return; }
       setToolVisible(true);
     } else {
       setShowLogin(true);
@@ -325,8 +330,8 @@ export default function CaloriesAIClient() {
             </span>
           </a>
           {status === "authenticated" ? (
-            <a href="/v1/dashboard" style={{ fontSize: 13, fontWeight: 700, color: "#ff6b35", textDecoration: "none", padding: "0.4rem 1rem", border: "1px solid rgba(255,107,53,0.3)", borderRadius: 99 }}>
-              Dashboard →
+            <a href="/v1/tracking" style={{ fontSize: 13, fontWeight: 700, color: "#ff6b35", textDecoration: "none", padding: "0.4rem 1rem", border: "1px solid rgba(255,107,53,0.3)", borderRadius: 99 }}>
+              Track more →
             </a>
           ) : (
             <button onClick={() => setShowLogin(true)} style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", background: "none", border: "1px solid #e8e5de", borderRadius: 99, padding: "0.4rem 1rem", cursor: "pointer", fontFamily: "inherit" }}>
@@ -448,7 +453,7 @@ export default function CaloriesAIClient() {
         {/* Result */}
         {result && (
           <div style={{ animation: "fadeIn 0.4s ease" }}>
-            <ResultCard result={result} onContinue={() => router.push("/v1/dashboard")} />
+            <ResultCard result={result} onContinue={() => router.push("/v1/tracking")} />
           </div>
         )}
       </div>
