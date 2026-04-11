@@ -2,7 +2,7 @@
 
 import CaloriesAIClient from "@/components/CaloriesAIClient";
 
-const BASE_URL = "https://yourpocketgym.com"; // ← change to your real domain
+const BASE_URL = "https://www.yourpocketgym.com/"; // ← change to your real domain
 
 export const metadata = {
   metadataBase: new URL(BASE_URL),

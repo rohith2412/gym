@@ -1,6 +1,6 @@
 // app/v1/ai-trainer/page.jsx - server component
 
-const BASE_URL = "https://yourpocketgym.com";
+const BASE_URL = "https://www.yourpocketgym.com/";
 
 export const metadata = {
   metadataBase: new URL(BASE_URL),

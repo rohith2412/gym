@@ -10,7 +10,7 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://yourpocketgym.com"),
+  metadataBase: new URL("https://www.yourpocketgym.com/"),
   title: {
     default: "YourPocketGym - AI Fitness & Nutrition Tracker",
     template: "%s | YourPocketGym",
@@ -25,13 +25,13 @@ export const metadata = {
     "ai fitness app",
   ],
   alternates: {
-    canonical: "https://yourpocketgym.com",
+    canonical: "https://www.yourpocketgym.com/",
   },
   openGraph: {
     title: "YourPocketGym - AI Fitness & Nutrition Tracker",
     description:
       "Track workouts, log meals with a photo, and hit your fitness goals faster with AI.",
-    url: "https://yourpocketgym.com",
+    url: "https://www.yourpocketgym.com/",
     siteName: "YourPocketGym",
     type: "website",
     locale: "en_US",

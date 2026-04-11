@@ -1,4 +1,4 @@
-const BASE_URL = "https://yourpocketgym.com";
+const BASE_URL = "https://www.yourpocketgym.com/";
 
 export default function sitemap() {
   return [

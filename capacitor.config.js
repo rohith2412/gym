@@ -5,7 +5,7 @@ const config = {
   appName: 'YourPocketGym',
   webDir: 'out',
   server: {
-    url: 'https://yourpocketgym.com',
+    url: 'https://www.yourpocketgym.com/',
     cleartext: false,
   },
 };
