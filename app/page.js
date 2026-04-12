@@ -179,9 +179,35 @@ export default function LandingPage() {
         <h1 style={S.h1}>
           The gym
           <br />
-          in your
+          in y
+          <span style={{ display: "inline-block", width: 60, height: 60 }}>
+            <img
+              src="/logo.png"
+              alt="logo"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "inline-block",
+                animation: "spin 6s linear infinite",
+              }}
+            />
+          </span>
+          ur
           <br />
           <span style={{ color: "#ff6b35" }}>pocket.</span>
+
+          <style>
+            {`
+              @keyframes spin {
+                from {
+                  transform: rotate(0deg);
+                }
+                to {
+                  transform: rotate(360deg);
+                }
+              }
+            `}
+          </style>
         </h1>
 
         <p style={S.heroSub}>

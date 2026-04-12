@@ -13,7 +13,7 @@ export async function DELETE(req, { params }) {
     if (!session?.user?.id)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
-    const { id } = params;
+    const { id } = await params;
     const doc = await SavedPlan.findOneAndDelete({ _id: id, userId: session.user.id });
 
     if (!doc)

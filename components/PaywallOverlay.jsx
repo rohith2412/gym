@@ -5,14 +5,13 @@ import { useSession } from "next-auth/react";
 
 const WHITELISTED_EMAILS = [
   "demo1@gmail.com",
-  "review@yourpocketgym.com", // Google reviewer account
+  "review@yourpocketgym.com",
 ];
 
 export default function PaywallOverlay() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  // bypass paywall for whitelisted emails
   if (WHITELISTED_EMAILS.includes(session?.user?.email)) {
     return null;
   }
@@ -25,7 +24,7 @@ export default function PaywallOverlay() {
       alignItems: "center", justifyContent: "center",
       padding: "2rem",
     }}>
-      {/* Frosted glass blur layer */}
+      {/* Blur layer */}
       <div style={{
         position: "absolute", inset: 0,
         backdropFilter: "blur(12px)",
@@ -41,23 +40,40 @@ export default function PaywallOverlay() {
         boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
         textAlign: "center", maxWidth: 340, width: "100%",
       }}>
-        <div style={S.root}>
-          <span style={S.logoText}>
+
+        {/* Logo */}
+        <div style={{ marginBottom: 6 }}>
+          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.035em" }}>
             <span style={{ color: "#1a1a1a" }}>Your</span>
             <span style={{ color: "#ff6b35" }}>Pocket</span>
             <span style={{ color: "#1a1a1a" }}>Gym</span>
-            <span>🔒</span>
+            <span> 🔒</span>
           </span>
         </div>
+
         <h2 style={{
           fontSize: 15, fontWeight: 800, color: "#1a1a1a",
-          letterSpacing: "-0.04em", lineHeight: 1.2, marginBottom: 8,
+          letterSpacing: "-0.04em", lineHeight: 1.2, marginBottom: 16,
         }}>
           Pro feature
         </h2>
-        <p style={{ fontSize: 14, color: "#aaa", lineHeight: 1.7, marginBottom: "1.5rem" }}>
-          Upgrade to Pro to unlock AI training plans, calories tracking and recipe finder.
-        </p>
+
+        {/* Feature list — outer centers, inner shrinks to content */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              "Unlimited calorie tracking",
+              "Unlimited recipes",
+              "Unlimited AI training plans",
+              "Unlimited AI chat bots",
+            ].map((text) => (
+              <div key={text} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ color: "#ff6b35", fontSize: 13 }}>✓</span>
+                <span style={{ fontSize: 13, color: "#666" }}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <button
           onClick={() => router.push("/v1/pricing")}
@@ -67,7 +83,7 @@ export default function PaywallOverlay() {
             border: "none", borderRadius: 10,
             fontSize: 15, fontWeight: 700, color: "#fff",
             fontFamily: "inherit", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            marginBottom: 12,
           }}
         >
           Upgrade to Pro
@@ -78,13 +94,3 @@ export default function PaywallOverlay() {
     </div>
   );
 }
-
-const S = {
-  root: { marginBottom: "5px" },
-  logoText: {
-    fontSize: 20,
-    fontWeight: 800,
-    letterSpacing: "-0.035em",
-  },
-};
-//nutrition tracking, recipe finder and more
