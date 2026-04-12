@@ -24,7 +24,6 @@ export async function GET(req) {
     const query = { userId: session.user.id };
 
     if (dateParam) {
-      // UTC-safe: always parse as explicit UTC midnight → end-of-day
       const start = new Date(`${dateParam}T00:00:00.000Z`);
       const end   = new Date(`${dateParam}T23:59:59.999Z`);
       query.date  = { $gte: start, $lte: end };
@@ -43,7 +42,9 @@ export async function GET(req) {
 }
 
 // ─── POST /api/meal-log ───────────────────────────────────────────────────────
-// Body: { image: "data:image/jpeg;base64,...", mealType, date? }
+// Body: { image?, mealType, date?, note?, manualMacros? }
+// • image + optional note  → AI vision analysis (note appended to prompt)
+// • manualMacros (no image) → skip AI, save directly
 export async function POST(req) {
   try {
     await connectdb();
@@ -52,30 +53,65 @@ export async function POST(req) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const body = await req.json();
-    const { image, mealType = "snack", date } = body;
+    const { image, mealType = "snack", date, note = "", manualMacros } = body;
 
+    // ── Manual macros path — no AI call needed ────────────────────────────────
+    if (manualMacros && !image) {
+      const macros = {
+        calories: parseFloat(manualMacros.calories) || 0,
+        protein:  parseFloat(manualMacros.protein)  || 0,
+        carbs:    parseFloat(manualMacros.carbs)     || 0,
+        fat:      parseFloat(manualMacros.fat)       || 0,
+        fiber:    parseFloat(manualMacros.fiber)     || 0,
+      };
+
+      // If user added a note, use it as the food name; otherwise generic
+      const foods = [{
+        name:       note.trim() || "Manual entry",
+        portion:    "custom",
+        macros,
+        confidence: 1,
+      }];
+
+      const doc = {
+        userId:   session.user.id,
+        date:     date ? new Date(date) : new Date(),
+        mealType,
+        foods,
+        totals:   macros,
+        aiNotes:  "Macros entered manually",
+      };
+
+      const inserted = await MealLog.collection.insertOne(doc);
+      doc._id = inserted.insertedId;
+      return Response.json({ success: true, data: doc });
+    }
+
+    // ── AI vision path ────────────────────────────────────────────────────────
     if (!image)
-      return Response.json({ success: false, error: "image is required" }, { status: 400 });
+      return Response.json({ success: false, error: "image or manualMacros is required" }, { status: 400 });
 
-    // Strip data URL prefix → raw base64
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
     const mediaType  = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
-    // ── GPT-4o Vision ─────────────────────────────────────────────────────────
-    // response_format: json_object eliminates markdown fences + trailing commas
+    // Build system prompt — inject user note if present
+    const noteContext = note.trim()
+      ? ` The user added this note about the meal: "${note.trim()}". Factor this into your analysis (e.g. extra toppings, large portions, specific brands).`
+      : "";
+
     const aiResponse = await openai.chat.completions.create({
       model:           "gpt-4o",
-      max_tokens:      400,
+      max_tokens:      500,
       response_format: { type: "json_object" },
       messages: [
         {
           role:    "system",
-          content: `Nutrition analyst. Analyse the food image. Return JSON only:
+          content: `Nutrition analyst. Analyse the food image.${noteContext} Return JSON only:
 {
   "foods": [{ "name":"string","portion":"string","macros":{"calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0},"confidence":0.0-1.0 }],
-  "aiNotes":"max 100 chars summary or caveat"
+  "aiNotes":"max 120 chars — brief summary or caveat, mention user note if it changed your estimate"
 }
-Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if uncertain, return empty foods array if no food detected.`,
+Rules: macros in grams except calories (kcal), round to 1 decimal place, set confidence<0.7 if uncertain, return empty foods array if no food detected.`,
         },
         {
           role: "user",
@@ -87,7 +123,7 @@ Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if u
       ],
     });
 
-    // ── Parse - json_object mode means this rarely fails, but still guard ─────
+    // ── Parse AI response ─────────────────────────────────────────────────────
     let parsed;
     try {
       parsed = JSON.parse(aiResponse.choices[0].message.content || "{}");
@@ -97,7 +133,6 @@ Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if u
 
     const foods = parsed.foods || [];
 
-    // ── Save via create() - avoids .save() triggering any cached hooks ─────────
     const doc = {
       userId:   session.user.id,
       date:     date ? new Date(date) : new Date(),
@@ -117,6 +152,63 @@ Rules: macros in grams except calories (kcal), round to 1dp, confidence<0.7 if u
   }
 }
 
+// ─── PATCH /api/meal-log?id=… ─────────────────────────────────────────────────
+// Body: { totals?: MacrosObject, foods?: FoodItem[] }
+// Allows the user to correct AI-detected macros or food items after analysis.
+export async function PATCH(req) {
+  try {
+    await connectdb();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id)
+      return Response.json({ error: "Not authenticated" }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id)
+      return Response.json({ error: "id required" }, { status: 400 });
+
+    const body = await req.json();
+
+    // Build $set payload — only update fields that were sent
+    const $set = {};
+    if (body.totals) {
+      $set.totals = {
+        calories: parseFloat(body.totals.calories) || 0,
+        protein:  parseFloat(body.totals.protein)  || 0,
+        carbs:    parseFloat(body.totals.carbs)     || 0,
+        fat:      parseFloat(body.totals.fat)       || 0,
+        fiber:    parseFloat(body.totals.fiber)     || 0,
+      };
+    }
+    if (body.foods) {
+      $set.foods = body.foods;
+      // If foods are updated but totals weren't explicitly sent, recalculate
+      if (!body.totals) {
+        $set.totals = calculateTotals(body.foods);
+      }
+    }
+    if (body.aiNotes !== undefined) {
+      $set.aiNotes = body.aiNotes;
+    }
+
+    if (Object.keys($set).length === 0)
+      return Response.json({ error: "Nothing to update" }, { status: 400 });
+
+    const result = await MealLog.updateOne(
+      { _id: id, userId: session.user.id }, // userId guard prevents cross-user edits
+      { $set }
+    );
+
+    if (result.matchedCount === 0)
+      return Response.json({ error: "Log not found or not yours" }, { status: 404 });
+
+    return Response.json({ success: true, updated: $set });
+  } catch (err) {
+    console.error("[meal-log PATCH]", err);
+    return Response.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
 // ─── DELETE /api/meal-log?id=… ────────────────────────────────────────────────
 export async function DELETE(req) {
   try {
@@ -127,7 +219,8 @@ export async function DELETE(req) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id) return Response.json({ error: "id required" }, { status: 400 });
+    if (!id)
+      return Response.json({ error: "id required" }, { status: 400 });
 
     await MealLog.deleteOne({ _id: id, userId: session.user.id });
     return Response.json({ success: true });

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter }  from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import ProfilePicture from "@/components/ProfilePicture";
 import PaywallOverlay from "@/components/PaywallOverlay";
 
@@ -29,8 +30,6 @@ function sumMacros(logs) {
 }
 function round1(n) { return Math.round(n * 10) / 10; }
 function fmt(n)    { return Math.round(n); }
-
-
 
 function mealEmoji(type) {
   return { breakfast: "🥞", lunch: "🥗", dinner: "🍜", snack: "🫐" }[type] ?? "🍽️";
@@ -113,9 +112,132 @@ function SkeletonCard({ height = 90 }) {
   );
 }
 
+// ─── Edit Macros Sheet ────────────────────────────────────────────────────────
+function EditMacrosSheet({ log, onClose, onSave }) {
+  const [macros, setMacros] = useState({
+    calories: log.totals?.calories ?? 0,
+    protein:  log.totals?.protein  ?? 0,
+    carbs:    log.totals?.carbs    ?? 0,
+    fat:      log.totals?.fat      ?? 0,
+    fiber:    log.totals?.fiber    ?? 0,
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  async function save() {
+    setSaving(true);
+    try {
+      await fetch(`/api/meal-log?id=${log._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ totals: macros }),
+      });
+      onSave(macros);
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const SHEET_Z = 9999;
+
+  return createPortal(
+    <>
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed", inset: 0,
+          background: "rgba(0,0,0,0.4)",
+          zIndex: SHEET_Z,
+          backdropFilter: "blur(3px)",
+          WebkitBackdropFilter: "blur(3px)",
+        }}
+      />
+      <div style={{
+        position: "fixed", bottom: 0,
+        left: "50%", transform: "translateX(-50%)",
+        width: "100%", maxWidth: 430,
+        background: "#fafaf8",
+        borderRadius: "24px 24px 0 0",
+        padding: "1.5rem 1.25rem 3rem",
+        zIndex: SHEET_Z + 1,
+        boxShadow: "0 -4px 40px rgba(0,0,0,0.18)",
+        maxHeight: "90dvh",
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
+      }}>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 22 }}>{mealEmoji(log.mealType)}</span>
+            <div>
+              <p style={{ fontSize: 11, color: "#bbb", fontWeight: 500 }}>{mealTypeLabel(log.mealType)}</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>Edit macros</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            style={{ fontSize: 12, color: "#bbb", background: "none", border: "none", fontFamily: "inherit", cursor: "pointer", fontWeight: 600 }}
+          >
+            Cancel
+          </button>
+        </div>
+
+        {/* Macro tiles */}
+        <div style={{ display: "flex", gap: 6, marginBottom: "1.25rem" }}>
+          {[
+            { key: "calories", label: "Cal",  unit: "kcal", color: "#1a1a1a" },
+            { key: "protein",  label: "Prot", unit: "g",    color: "#ff6b35" },
+            { key: "carbs",    label: "Carb", unit: "g",    color: "#1a1a1a" },
+            { key: "fat",      label: "Fat",  unit: "g",    color: "#888"    },
+            { key: "fiber",    label: "Fib",  unit: "g",    color: "#4ade80" },
+          ].map(({ key, label, unit, color }) => (
+            <div key={key} style={{
+              flex: 1, background: "#f4f2ed", borderRadius: 12,
+              padding: "0.6rem 0.3rem", textAlign: "center",
+              border: "1px solid #e8e5de",
+            }}>
+              <p style={{ fontSize: 9, fontWeight: 700, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+                {label}
+              </p>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={macros[key]}
+                onChange={e => setMacros(p => ({ ...p, [key]: parseFloat(e.target.value) || 0 }))}
+                style={{
+                  width: "100%", border: "none", outline: "none",
+                  background: "transparent",
+                  fontSize: 15, fontWeight: 800, color,
+                  fontFamily: "inherit", textAlign: "center", padding: 0,
+                }}
+              />
+              <p style={{ fontSize: 8, color: "#ccc", marginTop: 2 }}>{unit}</p>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={save}
+          disabled={saving}
+          style={{ ...S.ctaBtn, opacity: saving ? 0.5 : 1 }}
+        >
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      </div>
+    </>,
+    document.body
+  );
+}
+
 // ─── Log Sheet ────────────────────────────────────────────────────────────────
-// Rendered via a portal at document.body level so it's never clipped by any
-// stacking context created by the sticky header's backdropFilter.
 function LogSheet({ onClose, onSuccess }) {
   const fileRef = useRef(null);
   const [preview,  setPreview]  = useState(null);
@@ -124,7 +246,6 @@ function LogSheet({ onClose, onSuccess }) {
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState(null);
 
-  // Lock body scroll while sheet is open
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -166,14 +287,10 @@ function LogSheet({ onClose, onSuccess }) {
   ];
 
   const canSubmit = base64 && mealType && !loading;
-
-  // Use a high z-index that beats any stacking context on the page.
-  // 2147483647 is the max, 9999 is fine for this app.
   const SHEET_Z = 9999;
 
-  return (
+  return createPortal(
     <>
-      {/* Backdrop */}
       <div
         onClick={onClose}
         style={{
@@ -184,28 +301,16 @@ function LogSheet({ onClose, onSuccess }) {
           WebkitBackdropFilter: "blur(3px)",
         }}
       />
-
-      {/* Sheet panel */}
       <div style={{
-        position: "fixed",
-        bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        maxWidth: 430,
-        background: "#fafaf8",
-        borderRadius: "24px 24px 0 0",
-        padding: "1.5rem 1.25rem 2.5rem",
-        zIndex: SHEET_Z + 1,   // one above the backdrop
-        boxShadow: "0 -4px 40px rgba(0,0,0,0.18)",
-        maxHeight: "90dvh",
-        overflowY: "auto",
-        WebkitOverflowScrolling: "touch",
+        position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
+        width: "100%", maxWidth: 430, background: "#fafaf8",
+        borderRadius: "24px 24px 0 0", padding: "1.5rem 1.25rem 2.5rem",
+        zIndex: SHEET_Z + 1, boxShadow: "0 -4px 40px rgba(0,0,0,0.18)",
+        maxHeight: "90dvh", overflowY: "auto", WebkitOverflowScrolling: "touch",
       }}>
         <div style={{ width: 36, height: 4, borderRadius: 2, background: "#e0ddd6", margin: "0 auto 1.25rem" }} />
         <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>Log a meal</h2>
 
-        {/* Photo area */}
         <div
           onClick={() => fileRef.current?.click()}
           style={{
@@ -213,8 +318,7 @@ function LogSheet({ onClose, onSuccess }) {
             border: preview ? "none" : "2px dashed #e0ddd6",
             background: preview ? "transparent" : "#f4f2ed",
             display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", overflow: "hidden", marginBottom: "1rem",
-            position: "relative",
+            cursor: "pointer", overflow: "hidden", marginBottom: "1rem", position: "relative",
           }}
         >
           {preview ? (
@@ -234,7 +338,6 @@ function LogSheet({ onClose, onSuccess }) {
         </div>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files[0])} />
 
-        {/* Meal type */}
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#aaa", marginBottom: 8 }}>
           What meal is this?
         </p>
@@ -269,10 +372,7 @@ function LogSheet({ onClose, onSuccess }) {
         <button
           onClick={submit}
           disabled={!canSubmit}
-          style={{
-            ...S.ctaBtn, opacity: canSubmit ? 1 : 0.4,
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-          }}
+          style={{ ...S.ctaBtn, opacity: canSubmit ? 1 : 0.4, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
         >
           {loading ? (
             <>
@@ -282,7 +382,8 @@ function LogSheet({ onClose, onSuccess }) {
           ) : "✨ Analyse & log meal"}
         </button>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
@@ -296,7 +397,7 @@ function ResultSheet({ log, onClose }) {
 
   const SHEET_Z = 9999;
 
-  return (
+  return createPortal(
     <>
       <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: SHEET_Z, backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)" }} />
       <div style={{
@@ -360,13 +461,16 @@ function ResultSheet({ log, onClose }) {
         )}
         <button onClick={onClose} style={S.ctaBtn}>Done</button>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
 // ─── Meal Card ────────────────────────────────────────────────────────────────
-function MealCard({ log, index, onDelete }) {
+function MealCard({ log, index, onDelete, onEdit }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [currentTotals, setCurrentTotals] = useState(log.totals);
   const date = new Date(log.date);
 
   function handleDelete(e) {
@@ -379,59 +483,103 @@ function MealCard({ log, index, onDelete }) {
     onDelete(log._id);
   }
 
+  function handleSave(newMacros) {
+    setCurrentTotals(newMacros);
+    onEdit?.(log._id, newMacros);
+  }
+
   return (
-    <Card style={{ display: "flex", alignItems: "center", gap: 12, padding: "1rem 1.1rem" }}>
-      <div style={{
-        width: 44, height: 44, borderRadius: 13,
-        background: index === 0 ? "#1a1a1a" : "#f4f2ed",
-        border: "1px solid #e8e5de",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-      }}>
-        <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.06em", color: index === 0 ? "rgba(255,255,255,0.45)" : "#ccc" }}>
-          {date.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
-        </span>
-        <span style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.1, color: index === 0 ? "#fff" : "#1a1a1a" }}>
-          {date.getDate()}
-        </span>
-      </div>
+    <>
+      <Card style={{ padding: "0.85rem 1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 16 }}>{mealEmoji(log.mealType)}</span>
-          <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{mealTypeLabel(log.mealType)}</p>
-          {index === 0 && (
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#ff6b35", background: "rgba(255,107,53,0.1)", borderRadius: 99, padding: "0.22rem 0.55rem" }}>
-              Latest
+          {/* Date badge */}
+          <div style={{
+            width: 44, height: 44, borderRadius: 13,
+            background: index === 0 ? "#1a1a1a" : "#f4f2ed",
+            border: "1px solid #e8e5de",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            flexShrink: 0,
+          }}>
+            <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.06em", color: index === 0 ? "rgba(255,255,255,0.45)" : "#ccc" }}>
+              {date.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
             </span>
-          )}
+            <span style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.1, color: index === 0 ? "#fff" : "#1a1a1a" }}>
+              {date.getDate()}
+            </span>
+          </div>
+
+          {/* Meal name + foods */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 15 }}>{mealEmoji(log.mealType)}</span>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{mealTypeLabel(log.mealType)}</p>
+              {index === 0 && (
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#ff6b35", background: "rgba(255,107,53,0.1)", borderRadius: 99, padding: "0.22rem 0.55rem" }}>
+                  Latest
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: 11, color: "#aaa", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {log.foods.map((f) => f.name).join(", ")}
+            </p>
+          </div>
+
+          {/* Right column: macros on top, buttons on bottom */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 7, flexShrink: 0 }}>
+
+            {/* Cal + Protein */}
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em", lineHeight: 1 }}>
+                {fmt(currentTotals?.calories ?? 0)}
+                <span style={{ fontSize: 10, fontWeight: 500, color: "#bbb", marginLeft: 2 }}>kcal</span>
+              </p>
+              <p style={{ fontSize: 11, color: "#ff6b35", fontWeight: 600, marginTop: 2 }}>
+                {fmt(currentTotals?.protein ?? 0)}g protein
+              </p>
+            </div>
+
+            {/* Edit + Delete side by side */}
+            <div style={{ display: "flex", flexDirection: "row", gap: 5 }}>
+              <button
+                onClick={() => setEditOpen(true)}
+                style={{
+                  fontSize: 11, fontWeight: 700, color: "#555",
+                  border: "1px solid #e0ddd6", borderRadius: 8,
+                  padding: "3px 10px", background: "#f4f2ed",
+                  fontFamily: "inherit", cursor: "pointer",
+                }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{
+                  fontSize: 11, fontWeight: 700,
+                  color: confirmDelete ? "#f43f5e" : "#bbb",
+                  border: confirmDelete ? "1px solid rgba(244,63,94,0.25)" : "1px solid #e0ddd6",
+                  borderRadius: 8, padding: "3px 10px",
+                  background: confirmDelete ? "rgba(244,63,94,0.06)" : "#f4f2ed",
+                  fontFamily: "inherit", cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {confirmDelete ? "Sure?" : "Del"}
+              </button>
+            </div>
+
+          </div>
         </div>
-        <p style={{ fontSize: 11, color: "#aaa", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {log.foods.map((f) => f.name).join(", ")}
-        </p>
-        <p style={{ fontSize: 10, color: "#ccc", marginTop: 2 }}>{timeStr(log.date)}</p>
-      </div>
+      </Card>
 
-      <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <p style={{ fontSize: 15, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.03em" }}>{fmt(log.totals?.calories ?? 0)}</p>
-        <p style={{ fontSize: 10, color: "#bbb" }}>kcal</p>
-        <p style={{ fontSize: 10, color: "#ff6b35", marginTop: 2 }}>{fmt(log.totals?.protein ?? 0)}g prot</p>
-      </div>
-
-      <button
-        onClick={handleDelete}
-        style={{
-          border: "none", fontSize: 11, fontWeight: 700,
-          color: confirmDelete ? "#f43f5e" : "#ccc",
-          cursor: "pointer", fontFamily: "inherit",
-          padding: "4px 8px", borderRadius: 8,
-          background: confirmDelete ? "rgba(244,63,94,0.08)" : "transparent",
-          transition: "all 0.15s", flexShrink: 0,
-        }}
-      >
-        {confirmDelete ? "Confirm?" : "Delete"}
-      </button>
-    </Card>
+      {editOpen && (
+        <EditMacrosSheet
+          log={{ ...log, totals: currentTotals }}
+          onClose={() => setEditOpen(false)}
+          onSave={handleSave}
+        />
+      )}
+    </>
   );
 }
 
@@ -446,14 +594,14 @@ export default function NutritionPage() {
   const [showLog, setShowLog] = useState(false);
   const [result,  setResult]  = useState(null);
   const [selDate, setSelDate] = useState(todayISO());
-  const [isSubscribed, setIsSubscribed] = useState(null); // null = loading
+  const [isSubscribed, setIsSubscribed] = useState(null);
 
-useEffect(() => {
-  if (status !== "authenticated") return;
-  fetch("/api/user-intro")
-    .then(r => r.json())
-    .then(d => setIsSubscribed(d.data?.isSubscribed ?? false));
-}, [status]);
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/user-intro")
+      .then(r => r.json())
+      .then(d => setIsSubscribed(d.data?.isSubscribed ?? false));
+  }, [status]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -500,6 +648,12 @@ useEffect(() => {
     setLogs((prev) => prev.filter((l) => l._id !== id));
   }
 
+  function handleEdit(id, newMacros) {
+    setLogs((prev) =>
+      prev.map((l) => l._id === id ? { ...l, totals: newMacros } : l)
+    );
+  }
+
   function shiftDate(days) {
     const [y, m, d] = selDate.split("-").map(Number);
     const date = new Date(y, m - 1, d);
@@ -520,134 +674,125 @@ useEffect(() => {
 
   return (
     <div style={{ position: "relative" }}>
+      <div style={S.root}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          html, body { -webkit-font-smoothing: antialiased; background: #fafaf8; }
+          @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+          @keyframes spin    { to { transform: rotate(360deg); } }
+          ::-webkit-scrollbar { display: none; }
+          button { cursor: pointer; }
+        `}</style>
 
-    <div style={S.root}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { -webkit-font-smoothing: antialiased; background: #fafaf8; }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        @keyframes spin    { to { transform: rotate(360deg); } }
-        ::-webkit-scrollbar { display: none; }
-        button { cursor: pointer; }
-      `}</style>
-
-      {/* ── Header — NO backdropFilter (avoids stacking context that clips sheets) ── */}
-      <header style={{
-        ...S.header,
-        /* Replace blur with a fully opaque background so we can drop
-           backdropFilter entirely — this prevents a new CSS stacking context
-           that would cause the header to render above fixed sheets. */
-        background: "#fafaf8",
-        backdropFilter: "none",
-        WebkitBackdropFilter: "none",
-      }}>
-        <div>
-          <p style={S.greeting}>Good {getGreeting()}</p>
-          <h1 style={S.name}>{firstName} 🥗</h1>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button style={S.iconBtn} onClick={() => setShowLog(true)} title="Log meal">
-            <span style={{ fontSize: 18 }}>➕</span>
-          </button>
-          <a href="/v1/profile"><ProfilePicture size={40} /></a>
-        </div>
-      </header>
-
-      {/* ── Body ── */}
-      <main style={{
-        ...S.main,
-        opacity: vis ? 1 : 0,
-        transform: vis ? "translateY(0)" : "translateY(10px)",
-        transition: "opacity 0.38s ease, transform 0.38s ease",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <button onClick={() => shiftDate(-1)} style={S.navBtn}>‹</button>
-          <p style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" }}>{dateLabel()}</p>
-          <button
-            onClick={() => shiftDate(1)}
-            style={{ ...S.navBtn, opacity: isToday ? 0.25 : 1 }}
-            disabled={isToday}
-          >›</button>
-        </div>
-
-        {loading ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <SkeletonCard height={160} />
-            <SkeletonCard height={100} />
-            <SkeletonCard height={80} />
-            <SkeletonCard height={80} />
+        {/* Header */}
+        <header style={{ ...S.header, background: "#fafaf8", backdropFilter: "none", WebkitBackdropFilter: "none" }}>
+          <div>
+            <p style={S.greeting}>Good {getGreeting()}</p>
+            <h1 style={S.name}>{firstName} 🥗</h1>
           </div>
-        ) : (
-          <>
-            <Card style={{ marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
-                <div>
-                  <p style={S.eyebrow}>Calories {isToday ? "today" : dateLabel().toLowerCase()}</p>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 3 }}>
-                    <span style={{ fontSize: 36, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.05em" }}>
-                      {fmt(todayTotals.calories)}
-                    </span>
-                    <span style={{ fontSize: 13, color: "#bbb" }}>/ {GOALS.calories} kcal</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button style={S.iconBtn} onClick={() => setShowLog(true)} title="Log meal">
+              <span style={{ fontSize: 18 }}>➕</span>
+            </button>
+            <a href="/v1/profile"><ProfilePicture size={40} /></a>
+          </div>
+        </header>
+
+        {/* Body */}
+        <main style={{
+          ...S.main,
+          opacity: vis ? 1 : 0,
+          transform: vis ? "translateY(0)" : "translateY(10px)",
+          transition: "opacity 0.38s ease, transform 0.38s ease",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <button onClick={() => shiftDate(-1)} style={S.navBtn}>‹</button>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a", letterSpacing: "-0.02em" }}>{dateLabel()}</p>
+            <button onClick={() => shiftDate(1)} style={{ ...S.navBtn, opacity: isToday ? 0.25 : 1 }} disabled={isToday}>›</button>
+          </div>
+
+          {loading ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <SkeletonCard height={160} />
+              <SkeletonCard height={100} />
+              <SkeletonCard height={80} />
+              <SkeletonCard height={80} />
+            </div>
+          ) : (
+            <>
+              <Card style={{ marginBottom: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
+                  <div>
+                    <p style={S.eyebrow}>Calories {isToday ? "today" : dateLabel().toLowerCase()}</p>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 3 }}>
+                      <span style={{ fontSize: 36, fontWeight: 800, color: "#1a1a1a", letterSpacing: "-0.05em" }}>
+                        {fmt(todayTotals.calories)}
+                      </span>
+                      <span style={{ fontSize: 13, color: "#bbb" }}>/ {GOALS.calories} kcal</span>
+                    </div>
                   </div>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: calPct >= 90 ? "#e53e3e" : calPct >= 60 ? "#ff6b35" : "#bbb",
+                    background: calPct >= 90 ? "rgba(229,62,62,0.08)" : calPct >= 60 ? "rgba(255,107,53,0.09)" : "#f4f2ed",
+                    padding: "0.28rem 0.7rem", borderRadius: 99, letterSpacing: "0.04em",
+                  }}>
+                    {calPct >= 90 ? "🔥 Near limit" : calPct >= 60 ? "⚡ On track" : "💪 Keep eating"}
+                  </span>
                 </div>
-                <span style={{
-                  fontSize: 11, fontWeight: 700,
-                  color: calPct >= 90 ? "#e53e3e" : calPct >= 60 ? "#ff6b35" : "#bbb",
-                  background: calPct >= 90 ? "rgba(229,62,62,0.08)" : calPct >= 60 ? "rgba(255,107,53,0.09)" : "#f4f2ed",
-                  padding: "0.28rem 0.7rem", borderRadius: 99, letterSpacing: "0.04em",
-                }}>
-                  {calPct >= 90 ? "🔥 Near limit" : calPct >= 60 ? "⚡ On track" : "💪 Keep eating"}
-                </span>
-              </div>
 
-              <div style={{ height: 8, background: "#f0ede6", borderRadius: 99, overflow: "hidden", marginBottom: "1.25rem" }}>
-                <div style={{ height: "100%", width: `${calPct}%`, background: calPct >= 90 ? "#e53e3e" : "#ff6b35", borderRadius: 99, transition: "width 0.6s ease" }} />
-              </div>
+                <div style={{ height: 8, background: "#f0ede6", borderRadius: 99, overflow: "hidden", marginBottom: "1.25rem" }}>
+                  <div style={{ height: "100%", width: `${calPct}%`, background: calPct >= 90 ? "#e53e3e" : "#ff6b35", borderRadius: 99, transition: "width 0.6s ease" }} />
+                </div>
 
-              <div style={{ display: "flex", justifyContent: "space-around" }}>
-                <MacroRing value={round1(todayTotals.protein)} max={GOALS.protein} color="#ff6b35" label="Protein" />
-                <MacroRing value={round1(todayTotals.carbs)}   max={GOALS.carbs}   color="#1a1a1a" label="Carbs"   />
-                <MacroRing value={round1(todayTotals.fat)}     max={GOALS.fat}     color="#aaa"    label="Fat"     />
-                <MacroRing value={round1(todayTotals.fiber)}   max={30}            color="#4ade80" label="Fiber"   />
-              </div>
-            </Card>
-
-            <SectionLabel>Meals logged</SectionLabel>
-
-            {logs.length === 0 ? (
-              <Card style={{ textAlign: "center", padding: "2.5rem 1.5rem", marginBottom: 10 }}>
-                <p style={{ fontSize: 32, marginBottom: 10 }}>🍽️</p>
-                <p style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 6 }}>
-                  {isToday ? "No meals logged yet" : "No meals on this day"}
-                </p>
-                <p style={{ fontSize: 13, color: "#aaa", lineHeight: 1.7, marginBottom: "1.25rem" }}>
-                  {isToday ? "Take a photo of your next meal to track calories and macros automatically." : "Nothing was logged here."}
-                </p>
-                {isToday && <button onClick={() => setShowLog(true)} style={S.ctaBtn}>📸 Log a meal →</button>}
+                <div style={{ display: "flex", justifyContent: "space-around" }}>
+                  <MacroRing value={round1(todayTotals.protein)} max={GOALS.protein} color="#ff6b35" label="Protein" />
+                  <MacroRing value={round1(todayTotals.carbs)}   max={GOALS.carbs}   color="#1a1a1a" label="Carbs"   />
+                  <MacroRing value={round1(todayTotals.fat)}     max={GOALS.fat}     color="#aaa"    label="Fat"     />
+                  <MacroRing value={round1(todayTotals.fiber)}   max={30}            color="#4ade80" label="Fiber"   />
+                </div>
               </Card>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
-                {logs.map((log, i) => (
-                  <MealCard key={log._id} log={log} index={i} onDelete={handleDelete} />
-                ))}
-                {isToday && (
-                  <button onClick={() => setShowLog(true)} style={{ ...S.ctaBtn, marginTop: 4 }}>
-                    📸 Log another meal →
-                  </button>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </main>
 
-      {/* Sheets render last in the tree — above everything */}
-      {showLog && <LogSheet onClose={() => setShowLog(false)} onSuccess={handleSuccess} />}
-      {result   && <ResultSheet log={result} onClose={() => setResult(null)} />}
-    </div>
-    {isSubscribed === false && <PaywallOverlay />}
+              <SectionLabel>Meals logged</SectionLabel>
 
+              {logs.length === 0 ? (
+                <Card style={{ textAlign: "center", padding: "2.5rem 1.5rem", marginBottom: 10 }}>
+                  <p style={{ fontSize: 32, marginBottom: 10 }}>🍽️</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 6 }}>
+                    {isToday ? "No meals logged yet" : "No meals on this day"}
+                  </p>
+                  <p style={{ fontSize: 13, color: "#aaa", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+                    {isToday ? "Take a photo of your next meal to track calories and macros automatically." : "Nothing was logged here."}
+                  </p>
+                  {isToday && <button onClick={() => setShowLog(true)} style={S.ctaBtn}>📸 Log a meal →</button>}
+                </Card>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 8 }}>
+                  {logs.map((log, i) => (
+                    <MealCard
+                      key={log._id}
+                      log={log}
+                      index={i}
+                      onDelete={handleDelete}
+                      onEdit={handleEdit}
+                    />
+                  ))}
+                  {isToday && (
+                    <button onClick={() => setShowLog(true)} style={{ ...S.ctaBtn, marginTop: 4 }}>
+                      📸 Log another meal →
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </main>
+
+        {showLog && <LogSheet onClose={() => setShowLog(false)} onSuccess={handleSuccess} />}
+        {result   && <ResultSheet log={result} onClose={() => setResult(null)} />}
+      </div>
+      {isSubscribed === false && <PaywallOverlay />}
     </div>
   );
 }
