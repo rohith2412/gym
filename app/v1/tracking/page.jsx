@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useRef } from "react";
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
+// ─── helpers progress ──────────────────────────────────────────────────────────────────
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
