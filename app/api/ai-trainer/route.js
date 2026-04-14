@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/ai-trainer/route.js
 // POST /api/ai-trainer
 // body: { type: "plan" | "chat", ...payload }

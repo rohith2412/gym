@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export',
+  images: { unoptimized: true },
+  ...(process.env.MOBILE_BUILD
+    ? {
+        output: 'export',
+        distDir: 'out',
+      }
+    : {}),
 };
 
 export default nextConfig;
-
-

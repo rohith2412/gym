@@ -9,17 +9,18 @@ import jwt from "jsonwebtoken";
 export async function POST(req) {
   try {
     await connectdb();
-    const { name, email, password } = await req.json();
+    const { email, password } = await req.json();
 
-    if (!name || !email || !password)
+    if (!email || !password)
       return Response.json({ error: "All fields required" }, { status: 400 });
 
-    const existing = await CredentialAuth.findOne({ email });
-    if (existing)
-      return Response.json({ error: "Email already registered" }, { status: 400 });
+    const user = await CredentialAuth.findOne({ email });
+    if (!user)
+      return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await CredentialAuth.create({ name, email, password: hashed });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return Response.json({ error: "Invalid email or password" }, { status: 401 });
 
     const token = jwt.sign(
       { id: user._id, email: user.email, name: user.name },
@@ -27,9 +28,9 @@ export async function POST(req) {
       { expiresIn: "30d" }
     );
 
-
     
-    // New users never have an intro yet — but we check anyway for consistency
+
+    // Check if user has completed the intro — same logic as Google auth
     const introData = await userIntroModel.findOne({ userId: user._id.toString() });
     const hasIntro = !!introData;
 

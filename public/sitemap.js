@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 const BASE_URL = "https://www.yourpocketgym.com/";
 
 export default function sitemap() {

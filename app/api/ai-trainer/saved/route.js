@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/ai-trainer/saved/route.js
 // GET  /api/ai-trainer/saved        - list all saved plans for the user
 // POST /api/ai-trainer/saved        - save a new plan

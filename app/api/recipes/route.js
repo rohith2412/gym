@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/recipes/route.js
 
 import { connectdb } from "@/lib/connectdb";

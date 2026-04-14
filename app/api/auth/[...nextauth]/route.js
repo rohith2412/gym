@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { connectdb } from "../../../../lib/connectdb";
 import Auth from "../../../../models/authModel";
 import CredentialAuth from "../../../../models/credentialAuthModel";

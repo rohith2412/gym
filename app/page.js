@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoginButton from "@/components/LoginButton";
-//YourPocketGym 
+//YourPocketGym  user-intro
 const features = [
   {
     icon: "⚡",
@@ -180,7 +180,7 @@ export default function LandingPage() {
           The gym
           <br />
           in y
-          <span style={{ display: "inline-block", width: 60, height: 60 }}>
+          <span style={{ display: "inline-block", width: 55, height: 55 }}>
             <img
               src="/logo.png"
               alt="logo"

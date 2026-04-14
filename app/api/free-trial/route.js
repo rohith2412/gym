@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/free-trial/route.js
 // Tracks whether a user has already used their one free CalAI trial.
 // Stored as a flag on the user's existing intro document.

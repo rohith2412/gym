@@ -10,6 +10,12 @@ const ubuntu = Ubuntu({
 });
 
 export const metadata = {
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+  },
+
   metadataBase: new URL("https://www.yourpocketgym.com/"),
   title: {
     default: "YourPocketGym - AI Fitness & Nutrition Tracker",

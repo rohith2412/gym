@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/ai-trainer/saved/[id]/route.js
 // DELETE /api/ai-trainer/saved/:id  - remove a saved plan (owner only)
 

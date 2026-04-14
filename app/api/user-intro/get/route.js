@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 

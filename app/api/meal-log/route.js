@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 // app/api/meal-log/route.js
 import { connectdb }        from "@/lib/connectdb";
 import MealLog, { calculateTotals } from "@/models/mealLogModel";
