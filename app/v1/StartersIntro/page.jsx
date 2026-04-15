@@ -51,28 +51,32 @@ export default function IntroPage() {
   const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS));
   const back = () => setStep((s) => Math.max(s - 1, 1));
 
-  const submit = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/user-intro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setDone(true);
-        await update(); // refresh session so hasIntro becomes true
-        setTimeout(() => router.push("/v1/tracking"), 2000);
-      } else {
-        alert("Something went wrong: " + data.error);
-      }
-    } catch (err) {
-      alert("Network error. Please try again.");
-    } finally {
-      setLoading(false);
+const submit = async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token"); // or wherever you store it
+
+    const res = await fetch("/api/user-intro", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,   // ← add this
+      },
+      body: JSON.stringify(form),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setDone(true);
+      setTimeout(() => router.push("/v1/tracking"), 2000);
+    } else {
+      alert("Something went wrong: " + data.error);
     }
-  };
+  } catch (err) {
+    alert("Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (status === "loading" || session?.user?.hasIntro) {
     return null;

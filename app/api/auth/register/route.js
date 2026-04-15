@@ -5,6 +5,9 @@ import CredentialAuth from "@/models/credentialAuthModel";
 import userIntroModel from "@/models/userIntroModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+// Add these two imports back
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // adjust path to your NextAuth file
 
 export async function POST(req) {
   try {

@@ -4,6 +4,7 @@ import { connectdb } from "@/lib/connectdb";
 import CredentialAuth from "@/models/credentialAuthModel";
 import userIntroModel from "@/models/userIntroModel";
 import bcrypt from "bcryptjs";
+// Add these two imports back
 import jwt from "jsonwebtoken";
 
 export async function POST(req) {
