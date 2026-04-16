@@ -5,15 +5,23 @@ import userIntroModel from "@/models/userIntroModel";
 import jwt from "jsonwebtoken";
 import User from "@/models/credentialAuthModel";
 import { getServerSession } from "next-auth";
-// Add these two imports back// adjust path to your NextAuth file
-import { authOptions }      from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-async function getUserFromRequest(req) {
+async function getUserFromRequest(req: Request): Promise<{ id: string } | null> {
   // Mobile: Bearer JWT signed with JWT_SECRET
   const auth = req.headers.get("authorization");
   if (auth?.startsWith("Bearer ")) {
+    const rawToken = auth.slice(7);
+
+    // Guard: token is literally the string "null" (client called saveToken before login)
+    if (!rawToken || rawToken === "null" || rawToken === "undefined") {
+      return null;
+    }
+
     try {
-      const decoded = jwt.verify(auth.slice(7), process.env.JWT_SECRET);
+      const decoded = jwt.verify(rawToken, process.env.JWT_SECRET!) as {
+        id: string;
+      };
       return { id: decoded.id.toString() };
     } catch {
       return null;
@@ -29,13 +37,16 @@ async function getUserFromRequest(req) {
   return null;
 }
 
-export async function GET(req) {
+export async function GET(req: Request) {
   try {
     await connectdb();
     const user = await getUserFromRequest(req);
 
     if (!user?.id) {
-      return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      return Response.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const intro = await userIntroModel.findOne({ userId: user.id });
@@ -47,26 +58,51 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("GET User-Intro Error:", error);
-    return Response.json({ success: false, error: "Server error" }, { status: 500 });
+    return Response.json(
+      { success: false, error: "Server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req) {
+export async function POST(req: Request) {
   try {
     await connectdb();
     const user = await getUserFromRequest(req);
 
     if (!user?.id) {
-      return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      return Response.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const body = await req.json();
 
-    // Validate all required fields
-    const { age, height, weight, gender, fitnessGoal, experienceLevel, workoutDaysPerWeek } = body;
+    const {
+      age,
+      height,
+      weight,
+      gender,
+      fitnessGoal,
+      experienceLevel,
+      workoutDaysPerWeek,
+    } = body;
 
-    if (!age || !height || !weight || !gender || !fitnessGoal || !experienceLevel || !workoutDaysPerWeek) {
-      return Response.json({ success: false, error: "Missing required fields" }, { status: 400 });
+    // FIX: use == null instead of !value so that 0 is treated as valid
+    if (
+      age == null ||
+      height == null ||
+      weight == null ||
+      !gender ||
+      !fitnessGoal ||
+      !experienceLevel ||
+      workoutDaysPerWeek == null
+    ) {
+      return Response.json(
+        { success: false, error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     const [updatedIntro] = await Promise.all([
@@ -79,7 +115,7 @@ export async function POST(req) {
     ]);
 
     return Response.json({ success: true, data: updatedIntro });
-  } catch (err) {
+  } catch (err: any) {
     console.error("POST User-Intro Error:", err);
     return Response.json({ success: false, error: err.message }, { status: 500 });
   }
