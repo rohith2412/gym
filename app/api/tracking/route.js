@@ -1,9 +1,8 @@
 export const dynamic = "force-dynamic";
-// app/api/tracking/route.js
 import { connectdb } from "@/lib/connectdb";
 import tracking      from "@/models/trackingModel";
 import jwt           from "jsonwebtoken";
-import { ObjectId }  from "mongodb"; // ✅ FIX: needed for DELETE
+import { ObjectId }  from "mongodb"; 
 
 function getUserFromRequest(req) {
   const auth = req.headers.get("authorization");
@@ -15,7 +14,6 @@ function getUserFromRequest(req) {
   }
 }
 
-// ─── POST ─────────────────────────────────────────────────────────────────────
 export async function POST(req) {
   try {
     await connectdb();
@@ -50,7 +48,6 @@ export async function POST(req) {
   }
 }
 
-// ─── GET ──────────────────────────────────────────────────────────────────────
 export async function GET(req) {
   try {
     await connectdb();
@@ -70,7 +67,6 @@ export async function GET(req) {
   }
 }
 
-// ─── DELETE ───────────────────────────────────────────────────────────────────
 export async function DELETE(req) {
   try {
     await connectdb();

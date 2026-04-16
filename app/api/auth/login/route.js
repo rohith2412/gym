@@ -5,43 +5,58 @@ import CredentialAuth from "@/models/credentialAuthModel";
 import userIntroModel from "@/models/userIntroModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-//handleLogin
-export async function POST(req: Request) {
+
+// handleLogin
+export async function POST(req) {
   try {
     await connectdb();
+
     const { email, password } = await req.json();
 
-    if (!email || !password)
-      return Response.json({ error: "All fields required" }, { status: 400 });
+    if (!email || !password) {
+      return Response.json(
+        { error: "All fields required" },
+        { status: 400 }
+      );
+    }
 
     const user = await CredentialAuth.findOne({ email });
-    if (!user)
+
+    if (!user) {
       return Response.json(
         { error: "Invalid email or password" },
         { status: 401 }
       );
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+
+    if (!isMatch) {
       return Response.json(
         { error: "Invalid email or password" },
         { status: 401 }
       );
+    }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, name: user.name },
-      process.env.JWT_SECRET!,
+      {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "30d" }
     );
 
     const introData = await userIntroModel.findOne({
       userId: user._id.toString(),
     });
+
     const hasIntro = !!introData;
 
     return Response.json({
       success: true,
-      token, // ← make sure the client calls saveToken(data.token) on success
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -49,7 +64,11 @@ export async function POST(req: Request) {
         hasIntro,
       },
     });
-  } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+
+  } catch (err) {
+    return Response.json(
+      { error: err.message },
+      { status: 500 }
+    );
   }
 }

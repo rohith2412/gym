@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
-//app/api/user-intro/route.js
+// app/api/user-intro/route.js
+
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import jwt from "jsonwebtoken";
@@ -7,29 +8,28 @@ import User from "@/models/credentialAuthModel";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-async function getUserFromRequest(req: Request): Promise<{ id: string } | null> {
+async function getUserFromRequest(req) {
   // Mobile: Bearer JWT signed with JWT_SECRET
   const auth = req.headers.get("authorization");
+
   if (auth?.startsWith("Bearer ")) {
     const rawToken = auth.slice(7);
 
-    // Guard: token is literally the string "null" (client called saveToken before login)
     if (!rawToken || rawToken === "null" || rawToken === "undefined") {
       return null;
     }
 
     try {
-      const decoded = jwt.verify(rawToken, process.env.JWT_SECRET!) as {
-        id: string;
-      };
+      const decoded = jwt.verify(rawToken, process.env.JWT_SECRET);
       return { id: decoded.id.toString() };
     } catch {
       return null;
     }
   }
 
-  // Web: NextAuth session cookie signed with NEXTAUTH_SECRET
+  // Web: NextAuth session
   const session = await getServerSession(authOptions);
+
   if (session?.user?.id) {
     return { id: session.user.id };
   }
@@ -37,9 +37,10 @@ async function getUserFromRequest(req: Request): Promise<{ id: string } | null> 
   return null;
 }
 
-export async function GET(req: Request) {
+export async function GET(req) {
   try {
     await connectdb();
+
     const user = await getUserFromRequest(req);
 
     if (!user?.id) {
@@ -58,6 +59,7 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("GET User-Intro Error:", error);
+
     return Response.json(
       { success: false, error: "Server error" },
       { status: 500 }
@@ -65,9 +67,10 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req) {
   try {
     await connectdb();
+
     const user = await getUserFromRequest(req);
 
     if (!user?.id) {
@@ -89,7 +92,6 @@ export async function POST(req: Request) {
       workoutDaysPerWeek,
     } = body;
 
-    // FIX: use == null instead of !value so that 0 is treated as valid
     if (
       age == null ||
       height == null ||
@@ -114,9 +116,17 @@ export async function POST(req: Request) {
       User.findByIdAndUpdate(user.id, { hasIntro: true }),
     ]);
 
-    return Response.json({ success: true, data: updatedIntro });
-  } catch (err: any) {
+    return Response.json({
+      success: true,
+      data: updatedIntro,
+    });
+
+  } catch (err) {
     console.error("POST User-Intro Error:", err);
-    return Response.json({ success: false, error: err.message }, { status: 500 });
+
+    return Response.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
