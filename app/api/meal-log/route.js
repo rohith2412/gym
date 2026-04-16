@@ -1,17 +1,15 @@
-export const dynamic = "force-dynamic"
-
+export const dynamic = "force-dynamic";
 // app/api/meal-log/route.js
 import { connectdb }        from "@/lib/connectdb";
 import MealLog, { calculateTotals } from "@/models/mealLogModel";
 import { getServerSession } from "next-auth";
 import { authOptions }      from "@/app/api/auth/[...nextauth]/route";
+import { ObjectId }         from "mongodb"; // ✅ FIX: needed for PATCH + DELETE
 import OpenAI               from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─── GET /api/meal-log ────────────────────────────────────────────────────────
-// ?date=YYYY-MM-DD  → logs for that day (UTC-safe)
-// ?limit=N          → most recent N logs (default 30)
 export async function GET(req) {
   try {
     await connectdb();
@@ -44,9 +42,6 @@ export async function GET(req) {
 }
 
 // ─── POST /api/meal-log ───────────────────────────────────────────────────────
-// Body: { image?, mealType, date?, note?, manualMacros? }
-// • image + optional note  → AI vision analysis (note appended to prompt)
-// • manualMacros (no image) → skip AI, save directly
 export async function POST(req) {
   try {
     await connectdb();
@@ -57,7 +52,7 @@ export async function POST(req) {
     const body = await req.json();
     const { image, mealType = "snack", date, note = "", manualMacros } = body;
 
-    // ── Manual macros path — no AI call needed ────────────────────────────────
+    // ── Manual macros path ────────────────────────────────────────────────────
     if (manualMacros && !image) {
       const macros = {
         calories: parseFloat(manualMacros.calories) || 0,
@@ -67,7 +62,6 @@ export async function POST(req) {
         fiber:    parseFloat(manualMacros.fiber)     || 0,
       };
 
-      // If user added a note, use it as the food name; otherwise generic
       const foods = [{
         name:       note.trim() || "Manual entry",
         portion:    "custom",
@@ -76,12 +70,12 @@ export async function POST(req) {
       }];
 
       const doc = {
-        userId:   session.user.id,
-        date:     date ? new Date(date) : new Date(),
+        userId:  session.user.id,
+        date:    date ? new Date(date) : new Date(),
         mealType,
         foods,
-        totals:   macros,
-        aiNotes:  "Macros entered manually",
+        totals:  macros,
+        aiNotes: "Macros entered manually",
       };
 
       const inserted = await MealLog.collection.insertOne(doc);
@@ -96,9 +90,8 @@ export async function POST(req) {
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
     const mediaType  = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
-    // Build system prompt — inject user note if present
     const noteContext = note.trim()
-      ? ` The user added this note about the meal: "${note.trim()}". Factor this into your analysis (e.g. extra toppings, large portions, specific brands).`
+      ? ` The user added this note about the meal: "${note.trim()}". Factor this into your analysis.`
       : "";
 
     const aiResponse = await openai.chat.completions.create({
@@ -111,9 +104,9 @@ export async function POST(req) {
           content: `Nutrition analyst. Analyse the food image.${noteContext} Return JSON only:
 {
   "foods": [{ "name":"string","portion":"string","macros":{"calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0},"confidence":0.0-1.0 }],
-  "aiNotes":"max 120 chars — brief summary or caveat, mention user note if it changed your estimate"
+  "aiNotes":"max 120 chars"
 }
-Rules: macros in grams except calories (kcal), round to 1 decimal place, set confidence<0.7 if uncertain, return empty foods array if no food detected.`,
+Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.7 if uncertain, empty foods array if no food detected.`,
         },
         {
           role: "user",
@@ -125,7 +118,6 @@ Rules: macros in grams except calories (kcal), round to 1 decimal place, set con
       ],
     });
 
-    // ── Parse AI response ─────────────────────────────────────────────────────
     let parsed;
     try {
       parsed = JSON.parse(aiResponse.choices[0].message.content || "{}");
@@ -134,19 +126,17 @@ Rules: macros in grams except calories (kcal), round to 1 decimal place, set con
     }
 
     const foods = parsed.foods || [];
-
     const doc = {
-      userId:   session.user.id,
-      date:     date ? new Date(date) : new Date(),
+      userId:  session.user.id,
+      date:    date ? new Date(date) : new Date(),
       mealType,
       foods,
-      totals:   calculateTotals(foods),
-      aiNotes:  parsed.aiNotes || "",
+      totals:  calculateTotals(foods),
+      aiNotes: parsed.aiNotes || "",
     };
 
     const mealLog = await MealLog.collection.insertOne(doc);
     doc._id = mealLog.insertedId;
-
     return Response.json({ success: true, data: doc });
   } catch (err) {
     console.error("[meal-log POST]", err);
@@ -155,8 +145,6 @@ Rules: macros in grams except calories (kcal), round to 1 decimal place, set con
 }
 
 // ─── PATCH /api/meal-log?id=… ─────────────────────────────────────────────────
-// Body: { totals?: MacrosObject, foods?: FoodItem[] }
-// Allows the user to correct AI-detected macros or food items after analysis.
 export async function PATCH(req) {
   try {
     await connectdb();
@@ -169,10 +157,13 @@ export async function PATCH(req) {
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    const body = await req.json();
+    // ✅ FIX: validate ObjectId format before attempting conversion
+    if (!ObjectId.isValid(id))
+      return Response.json({ error: "Invalid id format" }, { status: 400 });
 
-    // Build $set payload — only update fields that were sent
+    const body = await req.json();
     const $set = {};
+
     if (body.totals) {
       $set.totals = {
         calories: parseFloat(body.totals.calories) || 0,
@@ -184,20 +175,16 @@ export async function PATCH(req) {
     }
     if (body.foods) {
       $set.foods = body.foods;
-      // If foods are updated but totals weren't explicitly sent, recalculate
-      if (!body.totals) {
-        $set.totals = calculateTotals(body.foods);
-      }
+      if (!body.totals) $set.totals = calculateTotals(body.foods);
     }
-    if (body.aiNotes !== undefined) {
-      $set.aiNotes = body.aiNotes;
-    }
+    if (body.aiNotes !== undefined) $set.aiNotes = body.aiNotes;
 
     if (Object.keys($set).length === 0)
       return Response.json({ error: "Nothing to update" }, { status: 400 });
 
+    // ✅ FIX: use new ObjectId(id) so MongoDB can actually match the document
     const result = await MealLog.updateOne(
-      { _id: id, userId: session.user.id }, // userId guard prevents cross-user edits
+      { _id: new ObjectId(id), userId: session.user.id },
       { $set }
     );
 
@@ -224,7 +211,11 @@ export async function DELETE(req) {
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    await MealLog.deleteOne({ _id: id, userId: session.user.id });
+    // ✅ FIX: validate then convert to ObjectId
+    if (!ObjectId.isValid(id))
+      return Response.json({ error: "Invalid id format" }, { status: 400 });
+
+    await MealLog.deleteOne({ _id: new ObjectId(id), userId: session.user.id });
     return Response.json({ success: true });
   } catch (err) {
     console.error("[meal-log DELETE]", err);

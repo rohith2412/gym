@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-
+//app/api/ai-trainer/saved/route.js
 import { connectdb }   from "@/lib/connectdb";
 import SavedPlan       from "@/models/savedPlanModel";
 import { getAuthUser } from "@/lib/getAuthUser";

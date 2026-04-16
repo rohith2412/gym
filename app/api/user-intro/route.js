@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-
+//app/api/user-intro/route.js
 import { connectdb } from "@/lib/connectdb";
 import userIntroModel from "@/models/userIntroModel";
 import jwt from "jsonwebtoken";
