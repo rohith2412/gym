@@ -40,30 +40,31 @@ async function getUserFromRequest(req) {
 export async function GET(req) {
   try {
     await connectdb();
-
     const user = await getUserFromRequest(req);
+    
+    console.log("=== USER-INTRO DEBUG ===");
+    console.log("user from request:", user);
+    
+    if (!user?.id)
+      return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
-    if (!user?.id) {
-      return Response.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const intro = await userIntroModel.findOne({ userId: user.id });
+    const intro = await userIntroModel.findOne({ userId: user.id }).lean();
+    
+    console.log("searching for userId:", user.id);
+    console.log("intro found:", intro ? "YES" : "NO");
+    
+    // ✅ Also search without the id to see what's actually in the DB
+    const allIntros = await userIntroModel.find({}).select("userId").lean();
+    console.log("all userIds in DB:", allIntros.map(i => i.userId));
 
     return Response.json({
       success: true,
-      exists: !!intro,
-      data: intro || null,
+      exists:  !!intro,
+      data:    intro || null,
     });
   } catch (error) {
     console.error("GET User-Intro Error:", error);
-
-    return Response.json(
-      { success: false, error: "Server error" },
-      { status: 500 }
-    );
+    return Response.json({ success: false, error: "Server error" }, { status: 500 });
   }
 }
 
