@@ -1,11 +1,10 @@
 export const dynamic = "force-dynamic";
 // app/api/meal-log/route.js
-import { connectdb }        from "@/lib/connectdb";
+import { connectdb }             from "@/lib/connectdb";
 import MealLog, { calculateTotals } from "@/models/mealLogModel";
-import { getServerSession } from "next-auth";
-import { authOptions }      from "@/app/api/auth/[...nextauth]/route";
-import { ObjectId }         from "mongodb"; // ✅ FIX: needed for PATCH + DELETE
-import OpenAI               from "openai";
+import { ObjectId }              from "mongodb";
+import OpenAI                    from "openai";
+import { getAuthUser }           from "@/lib/getAuthUser";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -13,15 +12,15 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export async function GET(req) {
   try {
     await connectdb();
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id)
+    const authUser = await getAuthUser(req);
+    if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
     const dateParam = searchParams.get("date");
     const limit     = Math.min(parseInt(searchParams.get("limit") || "30"), 200);
 
-    const query = { userId: session.user.id };
+    const query = { userId: authUser.id };
 
     if (dateParam) {
       const start = new Date(`${dateParam}T00:00:00.000Z`);
@@ -45,8 +44,8 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     await connectdb();
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id)
+    const authUser = await getAuthUser(req);
+    if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const body = await req.json();
@@ -70,7 +69,7 @@ export async function POST(req) {
       }];
 
       const doc = {
-        userId:  session.user.id,
+        userId:  authUser.id,
         date:    date ? new Date(date) : new Date(),
         mealType,
         foods,
@@ -127,7 +126,7 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
 
     const foods = parsed.foods || [];
     const doc = {
-      userId:  session.user.id,
+      userId:  authUser.id,
       date:    date ? new Date(date) : new Date(),
       mealType,
       foods,
@@ -148,8 +147,8 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
 export async function PATCH(req) {
   try {
     await connectdb();
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id)
+    const authUser = await getAuthUser(req);
+    if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
@@ -157,7 +156,6 @@ export async function PATCH(req) {
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    // ✅ FIX: validate ObjectId format before attempting conversion
     if (!ObjectId.isValid(id))
       return Response.json({ error: "Invalid id format" }, { status: 400 });
 
@@ -182,9 +180,8 @@ export async function PATCH(req) {
     if (Object.keys($set).length === 0)
       return Response.json({ error: "Nothing to update" }, { status: 400 });
 
-    // ✅ FIX: use new ObjectId(id) so MongoDB can actually match the document
     const result = await MealLog.updateOne(
-      { _id: new ObjectId(id), userId: session.user.id },
+      { _id: new ObjectId(id), userId: authUser.id },
       { $set }
     );
 
@@ -202,8 +199,8 @@ export async function PATCH(req) {
 export async function DELETE(req) {
   try {
     await connectdb();
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id)
+    const authUser = await getAuthUser(req);
+    if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
@@ -211,11 +208,10 @@ export async function DELETE(req) {
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    // ✅ FIX: validate then convert to ObjectId
     if (!ObjectId.isValid(id))
       return Response.json({ error: "Invalid id format" }, { status: 400 });
 
-    await MealLog.deleteOne({ _id: new ObjectId(id), userId: session.user.id });
+    await MealLog.deleteOne({ _id: new ObjectId(id), userId: authUser.id });
     return Response.json({ success: true });
   } catch (err) {
     console.error("[meal-log DELETE]", err);
