@@ -1,83 +1,140 @@
 export const dynamic = "force-dynamic";
-// app/api/user-intro/route.js
-import { connectdb }        from "@/lib/connectdb";
-import userIntroModel       from "@/models/userIntroModel";
-import jwt                  from "jsonwebtoken";
-import User                 from "@/models/credentialAuthModel";
-import { getServerSession } from "next-auth";
-import { authOptions }      from "@/app/api/auth/[...nextauth]/route";
+// app/api/ai-trainer/route.js
+import { connectdb }   from "@/lib/connectdb";
+import userIntroModel  from "@/models/userIntroModel";
+import { getAuthUser } from "@/lib/getAuthUser";
+import OpenAI          from "openai";
 
-async function getUserFromRequest(req) {
-  const auth = req.headers.get("authorization");
-  if (auth?.startsWith("Bearer ")) {
-    const rawToken = auth.slice(7);
-    if (!rawToken || rawToken === "null" || rawToken === "undefined") return null;
-    try {
-      const decoded = jwt.verify(rawToken, process.env.JWT_SECRET);
-      // ✅ FIX: always stringify — ObjectId from JWT can come back as object
-      return { id: decoded.id.toString() };
-    } catch {
-      return null;
-    }
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+function buildUserContext(intro, extra = {}) {
+  const parts = [];
+  if (intro) {
+    if (intro.age)                parts.push(`Age: ${intro.age}`);
+    if (intro.gender)             parts.push(`Gender: ${intro.gender}`);
+    if (intro.weight)             parts.push(`Weight: ${intro.weight}kg`);
+    if (intro.height)             parts.push(`Height: ${intro.height}cm`);
+    if (intro.fitnessGoal)        parts.push(`Primary goal: ${intro.fitnessGoal}`);
+    if (intro.experienceLevel)    parts.push(`Experience: ${intro.experienceLevel}`);
+    if (intro.workoutDaysPerWeek) parts.push(`Available days/week: ${intro.workoutDaysPerWeek}`);
   }
-  const session = await getServerSession(authOptions);
-  if (session?.user?.id) return { id: session.user.id };
-  return null;
-}
-
-export async function GET(req) {
-  try {
-    await connectdb();
-    const user = await getUserFromRequest(req);
-    if (!user?.id)
-      return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
-
-    const intro = await userIntroModel.findOne({ userId: user.id }).lean();
-
-    return Response.json({
-      success: true,
-      exists:  !!intro,
-      data:    intro || null,
-    });
-  } catch (error) {
-    console.error("GET User-Intro Error:", error);
-    return Response.json({ success: false, error: "Server error" }, { status: 500 });
-  }
+  if (extra.injuries)      parts.push(`Injuries/limitations: ${extra.injuries}`);
+  if (extra.equipment)     parts.push(`Equipment: ${extra.equipment}`);
+  if (extra.focusAreas)    parts.push(`Focus areas: ${extra.focusAreas}`);
+  if (extra.sessionLength) parts.push(`Session length preference: ${extra.sessionLength} minutes`);
+  return parts.join("\n");
 }
 
 export async function POST(req) {
   try {
     await connectdb();
-    const user = await getUserFromRequest(req);
-    if (!user?.id)
-      return Response.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
+    const authUser = await getAuthUser(req);
+    if (!authUser)
+      return Response.json({ error: "Not authenticated" }, { status: 401 });
+
+    // ✅ clone the request before reading body so we can log it
     const body = await req.json();
-    const {
-      age, height, weight, gender,
-      fitnessGoal, experienceLevel, workoutDaysPerWeek,
-    } = body;
 
-    if (
-      age == null || height == null || weight == null ||
-      !gender || !fitnessGoal || !experienceLevel ||
-      workoutDaysPerWeek == null
-    ) {
-      return Response.json({ success: false, error: "Missing required fields" }, { status: 400 });
+    console.log("[ai-trainer] authUser:", authUser);
+    console.log("[ai-trainer] body received:", JSON.stringify(body));
+
+    const { type, extra = {}, messages = [] } = body;
+
+    console.log("[ai-trainer] type:", type);
+
+    const intro   = await userIntroModel.findOne({ userId: authUser.id }).lean();
+    const userCtx = buildUserContext(intro, extra);
+
+    console.log("[ai-trainer] intro found:", intro ? "YES" : "NO");
+
+    if (type === "plan") {
+      const { planType = "weekly", focus } = body;
+      const prompt = `You are an elite personal trainer and strength & conditioning coach.
+Generate a detailed, personalised ${planType} workout plan for this athlete:
+
+${userCtx}
+${focus ? `Special focus: ${focus}` : ""}
+
+Return ONLY valid JSON:
+{
+  "planTitle": "string",
+  "planSummary": "string (2-3 sentences explaining the plan strategy)",
+  "weeklyVolume": "string (e.g. '4 days / ~45 min per session')",
+  "difficulty": "Beginner" | "Intermediate" | "Advanced",
+  "days": [
+    {
+      "day": "Monday",
+      "label": "string",
+      "focus": "string",
+      "restDay": false,
+      "warmup": "string",
+      "exercises": [
+        {
+          "name": "string",
+          "muscleGroup": "string",
+          "sets": number,
+          "reps": "string",
+          "rest": "string",
+          "tempo": "string",
+          "notes": "string"
+        }
+      ],
+      "cooldown": "string",
+      "estimatedTime": number
+    }
+  ],
+  "progressionTips": ["string"],
+  "nutritionTips": ["string"],
+  "weeklyGoals": ["string"]
+}
+
+Rules:
+- Include all 7 days (rest days have restDay: true and no exercises)
+- Scale intensity to experience level
+- Include warm-up and cooldown every training day
+- 4-6 exercises per training day`;
+
+      const res = await openai.chat.completions.create({
+        model:           "gpt-4o",
+        max_tokens:      2500,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: "Elite personal trainer. Return only valid JSON." },
+          { role: "user",   content: prompt },
+        ],
+      });
+
+      const plan = JSON.parse(res.choices[0].message.content || "{}");
+      return Response.json({ success: true, data: plan });
     }
 
-    const [updatedIntro] = await Promise.all([
-      userIntroModel.findOneAndUpdate(
-        { userId: user.id },
-        { ...body, userId: user.id },
-        { upsert: true, new: true, runValidators: true }
-      ),
-      User.findByIdAndUpdate(user.id, { hasIntro: true }),
-    ]);
+    if (type === "chat") {
+      const systemPrompt = `You are an elite AI personal trainer with expertise in strength training, nutrition, recovery and sports science.
 
-    return Response.json({ success: true, data: updatedIntro });
+Your athlete's profile:
+${userCtx || "Profile not provided - ask the user for details if needed."}
+
+Personality: Direct, motivating, evidence-based. Give specific actionable advice. Keep responses concise - 2-4 short paragraphs max. Use line breaks for readability. Do NOT use markdown headers or ** symbols.`;
+
+      const res = await openai.chat.completions.create({
+        model:      "gpt-4o",
+        max_tokens: 600,
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      });
+
+      return Response.json({ success: true, data: { reply: res.choices[0].message.content || "" } });
+    }
+
+    // ✅ if we get here type was not recognised — log what we got
+    console.log("[ai-trainer] unrecognised type, returning 400. type was:", type);
+    return Response.json({ success: false, error: "Invalid type" }, { status: 400 });
+
   } catch (err) {
-    console.error("POST User-Intro Error:", err);
+    console.error("[ai-trainer] error:", err);
     return Response.json({ success: false, error: err.message }, { status: 500 });
   }
 }
