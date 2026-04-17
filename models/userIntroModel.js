@@ -18,6 +18,13 @@ const userIntroSchema = new Schema({
   subscriptionStatus:  String,
   currentPeriodEnd:    Date,
 
+  // Add inside userIntroSchema — after workoutDaysPerWeek
+  customCalories: Number,
+  customProtein:  Number,
+  customCarbs:    Number,
+  customFat:      Number,
+  customFiber:    Number,
+
   // ── Free trial ────────────────────────────────────────────
   freeTrialUsed:       { type: Boolean, default: false },
 }, { timestamps: true });
