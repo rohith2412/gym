@@ -6765,5 +6765,1863 @@
     "totalTime": 5,
     "seeded": true,
     "aiGenerated": false
+  },
+  {
+    "name": "Scrambled Eggs with Spinach",
+    "emoji": "\ud83c\udf73",
+    "goal": "fat loss",
+    "mealType": "breakfast",
+    "difficulty": "Easy",
+    "prepTime": 3,
+    "cookTime": 6,
+    "servings": 1,
+    "macros": {
+      "calories": 220,
+      "protein": 18,
+      "carbs": 3,
+      "fat": 15,
+      "fiber": 1,
+      "sugar": 1,
+      "sodium": 280,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 large"
+      },
+      {
+        "item": "Baby spinach",
+        "amount": "40g"
+      },
+      {
+        "item": "Butter",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      }
+    ],
+    "steps": [
+      "Whisk eggs with salt and pepper.",
+      "Melt butter in a non-stick pan over low heat.",
+      "Add eggs and stir gently with a spatula, folding continuously.",
+      "Add spinach when eggs are almost set and stir until wilted.",
+      "Remove from heat while still slightly glossy and serve immediately."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Low heat and constant stirring gives you the creamiest scrambled eggs — never rush them.",
+    "dietaryTags": ["gluten-free", "low-carb", "keto"],
+    "calorieRange": "under-300",
+    "maxProtein": 18,
+    "totalTime": 9,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Shakshuka",
+    "emoji": "\ud83c\udf45",
+    "goal": "maintenance",
+    "mealType": "breakfast",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 18,
+    "servings": 2,
+    "macros": {
+      "calories": 260,
+      "protein": 16,
+      "carbs": 18,
+      "fat": 14,
+      "fiber": 4,
+      "sugar": 10,
+      "sodium": 540,
+      "cholesterol": 370
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "4 large"
+      },
+      {
+        "item": "Crushed tomatoes",
+        "amount": "400g"
+      },
+      {
+        "item": "Red bell pepper",
+        "amount": "1 diced"
+      },
+      {
+        "item": "Onion",
+        "amount": "\u00bd diced"
+      },
+      {
+        "item": "Garlic",
+        "amount": "2 cloves"
+      },
+      {
+        "item": "Cumin",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Smoked paprika",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Saut\u00e9 onion, pepper and garlic in olive oil 5 minutes.",
+      "Add cumin and paprika, stir 1 minute.",
+      "Pour in crushed tomatoes and simmer 8 minutes.",
+      "Make 4 wells in the sauce and crack an egg into each.",
+      "Cover and cook 5 minutes until whites are set but yolks are still runny.",
+      "Serve directly from the pan with crusty bread."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Cover the pan tightly — steam cooks the egg whites from above, keeping yolks runny.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegetarian"],
+    "calorieRange": "under-300",
+    "maxProtein": 16,
+    "totalTime": 23,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Egg Fried Rice",
+    "emoji": "\ud83c\udf73",
+    "goal": "maintenance",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 12,
+      "fiber": 2,
+      "sugar": 2,
+      "sodium": 620,
+      "cholesterol": 370
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 large"
+      },
+      {
+        "item": "Cooked rice (day old)",
+        "amount": "200g"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Spring onions",
+        "amount": "3 chopped"
+      },
+      {
+        "item": "Vegetable oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "1 clove minced"
+      }
+    ],
+    "steps": [
+      "Heat wok or large pan on very high heat with oil.",
+      "Add garlic and stir-fry 30 seconds.",
+      "Add cold rice, breaking up clumps, stir-fry 3 minutes.",
+      "Push rice to the side and scramble eggs in the centre.",
+      "Mix eggs into rice, add soy sauce and sesame oil.",
+      "Toss everything together, top with spring onions and serve."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Day-old cold rice is essential — fresh rice makes the dish clumpy and soggy.",
+    "dietaryTags": ["dairy-free"],
+    "calorieRange": "300-500",
+    "maxProtein": 18,
+    "totalTime": 15,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Spanish Tortilla",
+    "emoji": "\ud83c\udf73",
+    "goal": "maintenance",
+    "mealType": "lunch",
+    "difficulty": "Medium",
+    "prepTime": 10,
+    "cookTime": 20,
+    "servings": 2,
+    "macros": {
+      "calories": 320,
+      "protein": 20,
+      "carbs": 24,
+      "fat": 16,
+      "fiber": 2,
+      "sugar": 2,
+      "sodium": 320,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "5 large"
+      },
+      {
+        "item": "Potato",
+        "amount": "2 medium thinly sliced"
+      },
+      {
+        "item": "Onion",
+        "amount": "1 medium thinly sliced"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "3 tbsp"
+      },
+      {
+        "item": "Salt",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Cook potato and onion in olive oil on low heat 12 minutes until tender.",
+      "Drain, reserving 1 tbsp oil. Season with salt.",
+      "Whisk eggs and fold in the potato mixture.",
+      "Heat reserved oil in the pan, pour in the egg mixture.",
+      "Cook 5 minutes until edges set, then flip onto a plate and slide back into pan.",
+      "Cook 3 more minutes, slide onto a plate and serve warm or at room temperature."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "The classic Spanish tortilla is meant to be served at room temperature — it tastes better than hot.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegetarian"],
+    "calorieRange": "300-500",
+    "maxProtein": 20,
+    "totalTime": 30,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Simple Egg Curry",
+    "emoji": "\ud83e\udd5a",
+    "goal": "maintenance",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 20,
+    "servings": 2,
+    "macros": {
+      "calories": 290,
+      "protein": 18,
+      "carbs": 16,
+      "fat": 17,
+      "fiber": 3,
+      "sugar": 6,
+      "sodium": 480,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "4 hard-boiled"
+      },
+      {
+        "item": "Crushed tomatoes",
+        "amount": "300g"
+      },
+      {
+        "item": "Onion",
+        "amount": "1 large diced"
+      },
+      {
+        "item": "Garlic",
+        "amount": "3 cloves"
+      },
+      {
+        "item": "Ginger",
+        "amount": "1 tsp grated"
+      },
+      {
+        "item": "Garam masala",
+        "amount": "1.5 tsp"
+      },
+      {
+        "item": "Turmeric",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Coconut oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Hard-boil eggs 10 minutes, peel and set aside.",
+      "Saut\u00e9 onion in coconut oil 5 minutes until golden.",
+      "Add garlic, ginger and spices, cook 2 minutes.",
+      "Add crushed tomatoes, simmer 10 minutes.",
+      "Score eggs and add to the sauce.",
+      "Simmer 3 more minutes and serve with rice."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Score the hard-boiled eggs before adding to the sauce so they absorb the flavours.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegetarian"],
+    "calorieRange": "under-300",
+    "maxProtein": 18,
+    "totalTime": 28,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Poached Eggs on Toast",
+    "emoji": "\ud83e\udd5a",
+    "goal": "fat loss",
+    "mealType": "breakfast",
+    "difficulty": "Medium",
+    "prepTime": 3,
+    "cookTime": 8,
+    "servings": 1,
+    "macros": {
+      "calories": 280,
+      "protein": 20,
+      "carbs": 24,
+      "fat": 10,
+      "fiber": 3,
+      "sugar": 2,
+      "sodium": 400,
+      "cholesterol": 370
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "2 large"
+      },
+      {
+        "item": "Whole grain bread",
+        "amount": "2 slices"
+      },
+      {
+        "item": "White vinegar",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      },
+      {
+        "item": "Chilli flakes",
+        "amount": "optional pinch"
+      }
+    ],
+    "steps": [
+      "Toast bread to your liking.",
+      "Bring a wide pan of water to a gentle simmer, add vinegar.",
+      "Crack each egg into a small cup first.",
+      "Create a gentle swirl in the water and slide egg in.",
+      "Poach 3 minutes for a runny yolk.",
+      "Lift out with a slotted spoon, drain and place on toast.",
+      "Season with salt, pepper and chilli flakes."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Cracking eggs into a cup first lets you check for broken yolks before adding to the water.",
+    "dietaryTags": ["dairy-free", "high-fiber"],
+    "calorieRange": "under-300",
+    "maxProtein": 20,
+    "totalTime": 11,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Baked Eggs in Tomato Sauce",
+    "emoji": "\ud83c\udf45",
+    "goal": "fat loss",
+    "mealType": "breakfast",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 15,
+    "servings": 2,
+    "macros": {
+      "calories": 210,
+      "protein": 16,
+      "carbs": 14,
+      "fat": 10,
+      "fiber": 3,
+      "sugar": 9,
+      "sodium": 460,
+      "cholesterol": 370
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "4 large"
+      },
+      {
+        "item": "Passata",
+        "amount": "300g"
+      },
+      {
+        "item": "Garlic",
+        "amount": "2 cloves"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Oregano",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      }
+    ],
+    "steps": [
+      "Preheat oven to 190\u00b0C.",
+      "Heat olive oil in an oven-safe pan, saut\u00e9 garlic 1 minute.",
+      "Add passata and oregano, simmer 5 minutes.",
+      "Make 4 wells and crack an egg into each.",
+      "Transfer to oven and bake 8 minutes until whites are just set.",
+      "Serve immediately with crusty bread."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Pull the pan from the oven when whites look barely set — they keep cooking in the hot sauce.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegetarian", "low-carb"],
+    "calorieRange": "under-300",
+    "maxProtein": 16,
+    "totalTime": 20,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Classic French Omelette",
+    "emoji": "\ud83c\udf73",
+    "goal": "fat loss",
+    "mealType": "breakfast",
+    "difficulty": "Medium",
+    "prepTime": 3,
+    "cookTime": 5,
+    "servings": 1,
+    "macros": {
+      "calories": 230,
+      "protein": 18,
+      "carbs": 2,
+      "fat": 17,
+      "fiber": 0,
+      "sugar": 1,
+      "sodium": 260,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 large"
+      },
+      {
+        "item": "Butter",
+        "amount": "1.5 tsp"
+      },
+      {
+        "item": "Chives",
+        "amount": "1 tbsp chopped"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      }
+    ],
+    "steps": [
+      "Whisk eggs thoroughly with salt and pepper.",
+      "Melt butter in a non-stick pan over medium-high heat until foamy.",
+      "Pour in eggs and immediately stir in small circles with a spatula.",
+      "When curds form but eggs are still slightly liquid, stop stirring.",
+      "Shake pan to even out the omelette and fold one third over.",
+      "Roll out onto plate seam-side down. It should be pale yellow, not browned."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "A French omelette should take under 2 minutes to cook — high heat, fast hands.",
+    "dietaryTags": ["gluten-free", "low-carb", "keto"],
+    "calorieRange": "under-300",
+    "maxProtein": 18,
+    "totalTime": 8,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Egg & Veg Stir Fry",
+    "emoji": "\ud83c\udf73",
+    "goal": "fat loss",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 270,
+      "protein": 18,
+      "carbs": 14,
+      "fat": 15,
+      "fiber": 4,
+      "sugar": 6,
+      "sodium": 540,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 large"
+      },
+      {
+        "item": "Broccoli",
+        "amount": "100g florets"
+      },
+      {
+        "item": "Bell pepper",
+        "amount": "1 sliced"
+      },
+      {
+        "item": "Carrot",
+        "amount": "1 julienned"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "1 clove"
+      }
+    ],
+    "steps": [
+      "Whisk eggs and season lightly.",
+      "Heat wok on high with sesame oil, stir-fry vegetables 4 minutes.",
+      "Add garlic and cook 30 seconds.",
+      "Push veg to sides and scramble eggs in the centre.",
+      "Mix everything together, add soy sauce and toss.",
+      "Serve immediately."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Cook veg first on high heat so they stay crisp, then add eggs last.",
+    "dietaryTags": ["gluten-free", "dairy-free", "low-carb"],
+    "calorieRange": "under-300",
+    "maxProtein": 18,
+    "totalTime": 18,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Simple Grilled Chicken",
+    "emoji": "\ud83c\udf57",
+    "goal": "fat loss",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 14,
+    "servings": 1,
+    "macros": {
+      "calories": 230,
+      "protein": 44,
+      "carbs": 1,
+      "fat": 5,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 320,
+      "cholesterol": 130
+    },
+    "ingredients": [
+      {
+        "item": "Chicken breast",
+        "amount": "200g"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Garlic powder",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Paprika",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      },
+      {
+        "item": "Lemon",
+        "amount": "\u00bd squeezed"
+      }
+    ],
+    "steps": [
+      "Pound chicken to even thickness for faster cooking.",
+      "Rub with olive oil, garlic powder, paprika, salt and pepper.",
+      "Grill or pan-sear 6 to 7 minutes per side over medium-high heat.",
+      "Rest 3 minutes before slicing.",
+      "Squeeze lemon over and serve."
+    ],
+    "proteinSources": ["Chicken breast"],
+    "tip": "Pounding the chicken to even thickness ensures it cooks through without dry edges.",
+    "dietaryTags": ["gluten-free", "dairy-free", "low-carb", "keto"],
+    "calorieRange": "under-300",
+    "maxProtein": 44,
+    "totalTime": 19,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Quick Beef Stir Fry",
+    "emoji": "\ud83e\udd69",
+    "goal": "muscle gain",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 10,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 420,
+      "protein": 42,
+      "carbs": 18,
+      "fat": 18,
+      "fiber": 3,
+      "sugar": 6,
+      "sodium": 720,
+      "cholesterol": 105
+    },
+    "ingredients": [
+      {
+        "item": "Lean beef",
+        "amount": "180g sliced thin"
+      },
+      {
+        "item": "Mixed stir-fry vegetables",
+        "amount": "150g"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Oyster sauce",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "2 cloves"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Vegetable oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Mix soy sauce and oyster sauce together.",
+      "Heat wok on very high heat with vegetable oil.",
+      "Stir-fry beef 2 minutes until browned, remove from pan.",
+      "Add garlic and vegetables, stir-fry 3 minutes.",
+      "Return beef, pour over sauce and toss everything.",
+      "Drizzle sesame oil and serve immediately."
+    ],
+    "proteinSources": ["Lean beef"],
+    "tip": "High heat is essential for stir-fry — a hot wok gives you charred flavour, not steamed veg.",
+    "dietaryTags": ["dairy-free"],
+    "calorieRange": "300-500",
+    "maxProtein": 42,
+    "totalTime": 20,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Pan-Seared Salmon",
+    "emoji": "\ud83c\udf63",
+    "goal": "fat loss",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 3,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 340,
+      "protein": 42,
+      "carbs": 1,
+      "fat": 18,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 320,
+      "cholesterol": 95
+    },
+    "ingredients": [
+      {
+        "item": "Salmon fillet",
+        "amount": "200g skin-on"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "1 clove"
+      },
+      {
+        "item": "Lemon",
+        "amount": "\u00bd"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      },
+      {
+        "item": "Dill",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Pat salmon dry and season generously.",
+      "Heat olive oil in a pan over medium-high heat until shimmering.",
+      "Place salmon skin-side down and cook without moving for 5 minutes.",
+      "Flip and add garlic, cook 3 more minutes.",
+      "Squeeze lemon over and garnish with dill.",
+      "Serve immediately."
+    ],
+    "proteinSources": ["Salmon"],
+    "tip": "Resist moving the salmon — letting the skin render fully means it releases cleanly.",
+    "dietaryTags": ["gluten-free", "dairy-free", "low-carb", "keto"],
+    "calorieRange": "300-500",
+    "maxProtein": 42,
+    "totalTime": 13,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Tuna Salad",
+    "emoji": "\ud83e\udd57",
+    "goal": "fat loss",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 0,
+    "servings": 1,
+    "macros": {
+      "calories": 240,
+      "protein": 34,
+      "carbs": 8,
+      "fat": 8,
+      "fiber": 3,
+      "sugar": 4,
+      "sodium": 480,
+      "cholesterol": 50
+    },
+    "ingredients": [
+      {
+        "item": "Tuna in water",
+        "amount": "150g drained"
+      },
+      {
+        "item": "Mixed salad leaves",
+        "amount": "80g"
+      },
+      {
+        "item": "Cherry tomatoes",
+        "amount": "80g halved"
+      },
+      {
+        "item": "Cucumber",
+        "amount": "\u00bd sliced"
+      },
+      {
+        "item": "Red onion",
+        "amount": "\u00bc thinly sliced"
+      },
+      {
+        "item": "Lemon juice",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Arrange salad leaves on a plate.",
+      "Top with tomatoes, cucumber and red onion.",
+      "Flake tuna over the top.",
+      "Whisk lemon juice and olive oil for dressing.",
+      "Drizzle over salad and serve."
+    ],
+    "proteinSources": ["Tuna"],
+    "tip": "Tuna in spring water has no added fat and 26g protein per 100g — one of the best value proteins.",
+    "dietaryTags": ["gluten-free", "dairy-free", "low-carb", "keto"],
+    "calorieRange": "under-300",
+    "maxProtein": 34,
+    "totalTime": 8,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Simple Turkey Bowl",
+    "emoji": "\ud83e\uded9",
+    "goal": "fat loss",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 12,
+    "servings": 1,
+    "macros": {
+      "calories": 350,
+      "protein": 40,
+      "carbs": 22,
+      "fat": 10,
+      "fiber": 4,
+      "sugar": 4,
+      "sodium": 420,
+      "cholesterol": 90
+    },
+    "ingredients": [
+      {
+        "item": "Ground turkey",
+        "amount": "160g"
+      },
+      {
+        "item": "Brown rice (cooked)",
+        "amount": "100g"
+      },
+      {
+        "item": "Broccoli",
+        "amount": "100g steamed"
+      },
+      {
+        "item": "Garlic powder",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Brown ground turkey in olive oil with garlic powder until cooked through.",
+      "Steam broccoli 4 minutes.",
+      "Assemble bowl: rice, turkey, broccoli.",
+      "Drizzle soy sauce over everything and serve."
+    ],
+    "proteinSources": ["Ground turkey"],
+    "tip": "Ground turkey is one of the leanest proteins available — ideal for fat loss phases.",
+    "dietaryTags": ["gluten-free", "dairy-free"],
+    "calorieRange": "300-500",
+    "maxProtein": 40,
+    "totalTime": 17,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Pork & Veg Bowl",
+    "emoji": "\ud83e\udd69",
+    "goal": "maintenance",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 14,
+    "servings": 1,
+    "macros": {
+      "calories": 440,
+      "protein": 40,
+      "carbs": 28,
+      "fat": 16,
+      "fiber": 4,
+      "sugar": 5,
+      "sodium": 560,
+      "cholesterol": 110
+    },
+    "ingredients": [
+      {
+        "item": "Pork loin",
+        "amount": "180g sliced"
+      },
+      {
+        "item": "Cooked rice",
+        "amount": "120g"
+      },
+      {
+        "item": "Bok choy",
+        "amount": "2 heads halved"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "2 cloves"
+      },
+      {
+        "item": "Ginger",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Season pork with salt and pepper.",
+      "Sear pork in a hot pan 3 to 4 minutes per side.",
+      "Remove and rest. In same pan cook garlic and ginger 1 minute.",
+      "Add bok choy, soy sauce and sesame oil, stir-fry 3 minutes.",
+      "Slice pork and serve over rice with bok choy."
+    ],
+    "proteinSources": ["Pork loin"],
+    "tip": "Pork loin cooks fast — slice thin to avoid overcooking and keep it juicy.",
+    "dietaryTags": ["gluten-free", "dairy-free"],
+    "calorieRange": "300-500",
+    "maxProtein": 40,
+    "totalTime": 22,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Shrimp Garlic Butter",
+    "emoji": "\ud83e\udd90",
+    "goal": "fat loss",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 8,
+    "servings": 1,
+    "macros": {
+      "calories": 260,
+      "protein": 30,
+      "carbs": 4,
+      "fat": 14,
+      "fiber": 0,
+      "sugar": 0,
+      "sodium": 640,
+      "cholesterol": 250
+    },
+    "ingredients": [
+      {
+        "item": "Shrimp",
+        "amount": "200g peeled"
+      },
+      {
+        "item": "Butter",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "4 cloves minced"
+      },
+      {
+        "item": "Lemon juice",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Parsley",
+        "amount": "1 tbsp chopped"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      }
+    ],
+    "steps": [
+      "Pat shrimp dry and season with salt and pepper.",
+      "Melt butter in a pan over medium-high heat.",
+      "Add garlic and cook 1 minute until fragrant.",
+      "Add shrimp and cook 2 minutes per side until pink and curled.",
+      "Squeeze lemon over and garnish with parsley.",
+      "Serve immediately."
+    ],
+    "proteinSources": ["Shrimp"],
+    "tip": "Shrimp are done the moment they turn pink and curl into a C-shape — overcooked shrimp curl tight.",
+    "dietaryTags": ["gluten-free", "low-carb", "keto"],
+    "calorieRange": "under-300",
+    "maxProtein": 30,
+    "totalTime": 13,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Simple Tofu Bowl",
+    "emoji": "\ud83e\uded8",
+    "goal": "maintenance",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 10,
+    "cookTime": 20,
+    "servings": 1,
+    "macros": {
+      "calories": 390,
+      "protein": 26,
+      "carbs": 34,
+      "fat": 16,
+      "fiber": 5,
+      "sugar": 4,
+      "sodium": 540,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Firm tofu",
+        "amount": "200g cubed"
+      },
+      {
+        "item": "Brown rice (cooked)",
+        "amount": "120g"
+      },
+      {
+        "item": "Edamame",
+        "amount": "60g"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Garlic powder",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Sesame seeds",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Press tofu dry, cut into cubes.",
+      "Toss with soy sauce, sesame oil and garlic powder.",
+      "Bake at 200\u00b0C for 20 minutes until golden.",
+      "Microwave edamame 2 minutes.",
+      "Assemble bowl with rice, tofu and edamame.",
+      "Sprinkle sesame seeds and serve."
+    ],
+    "proteinSources": ["Tofu"],
+    "tip": "Pressing tofu removes water and lets it get crispy in the oven — a paper towel and heavy pan works.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan"],
+    "calorieRange": "300-500",
+    "maxProtein": 26,
+    "totalTime": 30,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Lentil Dal",
+    "emoji": "\ud83c\udf5b",
+    "goal": "maintenance",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 25,
+    "servings": 2,
+    "macros": {
+      "calories": 360,
+      "protein": 20,
+      "carbs": 52,
+      "fat": 8,
+      "fiber": 12,
+      "sugar": 5,
+      "sodium": 400,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Red lentils",
+        "amount": "180g"
+      },
+      {
+        "item": "Onion",
+        "amount": "1 diced"
+      },
+      {
+        "item": "Garlic",
+        "amount": "3 cloves"
+      },
+      {
+        "item": "Ginger",
+        "amount": "1 tbsp grated"
+      },
+      {
+        "item": "Turmeric",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Cumin",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Coconut oil",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Vegetable stock",
+        "amount": "600ml"
+      }
+    ],
+    "steps": [
+      "Saut\u00e9 onion in coconut oil 5 minutes until soft.",
+      "Add garlic, ginger, turmeric and cumin, cook 2 minutes.",
+      "Rinse lentils and add with stock.",
+      "Bring to boil, reduce heat and simmer 18 minutes until thick.",
+      "Season and serve with rice or flatbread."
+    ],
+    "proteinSources": ["Red lentils"],
+    "tip": "Dal naturally thickens as it cools — add a splash of water when reheating leftovers.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "300-500",
+    "maxProtein": 20,
+    "totalTime": 33,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Chickpea Stew",
+    "emoji": "\ud83e\uded8",
+    "goal": "maintenance",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 22,
+    "servings": 2,
+    "macros": {
+      "calories": 380,
+      "protein": 18,
+      "carbs": 54,
+      "fat": 10,
+      "fiber": 14,
+      "sugar": 8,
+      "sodium": 520,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Chickpeas (canned)",
+        "amount": "400g drained"
+      },
+      {
+        "item": "Crushed tomatoes",
+        "amount": "400g"
+      },
+      {
+        "item": "Spinach",
+        "amount": "80g"
+      },
+      {
+        "item": "Onion",
+        "amount": "1 diced"
+      },
+      {
+        "item": "Garlic",
+        "amount": "3 cloves"
+      },
+      {
+        "item": "Smoked paprika",
+        "amount": "1.5 tsp"
+      },
+      {
+        "item": "Olive oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Saut\u00e9 onion and garlic in olive oil 5 minutes.",
+      "Add paprika and stir 1 minute.",
+      "Add tomatoes and chickpeas, simmer 15 minutes.",
+      "Stir in spinach until wilted.",
+      "Season and serve with crusty bread."
+    ],
+    "proteinSources": ["Chickpeas"],
+    "tip": "Chickpeas absorb flavours well — this stew is always better the next day.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "300-500",
+    "maxProtein": 18,
+    "totalTime": 30,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Black Bean Bowl",
+    "emoji": "\ud83e\uded8",
+    "goal": "maintenance",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 430,
+      "protein": 20,
+      "carbs": 68,
+      "fat": 8,
+      "fiber": 16,
+      "sugar": 4,
+      "sodium": 540,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Black beans (canned)",
+        "amount": "200g drained"
+      },
+      {
+        "item": "Brown rice (cooked)",
+        "amount": "150g"
+      },
+      {
+        "item": "Corn",
+        "amount": "60g"
+      },
+      {
+        "item": "Avocado",
+        "amount": "\u00bd sliced"
+      },
+      {
+        "item": "Lime juice",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Cumin",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Coriander",
+        "amount": "handful"
+      }
+    ],
+    "steps": [
+      "Warm black beans with cumin and a pinch of salt in a small pan.",
+      "Assemble bowl: rice, beans, corn and avocado.",
+      "Squeeze lime over the top.",
+      "Garnish with fresh coriander and serve."
+    ],
+    "proteinSources": ["Black beans"],
+    "tip": "Rinsing canned black beans reduces sodium by about 40% without losing protein.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "300-500",
+    "maxProtein": 20,
+    "totalTime": 18,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Peanut Butter Oats",
+    "emoji": "\ud83e\udd5c",
+    "goal": "muscle gain",
+    "mealType": "breakfast",
+    "difficulty": "Easy",
+    "prepTime": 2,
+    "cookTime": 5,
+    "servings": 1,
+    "macros": {
+      "calories": 440,
+      "protein": 18,
+      "carbs": 52,
+      "fat": 18,
+      "fiber": 7,
+      "sugar": 8,
+      "sodium": 180,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Rolled oats",
+        "amount": "80g"
+      },
+      {
+        "item": "Peanut butter",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Banana",
+        "amount": "1 sliced"
+      },
+      {
+        "item": "Almond milk",
+        "amount": "250ml"
+      },
+      {
+        "item": "Honey",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Cinnamon",
+        "amount": "\u00bd tsp"
+      }
+    ],
+    "steps": [
+      "Cook oats in almond milk over medium heat 4 to 5 minutes, stirring.",
+      "Stir in peanut butter and honey.",
+      "Top with banana slices and cinnamon.",
+      "Serve immediately."
+    ],
+    "proteinSources": ["Peanut butter"],
+    "tip": "Natural peanut butter has only 2 ingredients — avoid brands with added sugar and palm oil.",
+    "dietaryTags": ["dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "300-500",
+    "maxProtein": 18,
+    "totalTime": 7,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Veggie Stir Fry",
+    "emoji": "\ud83c\udf3f",
+    "goal": "fat loss",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 10,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 220,
+      "protein": 10,
+      "carbs": 28,
+      "fat": 8,
+      "fiber": 8,
+      "sugar": 10,
+      "sodium": 560,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Broccoli",
+        "amount": "100g florets"
+      },
+      {
+        "item": "Snap peas",
+        "amount": "80g"
+      },
+      {
+        "item": "Red bell pepper",
+        "amount": "1 sliced"
+      },
+      {
+        "item": "Carrot",
+        "amount": "1 julienned"
+      },
+      {
+        "item": "Edamame",
+        "amount": "60g"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Garlic",
+        "amount": "2 cloves"
+      }
+    ],
+    "steps": [
+      "Heat wok on very high heat with a splash of oil.",
+      "Add hardest vegetables first — carrot and broccoli — stir-fry 3 minutes.",
+      "Add pepper, snap peas and edamame, stir-fry 3 more minutes.",
+      "Add garlic and stir 30 seconds.",
+      "Pour in soy sauce and sesame oil, toss and serve."
+    ],
+    "proteinSources": ["Edamame"],
+    "tip": "Add vegetables in order of hardness so everything finishes cooking at the same time.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "under-300",
+    "maxProtein": 10,
+    "totalTime": 20,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Greek Yogurt Parfait",
+    "emoji": "\ud83e\udd63",
+    "goal": "maintenance",
+    "mealType": "snack",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 0,
+    "servings": 1,
+    "macros": {
+      "calories": 280,
+      "protein": 22,
+      "carbs": 32,
+      "fat": 6,
+      "fiber": 3,
+      "sugar": 18,
+      "sodium": 80,
+      "cholesterol": 10
+    },
+    "ingredients": [
+      {
+        "item": "Greek yogurt",
+        "amount": "200g"
+      },
+      {
+        "item": "Mixed berries",
+        "amount": "100g"
+      },
+      {
+        "item": "Granola",
+        "amount": "25g"
+      },
+      {
+        "item": "Honey",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Spoon half the yogurt into a glass or bowl.",
+      "Add half the berries and granola.",
+      "Repeat the layers.",
+      "Drizzle honey over the top and serve."
+    ],
+    "proteinSources": ["Greek yogurt"],
+    "tip": "Layer from the bottom up so each spoonful has yogurt, berries and crunch together.",
+    "dietaryTags": ["gluten-free"],
+    "calorieRange": "under-300",
+    "maxProtein": 22,
+    "totalTime": 5,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Protein Oats",
+    "emoji": "\ud83c\udf3e",
+    "goal": "muscle gain",
+    "mealType": "breakfast",
+    "difficulty": "Easy",
+    "prepTime": 2,
+    "cookTime": 5,
+    "servings": 1,
+    "macros": {
+      "calories": 420,
+      "protein": 36,
+      "carbs": 46,
+      "fat": 8,
+      "fiber": 5,
+      "sugar": 6,
+      "sodium": 180,
+      "cholesterol": 20
+    },
+    "ingredients": [
+      {
+        "item": "Rolled oats",
+        "amount": "70g"
+      },
+      {
+        "item": "Whey protein powder",
+        "amount": "1 scoop (30g)"
+      },
+      {
+        "item": "Milk",
+        "amount": "250ml"
+      },
+      {
+        "item": "Banana",
+        "amount": "\u00bd"
+      },
+      {
+        "item": "Cinnamon",
+        "amount": "\u00bd tsp"
+      }
+    ],
+    "steps": [
+      "Cook oats in milk over medium heat 4 to 5 minutes, stirring.",
+      "Remove from heat and stir in protein powder.",
+      "Top with sliced banana and cinnamon.",
+      "Eat immediately."
+    ],
+    "proteinSources": ["Whey protein"],
+    "tip": "Always add protein powder off the heat — cooking it destroys the texture and turns it grainy.",
+    "dietaryTags": ["high-fiber"],
+    "calorieRange": "300-500",
+    "maxProtein": 36,
+    "totalTime": 7,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Simple Cottage Cheese Bowl",
+    "emoji": "\ud83c\udf53",
+    "goal": "fat loss",
+    "mealType": "snack",
+    "difficulty": "Easy",
+    "prepTime": 3,
+    "cookTime": 0,
+    "servings": 1,
+    "macros": {
+      "calories": 190,
+      "protein": 24,
+      "carbs": 14,
+      "fat": 3,
+      "fiber": 2,
+      "sugar": 10,
+      "sodium": 340,
+      "cholesterol": 14
+    },
+    "ingredients": [
+      {
+        "item": "Cottage cheese",
+        "amount": "200g"
+      },
+      {
+        "item": "Strawberries",
+        "amount": "100g sliced"
+      },
+      {
+        "item": "Honey",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Black pepper",
+        "amount": "pinch"
+      }
+    ],
+    "steps": [
+      "Spoon cottage cheese into a bowl.",
+      "Top with sliced strawberries.",
+      "Drizzle honey and add a pinch of black pepper.",
+      "Serve immediately."
+    ],
+    "proteinSources": ["Cottage cheese"],
+    "tip": "A pinch of black pepper on cottage cheese with fruit is a surprisingly good flavour pairing.",
+    "dietaryTags": ["gluten-free"],
+    "calorieRange": "under-300",
+    "maxProtein": 24,
+    "totalTime": 3,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Quick Protein Smoothie",
+    "emoji": "\ud83e\udd64",
+    "goal": "muscle gain",
+    "mealType": "snack",
+    "difficulty": "Easy",
+    "prepTime": 4,
+    "cookTime": 0,
+    "servings": 1,
+    "macros": {
+      "calories": 320,
+      "protein": 30,
+      "carbs": 36,
+      "fat": 6,
+      "fiber": 3,
+      "sugar": 18,
+      "sodium": 160,
+      "cholesterol": 20
+    },
+    "ingredients": [
+      {
+        "item": "Whey protein powder",
+        "amount": "1 scoop (30g)"
+      },
+      {
+        "item": "Banana",
+        "amount": "1 medium"
+      },
+      {
+        "item": "Milk",
+        "amount": "250ml"
+      },
+      {
+        "item": "Ice cubes",
+        "amount": "4"
+      }
+    ],
+    "steps": [
+      "Add all ingredients to a blender.",
+      "Blend 30 to 45 seconds until smooth.",
+      "Pour into a glass and drink immediately."
+    ],
+    "proteinSources": ["Whey protein"],
+    "tip": "A frozen banana replaces ice and makes the smoothie creamier — no watering down.",
+    "dietaryTags": ["gluten-free"],
+    "calorieRange": "300-500",
+    "maxProtein": 30,
+    "totalTime": 4,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Nut Butter Rice Cakes",
+    "emoji": "\ud83e\udd5c",
+    "goal": "fat loss",
+    "mealType": "snack",
+    "difficulty": "Easy",
+    "prepTime": 3,
+    "cookTime": 0,
+    "servings": 1,
+    "macros": {
+      "calories": 230,
+      "protein": 8,
+      "carbs": 24,
+      "fat": 12,
+      "fiber": 2,
+      "sugar": 4,
+      "sodium": 120,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Rice cakes",
+        "amount": "4"
+      },
+      {
+        "item": "Almond butter",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Banana",
+        "amount": "\u00bd sliced"
+      },
+      {
+        "item": "Cinnamon",
+        "amount": "pinch"
+      }
+    ],
+    "steps": [
+      "Spread almond butter generously over each rice cake.",
+      "Top with banana slices.",
+      "Dust with cinnamon and serve."
+    ],
+    "proteinSources": ["Almond butter"],
+    "tip": "Rice cakes are the best low-calorie base for toppings — 35 calories each with zero fat.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan"],
+    "calorieRange": "under-300",
+    "maxProtein": 8,
+    "totalTime": 3,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Egg Drop Soup (Egg-Only)",
+    "emoji": "\ud83c\udf5c",
+    "goal": "fat loss",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 3,
+    "cookTime": 8,
+    "servings": 1,
+    "macros": {
+      "calories": 160,
+      "protein": 14,
+      "carbs": 6,
+      "fat": 8,
+      "fiber": 0,
+      "sugar": 1,
+      "sodium": 680,
+      "cholesterol": 560
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 whisked"
+      },
+      {
+        "item": "Vegetable stock",
+        "amount": "500ml"
+      },
+      {
+        "item": "Cornstarch",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Soy sauce",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Sesame oil",
+        "amount": "\u00bd tsp"
+      },
+      {
+        "item": "Spring onion",
+        "amount": "1 sliced"
+      },
+      {
+        "item": "Ginger",
+        "amount": "\u00bd tsp grated"
+      }
+    ],
+    "steps": [
+      "Bring vegetable stock, ginger and soy sauce to a boil.",
+      "Dissolve cornstarch in 1 tbsp cold water and stir into stock.",
+      "Reduce to a gentle simmer.",
+      "Pour whisked eggs in a thin stream while stirring in slow circles.",
+      "Remove from heat, drizzle sesame oil and top with spring onion."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Pour eggs very slowly in a thin stream — this creates the signature silky egg ribbons.",
+    "dietaryTags": ["gluten-free", "dairy-free", "low-carb"],
+    "calorieRange": "under-300",
+    "maxProtein": 14,
+    "totalTime": 11,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "Lentil & Chickpea Dal Bowl",
+    "emoji": "\ud83c\udf5b",
+    "goal": "weight gain",
+    "mealType": "dinner",
+    "difficulty": "Easy",
+    "prepTime": 8,
+    "cookTime": 25,
+    "servings": 2,
+    "macros": {
+      "calories": 520,
+      "protein": 28,
+      "carbs": 78,
+      "fat": 10,
+      "fiber": 18,
+      "sugar": 6,
+      "sodium": 460,
+      "cholesterol": 0
+    },
+    "ingredients": [
+      {
+        "item": "Red lentils",
+        "amount": "120g"
+      },
+      {
+        "item": "Chickpeas (canned)",
+        "amount": "200g drained"
+      },
+      {
+        "item": "Basmati rice (dry)",
+        "amount": "80g"
+      },
+      {
+        "item": "Onion",
+        "amount": "1 diced"
+      },
+      {
+        "item": "Garlic",
+        "amount": "3 cloves"
+      },
+      {
+        "item": "Garam masala",
+        "amount": "2 tsp"
+      },
+      {
+        "item": "Turmeric",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Vegetable stock",
+        "amount": "600ml"
+      },
+      {
+        "item": "Coconut oil",
+        "amount": "1 tbsp"
+      }
+    ],
+    "steps": [
+      "Cook basmati rice per package.",
+      "Saut\u00e9 onion and garlic in coconut oil 5 minutes.",
+      "Add spices, stir 1 minute.",
+      "Add rinsed lentils, chickpeas and stock.",
+      "Simmer 20 minutes until lentils are soft and dal is thick.",
+      "Serve over rice."
+    ],
+    "proteinSources": ["Red lentils", "Chickpeas"],
+    "tip": "Combining lentils and chickpeas gives a more complete amino acid profile than either alone.",
+    "dietaryTags": ["gluten-free", "dairy-free", "vegan", "high-fiber"],
+    "calorieRange": "500-700",
+    "maxProtein": 28,
+    "totalTime": 33,
+    "seeded": true,
+    "aiGenerated": false
+  },
+  {
+    "name": "High-Protein Egg Salad",
+    "emoji": "\ud83e\udd5a",
+    "goal": "fat loss",
+    "mealType": "lunch",
+    "difficulty": "Easy",
+    "prepTime": 5,
+    "cookTime": 10,
+    "servings": 1,
+    "macros": {
+      "calories": 270,
+      "protein": 22,
+      "carbs": 6,
+      "fat": 18,
+      "fiber": 1,
+      "sugar": 2,
+      "sodium": 380,
+      "cholesterol": 740
+    },
+    "ingredients": [
+      {
+        "item": "Eggs",
+        "amount": "3 hard-boiled"
+      },
+      {
+        "item": "Greek yogurt",
+        "amount": "2 tbsp"
+      },
+      {
+        "item": "Dijon mustard",
+        "amount": "1 tsp"
+      },
+      {
+        "item": "Celery",
+        "amount": "1 stalk finely diced"
+      },
+      {
+        "item": "Chives",
+        "amount": "1 tbsp"
+      },
+      {
+        "item": "Salt & pepper",
+        "amount": "to taste"
+      },
+      {
+        "item": "Lemon juice",
+        "amount": "1 tsp"
+      }
+    ],
+    "steps": [
+      "Hard-boil eggs 10 minutes, cool in cold water and peel.",
+      "Roughly chop eggs.",
+      "Mix Greek yogurt, mustard and lemon juice.",
+      "Fold in eggs, celery and chives.",
+      "Season and serve on bread, crackers or lettuce cups."
+    ],
+    "proteinSources": ["Eggs"],
+    "tip": "Greek yogurt instead of mayo cuts fat by 80% while adding protein and keeping it creamy.",
+    "dietaryTags": ["gluten-free", "low-carb"],
+    "calorieRange": "under-300",
+    "maxProtein": 22,
+    "totalTime": 15,
+    "seeded": true,
+    "aiGenerated": false
   }
 ]

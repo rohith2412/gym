@@ -75,14 +75,29 @@ export async function POST(req) {
       const candidates = await Recipe.find(dbQuery).limit(50).lean();
 
       if (candidates.length > 0) {
+        const userIngsLower = ingredients.map((i) => i.toLowerCase());
+
         const scored = candidates.map((recipe) => {
           const recipeIngredients = recipe.ingredients.map((i) => i.item.toLowerCase());
-          const matches = ingredients.filter((userIng) =>
+          const matchCount = ingredients.filter((userIng) =>
             recipeIngredients.some(
               (ri) => ri.includes(userIng.toLowerCase()) || userIng.toLowerCase().includes(ri.split(" ")[0])
             )
-          );
-          return { recipe, score: matches.length };
+          ).length;
+
+          // Require at least one protein source to match user's ingredients
+          const proteinSources = recipe.proteinSources || [];
+          const hasProteinMatch =
+            proteinSources.length === 0 ||
+            proteinSources.some((ps) =>
+              userIngsLower.some(
+                (ui) => ps.toLowerCase().includes(ui) || ui.includes(ps.toLowerCase().split(" ")[0])
+              )
+            );
+
+          const coverage = recipeIngredients.length > 0 ? matchCount / recipeIngredients.length : 0;
+          const score = hasProteinMatch ? matchCount + coverage : 0;
+          return { recipe, score };
         });
 
         scored.sort((a, b) => b.score - a.score);
