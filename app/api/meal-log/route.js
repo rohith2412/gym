@@ -9,7 +9,7 @@ import { getAuthUser }               from "@/lib/getAuthUser";
 // When the app sends  ?local=true  we skip the MongoDB write entirely —
 // the app persists the result in on-device SQLite instead.
 // This eliminates the bulk of read/write DB cost for active users.
-const SKIP_DB_WRITE = true; // flip to false to re-enable server-side storage
+const SKIP_DB_WRITE = false; // existing users have MongoDB data — keep writes on
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
