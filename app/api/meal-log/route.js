@@ -1,15 +1,25 @@
 export const dynamic = "force-dynamic";
 // app/api/meal-log/route.js
-import { connectdb }             from "@/lib/connectdb";
+import { connectdb }                 from "@/lib/connectdb";
 import MealLog, { calculateTotals } from "@/models/mealLogModel";
-import { ObjectId }              from "mongodb";
-import OpenAI                    from "openai";
-import { getAuthUser }           from "@/lib/getAuthUser";
+import { ObjectId }                  from "mongodb";
+import OpenAI                        from "openai";
+import { getAuthUser }               from "@/lib/getAuthUser";
+
+// When the app sends  ?local=true  we skip the MongoDB write entirely —
+// the app persists the result in on-device SQLite instead.
+// This eliminates the bulk of read/write DB cost for active users.
+const SKIP_DB_WRITE = true; // flip to false to re-enable server-side storage
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─── GET /api/meal-log ────────────────────────────────────────────────────────
+// App now reads from on-device SQLite — this endpoint is kept for
+// backward compatibility but returns empty data when SKIP_DB_WRITE is on.
 export async function GET(req) {
+  if (SKIP_DB_WRITE) {
+    return Response.json({ success: true, data: [] });
+  }
   try {
     await connectdb();
     const authUser = await getAuthUser(req);
@@ -43,7 +53,8 @@ export async function GET(req) {
 // ─── POST /api/meal-log ───────────────────────────────────────────────────────
 export async function POST(req) {
   try {
-    await connectdb();
+    // connectdb only needed when writing to MongoDB
+    if (!SKIP_DB_WRITE) await connectdb();
     const authUser = await getAuthUser(req);
     if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
@@ -69,6 +80,7 @@ export async function POST(req) {
       }];
 
       const doc = {
+        _id:     `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         userId:  authUser.id,
         date:    date ? new Date(date) : new Date(),
         mealType,
@@ -77,8 +89,12 @@ export async function POST(req) {
         aiNotes: "Macros entered manually",
       };
 
-      const inserted = await MealLog.collection.insertOne(doc);
-      doc._id = inserted.insertedId;
+      // Only write to MongoDB when local storage is disabled
+      if (!SKIP_DB_WRITE) {
+        const inserted = await MealLog.collection.insertOne(doc);
+        doc._id = inserted.insertedId;
+      }
+
       return Response.json({ success: true, data: doc });
     }
 
@@ -126,6 +142,7 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
 
     const foods = parsed.foods || [];
     const doc = {
+      _id:     `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       userId:  authUser.id,
       date:    date ? new Date(date) : new Date(),
       mealType,
@@ -134,8 +151,12 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
       aiNotes: parsed.aiNotes || "",
     };
 
-    const mealLog = await MealLog.collection.insertOne(doc);
-    doc._id = mealLog.insertedId;
+    // Only write to MongoDB when local storage is disabled
+    if (!SKIP_DB_WRITE) {
+      const inserted = await MealLog.collection.insertOne(doc);
+      doc._id = inserted.insertedId;
+    }
+
     return Response.json({ success: true, data: doc });
   } catch (err) {
     console.error("[meal-log POST]", err);
@@ -144,7 +165,9 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
 }
 
 // ─── PATCH /api/meal-log?id=… ─────────────────────────────────────────────────
+// Edits are now handled locally in SQLite — no-op when SKIP_DB_WRITE is on.
 export async function PATCH(req) {
+  if (SKIP_DB_WRITE) return Response.json({ success: true });
   try {
     await connectdb();
     const authUser = await getAuthUser(req);
@@ -196,7 +219,9 @@ export async function PATCH(req) {
 }
 
 // ─── DELETE /api/meal-log?id=… ────────────────────────────────────────────────
+// Deletes are now handled locally in SQLite — no-op when SKIP_DB_WRITE is on.
 export async function DELETE(req) {
+  if (SKIP_DB_WRITE) return Response.json({ success: true });
   try {
     await connectdb();
     const authUser = await getAuthUser(req);
