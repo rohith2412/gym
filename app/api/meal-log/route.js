@@ -1,21 +1,15 @@
 export const dynamic = "force-dynamic";
-// app/api/meal-log/route.js
 import { connectdb }                 from "@/lib/connectdb";
 import MealLog, { calculateTotals } from "@/models/mealLogModel";
 import { ObjectId }                  from "mongodb";
 import OpenAI                        from "openai";
 import { getAuthUser }               from "@/lib/getAuthUser";
 
-// When the app sends  ?local=true  we skip the MongoDB write entirely —
-// the app persists the result in on-device SQLite instead.
-// This eliminates the bulk of read/write DB cost for active users.
-const SKIP_DB_WRITE = false; // existing users have MongoDB data — keep writes on
+const SKIP_DB_WRITE = false;
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─── GET /api/meal-log ────────────────────────────────────────────────────────
-// App now reads from on-device SQLite — this endpoint is kept for
-// backward compatibility but returns empty data when SKIP_DB_WRITE is on.
 export async function GET(req) {
   if (SKIP_DB_WRITE) {
     return Response.json({ success: true, data: [] });
@@ -53,7 +47,6 @@ export async function GET(req) {
 // ─── POST /api/meal-log ───────────────────────────────────────────────────────
 export async function POST(req) {
   try {
-    // connectdb only needed when writing to MongoDB
     if (!SKIP_DB_WRITE) await connectdb();
     const authUser = await getAuthUser(req);
     if (!authUser)
@@ -62,7 +55,7 @@ export async function POST(req) {
     const body = await req.json();
     const { image, mealType = "snack", date, note = "", manualMacros } = body;
 
-    // ── Manual macros path ────────────────────────────────────────────────────
+    // ── Manual macros path ──────────────────────────────────────────────────
     if (manualMacros && !image) {
       const macros = {
         calories: parseFloat(manualMacros.calories) || 0,
@@ -89,7 +82,6 @@ export async function POST(req) {
         aiNotes: "Macros entered manually",
       };
 
-      // Only write to MongoDB when local storage is disabled
       if (!SKIP_DB_WRITE) {
         const inserted = await MealLog.collection.insertOne(doc);
         doc._id = inserted.insertedId;
@@ -98,9 +90,12 @@ export async function POST(req) {
       return Response.json({ success: true, data: doc });
     }
 
-    // ── AI vision path ────────────────────────────────────────────────────────
+    // ── AI vision path ──────────────────────────────────────────────────────
     if (!image)
-      return Response.json({ success: false, error: "image or manualMacros is required" }, { status: 400 });
+      return Response.json(
+        { success: false, error: "image or manualMacros is required" },
+        { status: 400 }
+      );
 
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
     const mediaType  = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
@@ -137,7 +132,10 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
     try {
       parsed = JSON.parse(aiResponse.choices[0].message.content || "{}");
     } catch {
-      return Response.json({ success: false, error: "AI returned invalid JSON" }, { status: 502 });
+      return Response.json(
+        { success: false, error: "AI returned invalid JSON" },
+        { status: 502 }
+      );
     }
 
     const foods = parsed.foods || [];
@@ -151,7 +149,6 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
       aiNotes: parsed.aiNotes || "",
     };
 
-    // Only write to MongoDB when local storage is disabled
     if (!SKIP_DB_WRITE) {
       const inserted = await MealLog.collection.insertOne(doc);
       doc._id = inserted.insertedId;
@@ -164,8 +161,7 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
   }
 }
 
-// ─── PATCH /api/meal-log?id=… ─────────────────────────────────────────────────
-// Edits are now handled locally in SQLite — no-op when SKIP_DB_WRITE is on.
+// ─── PATCH /api/meal-log/[id] ─────────────────────────────────────────────────
 export async function PATCH(req) {
   if (SKIP_DB_WRITE) return Response.json({ success: true });
   try {
@@ -174,13 +170,11 @@ export async function PATCH(req) {
     if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    // Support both /api/meal-log?id=X and /api/meal-log/X
+    const { searchParams, pathname } = new URL(req.url);
+    const id = searchParams.get("id") || pathname.split("/").pop();
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
-
-    if (!ObjectId.isValid(id))
-      return Response.json({ error: "Invalid id format" }, { status: 400 });
 
     const body = await req.json();
     const $set = {};
@@ -203,10 +197,12 @@ export async function PATCH(req) {
     if (Object.keys($set).length === 0)
       return Response.json({ error: "Nothing to update" }, { status: 400 });
 
-    const result = await MealLog.updateOne(
-      { _id: new ObjectId(id), userId: authUser.id },
-      { $set }
-    );
+    // Handle both ObjectId and local string IDs
+    const filter = ObjectId.isValid(id)
+      ? { _id: new ObjectId(id), userId: authUser.id }
+      : { _id: id,               userId: authUser.id };
+
+    const result = await MealLog.updateOne(filter, { $set });
 
     if (result.matchedCount === 0)
       return Response.json({ error: "Log not found or not yours" }, { status: 404 });
@@ -218,8 +214,7 @@ export async function PATCH(req) {
   }
 }
 
-// ─── DELETE /api/meal-log?id=… ────────────────────────────────────────────────
-// Deletes are now handled locally in SQLite — no-op when SKIP_DB_WRITE is on.
+// ─── DELETE /api/meal-log/[id] ────────────────────────────────────────────────
 export async function DELETE(req) {
   if (SKIP_DB_WRITE) return Response.json({ success: true });
   try {
@@ -228,15 +223,18 @@ export async function DELETE(req) {
     if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    // Support both /api/meal-log?id=X and /api/meal-log/X
+    const { searchParams, pathname } = new URL(req.url);
+    const id = searchParams.get("id") || pathname.split("/").pop();
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    if (!ObjectId.isValid(id))
-      return Response.json({ error: "Invalid id format" }, { status: 400 });
+    // Handle both ObjectId and local string IDs (e.g. "local_1234_abc")
+    const filter = ObjectId.isValid(id)
+      ? { _id: new ObjectId(id), userId: authUser.id }
+      : { _id: id,               userId: authUser.id };
 
-    await MealLog.deleteOne({ _id: new ObjectId(id), userId: authUser.id });
+    await MealLog.deleteOne(filter);
     return Response.json({ success: true });
   } catch (err) {
     console.error("[meal-log DELETE]", err);
