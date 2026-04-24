@@ -23,25 +23,23 @@ export async function GET(req) {
 
     let subscription = await Subscription.findOne({ userId });
 
-    // If no subscription exists, create trial subscription
+    // If no subscription exists, user is not premium (no auto-trial)
     if (!subscription) {
-      const now = new Date();
-      const trialEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-      subscription = await Subscription.create({
+      return Response.json({
+        success: true,
         userId,
-        status: "trial",
-        paymentMethod: "iap",
-        startDate: now,
-        trialEndsAt: trialEnd,
+        isPremium: false,
+        subscription: null,
+        daysUntilRenewal: null,
+        canAccessAITrainer: false,
+        canAccessRecipes: false,
+        canAccessMacroScanner: false,
       });
     }
 
-    // Determine if user is premium
+    // Determine if user is premium (only active subscriptions)
     const now = new Date();
-    const isPremium =
-      subscription.status === "active" ||
-      (subscription.status === "trial" && now < subscription.trialEndsAt);
+    const isPremium = subscription.status === "active";
 
     // Calculate days until renewal
     let daysUntilRenewal = null;
