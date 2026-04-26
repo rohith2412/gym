@@ -21,15 +21,24 @@ export async function GET(req) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
-    const dateParam = searchParams.get("date");
+    const dateParam = searchParams.get("date"); // "YYYY-MM-DD" local date from client
     const limit     = Math.min(parseInt(searchParams.get("limit") || "30"), 200);
 
     const query = { userId: authUser.id };
 
     if (dateParam) {
-      const start = new Date(`${dateParam}T00:00:00.000Z`);
-      const end   = new Date(`${dateParam}T23:59:59.999Z`);
-      query.date  = { $gte: start, $lte: end };
+      // Prefer querying by localDate (timezone-safe string field).
+      // Fall back to UTC range for old documents that don't have localDate.
+      query.$or = [
+        { localDate: dateParam },
+        {
+          localDate: { $exists: false },
+          date: {
+            $gte: new Date(`${dateParam}T00:00:00.000Z`),
+            $lte: new Date(`${dateParam}T23:59:59.999Z`),
+          },
+        },
+      ];
     }
 
     const logs = await MealLog.find(query)
@@ -53,7 +62,12 @@ export async function POST(req) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const body = await req.json();
-    const { image, mealType = "snack", date, note = "", manualMacros } = body;
+    const { image, mealType = "snack", date, localDate, note = "", manualMacros } = body;
+
+    // localDate is "YYYY-MM-DD" sent by the client in their local timezone.
+    // This ensures the meal always appears on the correct day regardless of
+    // server UTC offset or user timezone.
+    const resolvedLocalDate = localDate || null;
 
     // ── Manual macros path ──────────────────────────────────────────────────
     if (manualMacros && !image) {
@@ -73,13 +87,14 @@ export async function POST(req) {
       }];
 
       const doc = {
-        _id:     `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-        userId:  authUser.id,
-        date:    date ? new Date(date) : new Date(),
+        _id:       `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        userId:    authUser.id,
+        date:      date ? new Date(date) : new Date(),
+        localDate: resolvedLocalDate,   // ← timezone-safe date string
         mealType,
         foods,
-        totals:  macros,
-        aiNotes: "Macros entered manually",
+        totals:    macros,
+        aiNotes:   "Macros entered manually",
       };
 
       if (!SKIP_DB_WRITE) {
@@ -140,13 +155,14 @@ Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.
 
     const foods = parsed.foods || [];
     const doc = {
-      _id:     `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      userId:  authUser.id,
-      date:    date ? new Date(date) : new Date(),
+      _id:       `local_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      userId:    authUser.id,
+      date:      date ? new Date(date) : new Date(),
+      localDate: resolvedLocalDate,   // ← timezone-safe date string
       mealType,
       foods,
-      totals:  calculateTotals(foods),
-      aiNotes: parsed.aiNotes || "",
+      totals:    calculateTotals(foods),
+      aiNotes:   parsed.aiNotes || "",
     };
 
     if (!SKIP_DB_WRITE) {
@@ -170,7 +186,6 @@ export async function PATCH(req) {
     if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
-    // Support both /api/meal-log?id=X and /api/meal-log/X
     const { searchParams, pathname } = new URL(req.url);
     const id = searchParams.get("id") || pathname.split("/").pop();
     if (!id)
@@ -197,7 +212,6 @@ export async function PATCH(req) {
     if (Object.keys($set).length === 0)
       return Response.json({ error: "Nothing to update" }, { status: 400 });
 
-    // Handle both ObjectId and local string IDs
     const filter = ObjectId.isValid(id)
       ? { _id: new ObjectId(id), userId: authUser.id }
       : { _id: id,               userId: authUser.id };
@@ -223,13 +237,11 @@ export async function DELETE(req) {
     if (!authUser)
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
-    // Support both /api/meal-log?id=X and /api/meal-log/X
     const { searchParams, pathname } = new URL(req.url);
     const id = searchParams.get("id") || pathname.split("/").pop();
     if (!id)
       return Response.json({ error: "id required" }, { status: 400 });
 
-    // Handle both ObjectId and local string IDs (e.g. "local_1234_abc")
     const filter = ObjectId.isValid(id)
       ? { _id: new ObjectId(id), userId: authUser.id }
       : { _id: id,               userId: authUser.id };
