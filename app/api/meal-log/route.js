@@ -9,7 +9,7 @@ const SKIP_DB_WRITE = false;
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ─── GET /api/meal-log ────────────────────────────────────────────────────────
+// ─── GET /api/meal-log localDate ────────────────────────────────────────────────────────
 export async function GET(req) {
   if (SKIP_DB_WRITE) {
     return Response.json({ success: true, data: [] });
