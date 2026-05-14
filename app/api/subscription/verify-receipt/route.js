@@ -19,8 +19,10 @@ function makeAppleJWT() {
   const keyId    = process.env.APPLE_KEY_ID;
   const issuerId = process.env.APPLE_ISSUER_ID;
   const bundleId = process.env.APPLE_BUNDLE_ID || "com.pocketgym.app";
-  // Private key from .env — keep newlines intact
-  const privateKey = (process.env.APPLE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+  // Private key from .env — normalise whether pasted with real newlines or \n literals
+  const privateKey = (process.env.APPLE_PRIVATE_KEY || "")
+    .replace(/\\n/g, "\n")   // escaped \n → real newline
+    .replace(/\r/g, "");     // strip any carriage returns
 
   if (!keyId || !issuerId || !privateKey) {
     throw new Error("Missing APPLE_KEY_ID, APPLE_ISSUER_ID or APPLE_PRIVATE_KEY env vars");

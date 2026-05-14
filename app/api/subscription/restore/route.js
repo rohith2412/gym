@@ -10,7 +10,9 @@ function makeAppleJWT() {
   const keyId      = process.env.APPLE_KEY_ID;
   const issuerId   = process.env.APPLE_ISSUER_ID;
   const bundleId   = process.env.APPLE_BUNDLE_ID || "com.pocketgym.app";
-  const privateKey = (process.env.APPLE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+  const privateKey = (process.env.APPLE_PRIVATE_KEY || "")
+    .replace(/\\n/g, "\n")
+    .replace(/\r/g, "");
 
   if (!keyId || !issuerId || !privateKey) {
     throw new Error("Missing Apple API env vars");
