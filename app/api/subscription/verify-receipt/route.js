@@ -24,6 +24,12 @@ function makeAppleJWT() {
     .replace(/\\n/g, "\n")   // escaped \n → real newline
     .replace(/\r/g, "");     // strip any carriage returns
 
+  console.log("[Apple JWT] keyId:", keyId);
+  console.log("[Apple JWT] issuerId:", issuerId);
+  console.log("[Apple JWT] bundleId:", bundleId);
+  console.log("[Apple JWT] keyLength:", privateKey.length);
+  console.log("[Apple JWT] keyStart:", privateKey.slice(0, 27));
+
   if (!keyId || !issuerId || !privateKey) {
     throw new Error("Missing APPLE_KEY_ID, APPLE_ISSUER_ID or APPLE_PRIVATE_KEY env vars");
   }
@@ -61,6 +67,7 @@ async function verifyWithApple(originalTransactionId) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      console.log("[Apple API] status:", res.status, "body:", JSON.stringify(err), "url:", url);
       // 4040010 = transaction not found in this environment → try sandbox
       if (err.errorCode === 4040010) continue;
       throw new Error(`Apple API error ${res.status}: ${JSON.stringify(err)}`);
@@ -114,7 +121,37 @@ export async function POST(req) {
 
     const userId = user.id;
 
-    // ── Verify with Apple ──────────────────────────────────────────────────
+    // ── HARDCODED MODE — skip Apple verification for now ───────────────────
+    // TODO: remove this and uncomment the real verify block below once IAP is fixed
+    const endDate = new Date();
+    endDate.setFullYear(endDate.getFullYear() + 1); // 1 year from now
+
+    const subscription = await Subscription.findOneAndUpdate(
+      { userId },
+      {
+        status:                "active",
+        paymentMethod:         "iap",
+        transactionId:         transactionId,
+        originalTransactionId: transactionId,
+        productId:             "com.pocketgym.app.annual",
+        receiptData:           receiptData || null,
+        bundleId:              bundleId || "com.pocketgym.app",
+        endDate,
+        startDate:             new Date(),
+        isTrialUsed:           true,
+        billingCycle:          "annual",
+        environment:           "Sandbox",
+      },
+      { upsert: true, new: true }
+    );
+
+    return Response.json({
+      success: true,
+      subscription: { status: subscription.status, endDate: subscription.endDate, plan: subscription.plan },
+    });
+
+    // ── Real Apple verification (disabled for now) ─────────────────────────
+    /*
     let result;
     try {
       result = await verifyWithApple(transactionId);
@@ -127,7 +164,6 @@ export async function POST(req) {
       return Response.json({ error: "Subscription not active or not found" }, { status: 400 });
     }
 
-    // ── Save to DB ─────────────────────────────────────────────────────────
     const subscription = await Subscription.findOneAndUpdate(
       { userId },
       {
@@ -146,6 +182,7 @@ export async function POST(req) {
       },
       { upsert: true, new: true }
     );
+    */
 
     return Response.json({
       success: true,
