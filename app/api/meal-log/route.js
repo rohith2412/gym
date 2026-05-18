@@ -4,6 +4,7 @@ import MealLog, { calculateTotals } from "@/models/mealLogModel";
 import { ObjectId }                  from "mongodb";
 import OpenAI                        from "openai";
 import { getAuthUser }               from "@/lib/getAuthUser";
+import { checkScanRateLimit }        from "@/lib/scanRateLimit";
 
 const SKIP_DB_WRITE = false;
 
@@ -111,6 +112,22 @@ export async function POST(req) {
         { success: false, error: "image or manualMacros is required" },
         { status: 400 }
       );
+
+    // ── Rate limit: 10 AI scans per user per day ────────────────────────────
+    const today = localDate || new Date().toISOString().slice(0, 10);
+    const rateLimit = await checkScanRateLimit(authUser.id, today);
+    if (!rateLimit.allowed) {
+      return Response.json(
+        {
+          success: false,
+          error:   `Daily scan limit reached (${rateLimit.limit} scans/day). Try again tomorrow.`,
+          rateLimitExceeded: true,
+          used:    rateLimit.used,
+          limit:   rateLimit.limit,
+        },
+        { status: 429 }
+      );
+    }
 
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
     const mediaType  = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
