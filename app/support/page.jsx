@@ -2,26 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
-const SUPPORT_EMAIL = "rohithra75@gmail.com";
+const SUPPORT_EMAIL = "support@yourpocketgym.com";
 
-const FAQ = [
-  {
-    q: "Can I use PocketGym on multiple devices?",
-    a: "Yes. Log in with the same account on any device and your data will sync automatically.",
-  },
-  {
-    q: "Is my data private?",
-    a: "Yes. Your data is stored securely and never sold to third parties. See our Privacy Policy for full details.",
-  },
-  {
-    q: "How do I delete my account?",
-    a: "Open the app, go to Profile → Delete Account. This permanently removes all your data.",
-  },
-  {
-    q: "The AI scan isn't working — what should I do?",
-    a: "Make sure you've allowed camera access in your iPhone Settings. If the issue persists, contact us at support@yourpocketgym.com.",
-  },
-];
 
 export default function SupportPage() {
   const router = useRouter();
@@ -76,15 +58,6 @@ export default function SupportPage() {
             </div>
           </div>
 
-          <div style={S.section}>
-            <h2 style={S.sectionTitle}>Common Questions</h2>
-            {FAQ.map((item, i) => (
-              <div key={i} style={{ ...S.card, marginBottom: i < FAQ.length - 1 ? 10 : 0 }}>
-                <p style={S.cardLabel}>{item.q}</p>
-                <p style={S.p}>{item.a}</p>
-              </div>
-            ))}
-          </div>
 
         </div>
 
