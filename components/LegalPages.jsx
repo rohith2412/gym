@@ -89,154 +89,111 @@ function Highlight({ children }) {
 export function TermsPage() {
   const router = useRouter();
   return (
-    <LegalShell title="Terms of Service" lastUpdated="April 7, 2026" router={router}>
+    <LegalShell title="Terms of Service" lastUpdated="May 2025" router={router}>
 
       <Highlight>
         <P>
-          By using YourPocketGym you agree to these terms. Please read them carefully.
+          By downloading or using Your Pocket Gym, you agree to be bound by these Terms of Service.
           If you do not agree, do not use the app.
         </P>
       </Highlight>
 
-      <Section title="1. About YourPocketGym">
-        <P>
-          YourPocketGym ("we", "us", "our") is a fitness tracking application that helps
-          you log workouts, track body metrics, log meals, and access AI-powered training
-          and nutrition guidance. The app is operated as an independent product and is not
-          affiliated with any gym or healthcare provider.
-        </P>
-      </Section>
-
-      <Section title="2. Eligibility">
-        <P>You must be at least 13 years old to use this app. By using it you confirm:</P>
+      <Section title="1. Description of Service">
+        <P>Your Pocket Gym provides:</P>
         <UL items={[
-          "You are 13 years of age or older.",
-          "You have read and accepted these Terms.",
-          "If you are under 18, a parent or guardian has reviewed and accepted these Terms on your behalf.",
+          "Workout logging and progress tracking",
+          "AI-generated workout plans",
+          "Nutrition scanning via camera",
+          "AI-generated recipes based on your ingredients",
+          "An AI personal trainer chat assistant",
         ]} />
       </Section>
 
-      <Section title="3. Your account">
+      <Section title="2. AI Disclaimer">
         <P>
-          You are responsible for keeping your account credentials secure. You must not
-          share your account with others or use another person's account.
-        </P>
-        <P>
-          We reserve the right to suspend or terminate accounts that violate these Terms,
-          engage in abuse, or are inactive for an extended period.
-        </P>
-      </Section>
-
-      <Section title="4. Subscription and billing">
-        <P>
-          YourPocketGym offers a free tier and a Pro subscription billed monthly. By
-          subscribing you authorize us to charge your payment method on a recurring basis.
-        </P>
-        <UL items={[
-          "Subscriptions auto-renew each billing cycle unless canceled before the renewal date.",
-          "You may cancel at any time via your Profile page. Access continues until the end of the current paid period.",
-          "We do not offer refunds for partial billing periods.",
-          "We reserve the right to change pricing with 30 days' notice.",
-          "Payments are processed by Stripe. We do not store your full card details.",
-        ]} />
-      </Section>
-
-      <Section title="5. Acceptable use">
-        <P>You agree not to:</P>
-        <UL items={[
-          "Reverse-engineer, decompile, or attempt to extract the source code of the app.",
-          "Use the app for any unlawful purpose or in violation of any applicable law.",
-          "Scrape, crawl, or systematically download content from the app.",
-          "Attempt to gain unauthorized access to any part of the app or its infrastructure.",
-          "Upload or transmit malicious code or interfere with the app's operation.",
-          "Resell, sublicense, or redistribute access to the app.",
-        ]} />
-      </Section>
-
-      <Section title="6. Health and fitness disclaimer">
-        <P>
-          YourPocketGym provides general fitness and nutrition information for
-          informational purposes only. Nothing in this app constitutes medical advice,
-          diagnosis, or treatment.
+          The AI trainer, recipe suggestions, workout plans, and food analysis are for
+          informational purposes only. They are not a substitute for professional medical,
+          nutritional, or fitness advice.
         </P>
         <Highlight>
           <P>
-            Always consult a qualified healthcare provider before starting any new
-            exercise or nutrition programme, especially if you have a pre-existing medical
-            condition, injury, or are pregnant. You use the app entirely at your own risk.
+            Always consult a qualified professional before starting a new exercise program
+            or making significant dietary changes. Results vary and are not guaranteed.
           </P>
         </Highlight>
+      </Section>
+
+      <Section title="3. Health &amp; Safety">
         <P>
-          We are not liable for any injury, health issue, or adverse outcome arising from
-          workouts or meal plans logged or suggested through the app.
+          Exercise involves risk of injury. You assume full responsibility for your use of
+          this app and any physical activity you undertake as a result. Your Pocket Gym is
+          not liable for any injury, illness, or health complication arising from use of the app.
         </P>
       </Section>
 
-      <Section title="7. AI-generated content">
+      <Section title="4. Camera &amp; Photos">
         <P>
-          Pro subscribers have access to AI-powered training suggestions, meal analysis,
-          and recipe recommendations. This content is generated automatically and may not
-          always be accurate or appropriate for your individual circumstances. Always apply
-          your own judgment and consult a fitness or nutrition professional if in doubt.
-        </P>
-        <P>
-          Food macro estimates generated via AI image analysis are approximations only and
-          should not be relied upon for medical dietary management.
+          The nutrition scanner uses your device camera and photo library solely to analyze
+          food for calorie and macro estimation. Images are processed to generate nutritional
+          data and are not stored on our servers.
         </P>
       </Section>
 
-      <Section title="8. User-generated content">
+      <Section title="5. User Accounts">
         <P>
-          You may upload food photos for AI-powered meal analysis. By uploading images you
-          confirm you have the right to share them and that they do not contain
-          inappropriate content. We store these images solely to provide the meal logging
-          feature and do not use them for any other purpose.
+          You are responsible for maintaining the confidentiality of your account credentials.
+          You agree to provide accurate information and to notify us immediately of any
+          unauthorized use of your account.
         </P>
       </Section>
 
-      <Section title="9. Intellectual property">
+      <Section title="6. Prohibited Conduct">
+        <P>You agree not to:</P>
+        <UL items={[
+          "Reverse engineer or attempt to extract source code",
+          "Use the app for any unlawful purpose",
+          "Share your account with others",
+          "Attempt to disrupt or compromise our servers or services",
+        ]} />
+      </Section>
+
+      <Section title="7. Data &amp; Account Deletion">
         <P>
-          All content, branding, and software in YourPocketGym is owned by or licensed to
-          us. You may not copy, modify, or distribute any part of the app without our
-          written permission. Your personal data and workout logs remain yours — we claim
-          no ownership over data you input.
+          You may delete your account at any time from Profile → Delete Account. This
+          permanently removes all your data from our servers including workout logs, meal
+          logs, recipes, and profile information.
         </P>
       </Section>
 
-      <Section title="10. Limitation of liability">
+      <Section title="8. Intellectual Property">
         <P>
-          To the maximum extent permitted by law, YourPocketGym and its operators shall
-          not be liable for any indirect, incidental, special, consequential, or punitive
-          damages arising from your use of the app, including but not limited to loss of
-          data, loss of revenue, or personal injury.
-        </P>
-        <P>
-          Our total liability to you for any claim shall not exceed the amount you paid us
-          in the 12 months preceding the claim.
+          All content, design, and code within Your Pocket Gym is owned by or licensed to
+          us. You may not reproduce, distribute, or create derivative works without our
+          express written permission.
         </P>
       </Section>
 
-      <Section title="11. Termination">
+      <Section title="9. Limitation of Liability">
         <P>
-          You may stop using the app and delete your account at any time. We may suspend
-          or terminate your access if you breach these Terms, with or without notice.
-          Upon termination, your right to use the app ceases immediately.
+          To the fullest extent permitted by law, Your Pocket Gym and its developers are
+          not liable for any indirect, incidental, special, or consequential damages
+          arising from your use of the app.
         </P>
       </Section>
 
-      <Section title="12. Changes to these terms">
+      <Section title="10. Changes to Terms">
         <P>
-          We may update these Terms from time to time. We will notify you of material
-          changes via email or an in-app notice at least 14 days before they take effect.
-          Continued use of the app after the effective date constitutes acceptance.
+          We may update these terms from time to time. Continued use of the app after
+          changes are posted constitutes your acceptance of the updated terms.
         </P>
       </Section>
 
-      <Section title="13. Governing law">
+      <Section title="11. Contact">
         <P>
-          These Terms are governed by the laws of the Province of Ontario, Canada, without
-          regard to its conflict of law provisions. Any disputes shall be resolved in the
-          courts of Ontario.
+          If you have questions about these terms, contact us at{" "}
+          <a href="mailto:support@yourpocketgym.com" style={{ color: "#e8380d", fontWeight: 500 }}>
+            support@yourpocketgym.com
+          </a>
         </P>
       </Section>
 
@@ -250,178 +207,177 @@ export function TermsPage() {
 export function PrivacyPage() {
   const router = useRouter();
   return (
-    <LegalShell title="Privacy Policy" lastUpdated="April 7, 2026" router={router}>
+    <LegalShell title="Privacy Policy" lastUpdated="May 18, 2025" router={router}>
 
       <Highlight>
         <P>
-          We take your privacy seriously. This policy explains exactly what data we
-          collect, why we collect it, and how you can control it.
+          Your Pocket Gym ("we", "us", or "our") is committed to protecting your privacy.
+          This policy explains what data we collect across all features of the app, how we
+          use it, and your rights over it.
         </P>
       </Highlight>
 
-      <Section title="1. Who we are">
+      <Section title="1. Information We Collect">
+        <P>We collect the following information when you use Your Pocket Gym:</P>
+
+        <SubLabel>Account Information</SubLabel>
+        <UL items={[
+          "Name and email address when you register",
+          "Password (stored as a secure hash — we never store plain-text passwords)",
+          "If you use Google Sign-In: your name and email from Google",
+        ]} />
+
+        <SubLabel>Fitness Profile</SubLabel>
+        <UL items={[
+          "Age, height, weight, biological sex",
+          "Fitness goal (e.g. lose fat, gain muscle, strength)",
+          "Experience level and workout days per week",
+        ]} />
+
+        <SubLabel>Workout Data</SubLabel>
+        <UL items={[
+          "Exercises logged, sets, reps, and weights",
+          "Workout dates and session history",
+        ]} />
+
+        <SubLabel>Nutrition Data</SubLabel>
+        <UL items={[
+          "Meal logs including calorie and macro estimates",
+          "Food photos you take or select for AI analysis",
+          "Daily nutrition goals you set",
+        ]} />
+
+        <SubLabel>AI Trainer Conversations</SubLabel>
+        <UL items={[
+          "Messages you send to the AI Trainer are transmitted to our AI service to generate responses",
+          "Conversation history may be stored to maintain context within a session",
+        ]} />
+
+        <SubLabel>Recipe Requests</SubLabel>
+        <UL items={[
+          "Ingredients and meal preferences you select when generating recipes are sent to our AI service",
+        ]} />
+      </Section>
+
+      <Section title="2. How We Use Your Information">
+        <P>We use your data to:</P>
+        <UL items={[
+          "Provide and personalise the app experience",
+          "Generate AI workout plans based on your fitness profile, equipment, and goals",
+          "Analyse food photos to estimate calories and macros",
+          "Generate recipe suggestions based on your selected ingredients and dietary goals",
+          "Display your workout history, volume tracking, and progress stats",
+          "Calculate BMI and personalised nutrition goals from your profile",
+          "Respond to your messages in the AI Trainer feature",
+        ]} />
+      </Section>
+
+      <Section title="3. AI Features &amp; Data Processing">
+        <SubLabel>AI Trainer (Chat)</SubLabel>
         <P>
-          YourPocketGym is a fitness and nutrition tracking application.
+          Messages you type are sent to our AI service to generate fitness coaching
+          responses. Chat history may be retained temporarily to maintain conversation context.
+        </P>
+        <SubLabel>Food Photo Analysis</SubLabel>
+        <P>
+          Photos you take or select are transmitted securely to our AI service to estimate
+          the nutritional content of your meal. Photos are processed and are not permanently
+          stored on our servers after analysis.
+        </P>
+        <SubLabel>Recipe Generation</SubLabel>
+        <P>
+          Ingredients and meal preferences you select are sent to our AI service to generate
+          recipe suggestions. No photos are involved in this feature.
+        </P>
+        <SubLabel>Workout Plan Generation</SubLabel>
+        <P>
+          Your fitness profile (goal, experience level, equipment, focus area) is sent to our
+          AI service to generate personalised workout plans.
+        </P>
+        <P>All AI-generated content is for informational purposes only and may not be 100% accurate.</P>
+      </Section>
+
+      <Section title="4. Google Sign-In">
+        <P>
+          If you choose to sign in with Google, we receive your name and email address from
+          Google. We do not receive or store your Google password. Your use of Google Sign-In
+          is also governed by Google's Privacy Policy at{" "}
+          <a href="https://policies.google.com/privacy" style={{ color: "#e8380d", fontWeight: 500 }}>
+            policies.google.com/privacy
+          </a>.
         </P>
       </Section>
 
-      <Section title="2. Data we collect">
-        <P>We collect only what is necessary to provide the service:</P>
-
-        <SubLabel>Account data</SubLabel>
-        <UL items={[
-          "Name and email address (via Google sign-in or email/password).",
-          "Profile photo (optional, from your Google account).",
-        ]} />
-
-        <SubLabel>Body & fitness profile</SubLabel>
-        <UL items={[
-          "Age, height, weight, biological sex — optional, entered by you.",
-          "Fitness goal (e.g. lose fat, gain muscle), experience level, workout days per week.",
-        ]} />
-
-        <SubLabel>Workout data</SubLabel>
-        <UL items={[
-          "Exercise names, muscle groups, sets, reps, and weight per set.",
-          "Workout date, timestamp, and any personal notes you add.",
-          "Saved AI-generated workout plans including exercises, sets, reps, and coaching tips.",
-        ]} />
-
-        <SubLabel>Nutrition & meal data</SubLabel>
-        <UL items={[
-          "Meal logs: meal type (breakfast, lunch, dinner, snack), date, and food items.",
-          "Per-food macros: calories, protein, carbs, fat, and fiber.",
-          "Food photos you upload for AI meal analysis (stored as image URLs).",
-          "AI-generated notes attached to meal logs.",
-          "Macro totals per meal and per day.",
-        ]} />
-
-        <SubLabel>Recipe data</SubLabel>
-        <UL items={[
-          "AI-generated recipes associated with your fitness goal and meal preferences.",
-          "Recipe details: ingredients, steps, macros, dietary tags, prep and cook time.",
-        ]} />
-
-        <SubLabel>Subscription data</SubLabel>
-        <UL items={[
-          "Subscription status, billing period start and end dates.",
-          "Stripe customer ID and subscription ID — never your full card number.",
-        ]} />
-
-        <SubLabel>Usage data</SubLabel>
-        <UL items={[
-          "Basic server logs: IP address, browser/device type, pages visited.",
-          "Errors and crash reports to help us fix bugs.",
-        ]} />
-      </Section>
-
-      <Section title="3. How we use your data">
-        <UL items={[
-          "To create and manage your account.",
-          "To store and display your workout history, body metrics, and meal logs.",
-          "To generate AI-powered training plans, meal analysis, and recipe suggestions (Pro).",
-          "To calculate and display macro totals and nutrition progress.",
-          "To process subscription payments via Stripe.",
-          "To send transactional emails (receipts, password resets, important notices).",
-          "To improve the app based on anonymised, aggregated usage patterns.",
-          "To comply with legal obligations.",
-        ]} />
-        <P>We do not sell your data. We do not serve ads.</P>
-      </Section>
-
-      <Section title="4. Legal basis for processing (GDPR)">
-        <P>If you are in the EEA or UK, we process your data under these legal bases:</P>
-        <UL items={[
-          "Contract — to provide the service you signed up for.",
-          "Legitimate interests — to improve the app and prevent fraud.",
-          "Legal obligation — to comply with applicable laws.",
-          "Consent — where you have explicitly opted in (e.g. marketing emails).",
-        ]} />
-      </Section>
-
-      <Section title="5. Data sharing">
-        <P>We share data only with the following trusted service providers:</P>
-        <UL items={[
-          "Stripe — payment processing. Stripe's privacy policy applies to payment data.",
-          "MongoDB Atlas — database hosting for all your personal and fitness data.",
-          "Google OAuth — only if you sign in with Google; we receive your name, email, and photo.",
-          "Vercel — server infrastructure and hosting.",
-          "AI provider (OpenAI / Anthropic) — meal photos and prompts are sent to generate analysis and recipes. No data is retained by the provider beyond the request.",
-        ]} />
+      <Section title="5. Camera &amp; Photo Library Access">
         <P>
-          We may disclose data if required by law, court order, or to protect the rights
-          and safety of our users or the public.
+          The App requests camera and photo library access solely for the food photo analysis
+          feature in Nutrition Tracking. We do not access your camera or photos for any other
+          purpose. Photos are transmitted securely and are not stored after AI analysis is complete.
         </P>
       </Section>
 
-      <Section title="6. Food photos">
-        <P>
-          When you photograph a meal for AI analysis, the image is uploaded and a URL is
-          stored alongside your meal log. Images are used solely to generate macro
-          estimates and to display your own log back to you. We do not use food photos for
-          advertising, model training, or any other purpose.
-        </P>
-      </Section>
-
-      <Section title="7. Data retention">
-        <P>
-          We retain your data for as long as your account is active. If you delete your
-          account, we delete your personal data within 30 days, except where we are
-          required to retain it for legal or financial compliance purposes (e.g. billing
-          records for up to 7 years).
-        </P>
-      </Section>
-
-      <Section title="8. Your rights">
-        <P>Depending on your location, you may have the right to:</P>
+      <Section title="6. Data Sharing">
+        <P>We do not sell your personal information. We share data only with:</P>
         <UL items={[
-          "Access — request a copy of the data we hold about you.",
-          "Correction — ask us to correct inaccurate data.",
-          "Deletion — request that we delete your account and all associated data.",
-          "Portability — receive your data in a machine-readable format.",
-          "Restriction — ask us to stop processing your data in certain circumstances.",
-          "Objection — object to processing based on legitimate interests.",
-          "Withdraw consent — where processing is based on consent.",
+          "AI service providers — to power the AI Trainer, food analysis, recipe generation, and workout plan features",
+          "Google — for authentication if you use Google Sign-In",
         ]} />
-      </Section>
-
-      <Section title="9. Cookies and tracking">
         <P>
-          We use only essential session cookies required for authentication and security.
-          We do not use advertising cookies, third-party trackers, or analytics cookies
-          that track you across other websites.
+          All third-party providers are bound by data processing agreements and may not use
+          your data for their own purposes.
         </P>
       </Section>
 
-      <Section title="10. Children's privacy">
+      <Section title="7. Data Storage &amp; Security">
+        <P>Your data is stored on secure servers. We use:</P>
+        <UL items={[
+          "HTTPS encryption for all data transmitted between the app and our servers",
+          "Secure token-based authentication (JWT)",
+          "Hashed password storage",
+        ]} />
         <P>
-          YourPocketGym is not directed at children under 13. We do not knowingly collect
-          personal data from children under 13. If you believe a child has provided us
-          with personal data, please let us know and we will delete it promptly.
+          We retain your data for as long as your account is active. Workout logs, meal logs,
+          and fitness profile data are deleted when you delete your account.
         </P>
       </Section>
 
-      <Section title="11. Data security">
+      <Section title="8. Your Rights &amp; Account Deletion">
+        <P>You have the right to:</P>
+        <UL items={[
+          "Access the data we hold about you",
+          "Correct inaccurate data via the profile edit screen",
+          "Delete your account and all associated data",
+        ]} />
         <P>
-          We use industry-standard security measures including HTTPS encryption, hashed
-          passwords, and access-controlled databases. However, no system is 100% secure
-          and we cannot guarantee absolute security.
+          To delete your account, tap "Delete Account" on the Profile screen or email us at{" "}
+          <a href="mailto:privacy@yourpocketgym.com" style={{ color: "#e8380d", fontWeight: 500 }}>
+            privacy@yourpocketgym.com
+          </a>. Account deletion is processed within 30 days.
         </P>
       </Section>
 
-      <Section title="12. International transfers">
+      <Section title="9. Children's Privacy">
         <P>
-          Your data may be processed outside your country of residence (e.g. on servers
-          in the United States). Where we transfer data from the EEA or UK, we ensure
-          appropriate safeguards are in place such as Standard Contractual Clauses.
+          Your Pocket Gym is not intended for children under the age of 13. We do not
+          knowingly collect personal information from children under 13. If you believe a
+          child has provided us with personal information, please contact us immediately.
         </P>
       </Section>
 
-      <Section title="13. Changes to this policy">
+      <Section title="10. Changes to This Policy">
         <P>
           We may update this Privacy Policy from time to time. We will notify you of
-          significant changes by email or in-app notice at least 14 days before they
-          take effect.
+          significant changes through the app. Continued use of the app after changes are
+          posted constitutes your acceptance of the updated policy.
+        </P>
+      </Section>
+
+      <Section title="11. Contact">
+        <P>
+          For privacy-related questions or requests:{" "}
+          <a href="mailto:privacy@yourpocketgym.com" style={{ color: "#e8380d", fontWeight: 500 }}>
+            privacy@yourpocketgym.com
+          </a>
         </P>
       </Section>
 

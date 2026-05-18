@@ -37,6 +37,21 @@ export default function SupportPage() {
           </div>
 
           <div style={S.section}>
+            <h2 style={S.sectionTitle}>Account Deletion</h2>
+            <div style={S.card}>
+              <p style={S.cardLabel}>Delete Your Account</p>
+              <p style={S.p}>
+                You can delete your account directly in the app via Profile → Delete Account.
+                This permanently removes all your data including workout logs, meal logs, and
+                your fitness profile. You can also email us to request deletion.
+              </p>
+              <a href={`mailto:${SUPPORT_EMAIL}`} style={S.emailBtn}>
+                {SUPPORT_EMAIL}
+              </a>
+            </div>
+          </div>
+
+          <div style={S.section}>
             <h2 style={S.sectionTitle}>Legal</h2>
             <div style={S.card}>
               <p style={S.p}>
