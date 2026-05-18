@@ -42,17 +42,6 @@ export default function SupportPage() {
           </div>
 
           <div style={S.card}>
-            <div style={S.cardIcon}>🔄</div>
-            <div style={S.cardBody}>
-              <p style={S.cardTitle}>Restore Purchases</p>
-              <p style={S.cardDesc}>
-                If your premium subscription isn't showing, open the app and go to{" "}
-                <strong>Profile → Restore Purchases</strong>.
-              </p>
-            </div>
-          </div>
-
-          <div style={S.card}>
             <div style={S.cardIcon}>🗑️</div>
             <div style={S.cardBody}>
               <p style={S.cardTitle}>Delete Your Account</p>
@@ -98,20 +87,20 @@ export default function SupportPage() {
 
 const FAQ = [
   {
-    q: "Why isn't my subscription showing?",
-    a: "Open the app, go to Profile and tap 'Restore Purchases'. Make sure you're signed in with the same Apple ID used to purchase.",
-  },
-  {
     q: "Can I use PocketGym on multiple devices?",
     a: "Yes. Log in with the same account on any device and your data will sync automatically.",
   },
   {
-    q: "How do I cancel my subscription?",
-    a: "Go to iPhone Settings → Apple ID → Subscriptions → PocketGym, then tap Cancel Subscription.",
-  },
-  {
     q: "Is my data private?",
     a: "Yes. Your data is stored securely and never sold to third parties. See our Privacy Policy for full details.",
+  },
+  {
+    q: "How do I delete my account?",
+    a: "Open the app, go to Profile → Delete Account. This permanently removes all your data.",
+  },
+  {
+    q: "The AI scan isn't working — what should I do?",
+    a: "Make sure you've allowed camera access in your iPhone Settings. If the issue persists, contact us at support@yourpocketgym.com.",
   },
 ];
 
