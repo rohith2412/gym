@@ -7,7 +7,7 @@ import { getAuthUser }               from "@/lib/getAuthUser";
 import { checkScanRateLimit }        from "@/lib/scanRateLimit";
 
 const SKIP_DB_WRITE = false;
-
+//checkScanRateLimit
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─── GET /api/meal-log localDate ────────────────────────────────────────────────────────
