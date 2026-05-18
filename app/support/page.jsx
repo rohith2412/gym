@@ -37,17 +37,6 @@ export default function SupportPage() {
           </div>
 
           <div style={S.section}>
-            <h2 style={S.sectionTitle}>Account</h2>
-            <div style={S.card}>
-              <p style={S.cardLabel}>Delete Your Account</p>
-              <p style={S.p}>
-                You can permanently delete your account and all data from inside the app, or{" "}
-                <a href="/legal/delete-account" style={S.inlineLink}>request deletion here</a>.
-              </p>
-            </div>
-          </div>
-
-          <div style={S.section}>
             <h2 style={S.sectionTitle}>Legal</h2>
             <div style={S.card}>
               <p style={S.p}>
