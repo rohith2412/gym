@@ -26,6 +26,7 @@ export default function ClientLayout({ children }) {
     "/v1/profile",
     "/legal/terms",
     "/legal/privacy",
+    "/support",
   ].includes(pathname);
 
   // 📱 Mobile-only gate
