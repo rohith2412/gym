@@ -39,7 +39,7 @@ export async function POST(req) {
     console.log("[ai-trainer] authUser:", authUser);
     console.log("[ai-trainer] body received:", JSON.stringify(body));
 
-    const { type, extra = {}, messages = [] } = body;
+    const { type, extra = {}, messages = [], image } = body;
 
     console.log("[ai-trainer] type:", type);
 
@@ -110,19 +110,34 @@ Rules:
     }
 
     if (type === "chat") {
-      const systemPrompt = `You are an elite AI personal trainer with expertise in strength training, nutrition, recovery and sports science.
+      const systemPrompt = extra.systemNote
+        ? extra.systemNote
+        : `You are an elite AI personal trainer with expertise in strength training, nutrition, recovery and sports science.
 
 Your athlete's profile:
 ${userCtx || "Profile not provided - ask the user for details if needed."}
 
 Personality: Direct, motivating, evidence-based. Give specific actionable advice. Keep responses concise - 2-4 short paragraphs max. Use line breaks for readability. Do NOT use markdown headers or ** symbols.`;
 
+      const chatMessages = messages.map((m) => {
+        if (m.role === "user" && image) {
+          return {
+            role: "user",
+            content: [
+              { type: "image_url", image_url: { url: image, detail: "low" } },
+              { type: "text", text: m.content },
+            ],
+          };
+        }
+        return { role: m.role, content: m.content };
+      });
+
       const res = await openai.chat.completions.create({
         model:      "gpt-4o",
-        max_tokens: 600,
+        max_tokens: 800,
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages.map((m) => ({ role: m.role, content: m.content })),
+          ...chatMessages,
         ],
       });
 
