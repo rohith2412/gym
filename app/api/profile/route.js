@@ -85,3 +85,47 @@ export async function GET(req) {
     return Response.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
+export async function PUT(req) {
+  try {
+    await connectdb();
+    const decoded = getUserFromRequest(req);
+    if (!decoded) {
+      return Response.json({ success: false, error: "Not authenticated" }, { status: 401 });
+    }
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return Response.json({ success: false, error: "Invalid body" }, { status: 400 });
+    }
+
+    const update = {};
+    if (typeof body.name === "string") {
+      const trimmed = body.name.trim();
+      if (trimmed.length < 1 || trimmed.length > 60) {
+        return Response.json({ success: false, error: "Name must be 1–60 characters" }, { status: 400 });
+      }
+      update.name = trimmed;
+    }
+
+    if (!Object.keys(update).length) {
+      return Response.json({ success: false, error: "No editable fields provided" }, { status: 400 });
+    }
+
+    const updated = await User.findByIdAndUpdate(decoded.id, update, {
+      new: true,
+      runValidators: true,
+    }).select("name email");
+
+    if (!updated) {
+      return Response.json({ success: false, error: "User not found" }, { status: 404 });
+    }
+
+    return Response.json({
+      success: true,
+      data: { name: updated.name, email: updated.email },
+    });
+  } catch (err) {
+    return Response.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
