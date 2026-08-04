@@ -27,6 +27,9 @@ const userIntroSchema = new Schema({
 
   // ── Free trial ────────────────────────────────────────────
   freeTrialUsed:       { type: Boolean, default: false },
+
+  // ── Region (ISO 3166-1 alpha-2, e.g. "US", "GB", "IN"). "OTHER" allowed. ─
+  region:              { type: String, uppercase: true, trim: true, maxlength: 8 },
 }, { timestamps: true });
 
 export default mongoose.models.UserIntro || mongoose.model("UserIntro", userIntroSchema);
