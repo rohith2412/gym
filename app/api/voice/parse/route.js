@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getAuthUser } from "@/lib/getAuthUser";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -22,6 +23,11 @@ Rules:
 - Output JSON only, no prose.`;
 
 export async function POST(req) {
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   const form = await req.formData();
   const audio = form.get("audio");
   if (!audio) {
