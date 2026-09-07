@@ -96,7 +96,7 @@ Rules:
 - 4-6 exercises per training day`;
 
       const res = await openai.chat.completions.create({
-        model:           "gpt-4o",
+        model:           "gpt-4o-mini",
         max_tokens:      2500,
         response_format: { type: "json_object" },
         messages: [
@@ -133,7 +133,7 @@ Personality: Direct, motivating, evidence-based. Give specific actionable advice
       });
 
       const res = await openai.chat.completions.create({
-        model:      "gpt-4o",
+        model:      "gpt-4o-mini",
         max_tokens: 800,
         messages: [
           { role: "system", content: systemPrompt },
