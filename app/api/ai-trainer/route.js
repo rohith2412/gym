@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { connectdb }   from "@/lib/connectdb";
 import userIntroModel  from "@/models/userIntroModel";
 import { getAuthUser } from "@/lib/getAuthUser";
+import { guardAiLimit, recordAiUsage } from "@/lib/aiRateLimit";
 import OpenAI          from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -49,6 +50,8 @@ export async function POST(req) {
     console.log("[ai-trainer] intro found:", intro ? "YES" : "NO");
 
     if (type === "plan") {
+      const planLimited = await guardAiLimit(authUser.id, "meal-plan");
+      if (planLimited) return planLimited;
       const { planType = "weekly", focus } = body;
       const prompt = `You are an elite personal trainer and strength & conditioning coach.
 Generate a detailed, personalised ${planType} workout plan for this athlete:
@@ -106,10 +109,13 @@ Rules:
       });
 
       const plan = JSON.parse(res.choices[0].message.content || "{}");
+      await recordAiUsage(authUser.id, "meal-plan", res.usage?.total_tokens ?? 0);
       return Response.json({ success: true, data: plan });
     }
 
     if (type === "chat") {
+      const chatLimited = await guardAiLimit(authUser.id, "coach");
+      if (chatLimited) return chatLimited;
       const systemPrompt = extra.systemNote
         ? extra.systemNote
         : `You are an elite AI personal trainer with expertise in strength training, nutrition, recovery and sports science.
@@ -141,6 +147,7 @@ Personality: Direct, motivating, evidence-based. Give specific actionable advice
         ],
       });
 
+      await recordAiUsage(authUser.id, "coach", res.usage?.total_tokens ?? 0);
       return Response.json({ success: true, data: { reply: res.choices[0].message.content || "" } });
     }
 

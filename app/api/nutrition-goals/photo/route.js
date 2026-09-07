@@ -5,6 +5,7 @@ export const maxDuration = 30;
 
 import OpenAI from "openai";
 import { getAuthUser } from "@/lib/getAuthUser";
+import { guardAiLimit, recordAiUsage } from "@/lib/aiRateLimit";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -28,9 +29,16 @@ export async function POST(req) {
     const authUser = await getAuthUser(req);
     if (!authUser) return Response.json({ error: "Not authenticated" }, { status: 401 });
 
+    const limited = await guardAiLimit(authUser.id, "photo");
+    if (limited) return limited;
+
     const form = await req.formData();
     const photo = form.get("photo");
     if (!photo) return Response.json({ error: "photo field required" }, { status: 400 });
+    if (photo.size && photo.size > 10 * 1024 * 1024) {
+      await recordAiUsage(authUser.id, "photo");
+    return Response.json({ error: "Image too large (max 10 MB)" }, { status: 413 });
+    }
 
     // Convert uploaded file → data URL for the vision API
     const buf = Buffer.from(await photo.arrayBuffer());

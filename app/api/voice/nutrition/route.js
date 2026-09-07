@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getAuthUser } from "@/lib/getAuthUser";
+import { guardAiLimit, recordAiUsage } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -33,10 +34,19 @@ export async function POST(req) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const limited = await guardAiLimit(user.id, "voice");
+  if (limited) return limited;
+
   const form = await req.formData();
   const audio = form.get("audio");
   if (!audio) {
     return NextResponse.json({ error: "audio field required" }, { status: 400 });
+  }
+  if (audio.size && audio.size > 2 * 1024 * 1024) {
+    return NextResponse.json(
+      { error: "Recording too long (max ~60s)" },
+      { status: 413 }
+    );
   }
 
   // 1) Transcribe
@@ -45,6 +55,8 @@ export async function POST(req) {
     model: "whisper-1",
   });
   const transcript = (tr.text || "").trim();
+
+  await recordAiUsage(user.id, "voice");
 
   if (!transcript) {
     return NextResponse.json({ transcript: "", foods: [], waterMl: 0 });

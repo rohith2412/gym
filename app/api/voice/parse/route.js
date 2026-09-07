@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getAuthUser } from "@/lib/getAuthUser";
+import { guardAiLimit, recordAiUsage } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -28,10 +29,26 @@ export async function POST(req) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  // Hard cap — this is what actually protects the OpenAI bill. The 60s
+  // client cap is UX; a modified build would ignore it.
+  const limited = await guardAiLimit(user.id, "voice");
+  if (limited) return limited;
+
   const form = await req.formData();
   const audio = form.get("audio");
   if (!audio) {
     return NextResponse.json({ error: "audio field required" }, { status: 400 });
+  }
+  // File size stand-in for duration: at Whisper's typical bitrate, ~1 MB per
+  // minute of speech. We give it 2 MB of headroom, which covers any real
+  // 60s take even from a phone that records loudly, and rejects the 10-min
+  // clip an abuser would try. Same one-line change on the client wouldn't
+  // help them.
+  if (audio.size && audio.size > 2 * 1024 * 1024) {
+    return NextResponse.json(
+      { error: "Recording too long (max ~60s)" },
+      { status: 413 }
+    );
   }
 
   // 1) Transcribe
@@ -40,6 +57,9 @@ export async function POST(req) {
     model: "whisper-1",
   });
   const transcript = (tr.text || "").trim();
+
+  // Record before returning either way — the Whisper cost was already paid.
+  await recordAiUsage(user.id, "voice");
 
   if (!transcript) {
     return NextResponse.json({ transcript: "", exercises: [] });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getAuthUser } from "@/lib/getAuthUser";
+import { guardAiLimit, recordAiUsage } from "@/lib/aiRateLimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -19,6 +20,9 @@ export async function POST(req) {
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  const limited = await guardAiLimit(user.id, "coach");
+  if (limited) return limited;
 
   let body;
   try {
@@ -41,5 +45,6 @@ export async function POST(req) {
   });
 
   const reply = chat.choices?.[0]?.message?.content?.trim() ?? "";
+  await recordAiUsage(user.id, "coach", chat.usage?.total_tokens ?? 0);
   return NextResponse.json({ reply });
 }
