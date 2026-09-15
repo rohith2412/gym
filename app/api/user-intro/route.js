@@ -124,6 +124,75 @@ export async function POST(req) {
 
   } catch (err) {
     console.error("POST User-Intro Error:", err);
+    return Response.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH — partial upsert. Used by the Nutrition onboarding sheet which
+ * only asks for weight/height/age/goal and leaves the rest to be filled
+ * in later from the Profile page. Fields left `undefined` are ignored;
+ * defaults are only applied when creating a brand-new intro document.
+ */
+export async function PATCH(req) {
+  try {
+    await connectdb();
+    const user = await getUserFromRequest(req);
+    if (!user?.id) {
+      return Response.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const allowed = [
+      "age",
+      "height",
+      "weight",
+      "gender",
+      "fitnessGoal",
+      "experienceLevel",
+      "workoutDaysPerWeek",
+      "region",
+    ];
+    const $set = {};
+    for (const k of allowed) {
+      if (body[k] !== undefined && body[k] !== null) $set[k] = body[k];
+    }
+    if (Object.keys($set).length === 0) {
+      return Response.json(
+        { success: false, error: "No fields to update" },
+        { status: 400 }
+      );
+    }
+
+    // On first-ever insert, fill in the required fields with safe defaults
+    // so schema validation passes even when the caller only sent a subset.
+    const $setOnInsert = {
+      userId: user.id,
+      gender: "other",
+      experienceLevel: "beginner",
+      workoutDaysPerWeek: 3,
+    };
+    // Don't double-write keys that are already in $set.
+    for (const k of Object.keys($set)) delete $setOnInsert[k];
+
+    const [updated] = await Promise.all([
+      userIntroModel.findOneAndUpdate(
+        { userId: user.id },
+        { $set, $setOnInsert },
+        { upsert: true, new: true, runValidators: true }
+      ),
+      User.findByIdAndUpdate(user.id, { hasIntro: true }),
+    ]);
+
+    return Response.json({ success: true, data: updated });
+  } catch (err) {
+    console.error("PATCH User-Intro Error:", err);
 
     return Response.json(
       { success: false, error: err.message },
