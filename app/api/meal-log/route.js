@@ -63,7 +63,15 @@ export async function POST(req) {
       return Response.json({ error: "Not authenticated" }, { status: 401 });
 
     const body = await req.json();
-    const { image, mealType = "snack", date, localDate, note = "", manualMacros } = body;
+    const {
+      image,
+      imageUrl,
+      mealType = "snack",
+      date,
+      localDate,
+      note = "",
+      manualMacros,
+    } = body;
 
     // localDate is "YYYY-MM-DD" sent by the client in their local timezone.
     // This ensures the meal always appears on the correct day regardless of
@@ -93,6 +101,10 @@ export async function POST(req) {
         date:      date ? new Date(date) : new Date(),
         localDate: resolvedLocalDate,   // ← timezone-safe date string
         mealType,
+        // R2 photo URL from the client — persisted so meals survive an app
+        // reinstall (the local photo map is device-scoped and would be
+        // wiped when the app is deleted).
+        imageUrl:  imageUrl || null,
         foods,
         totals:    macros,
         aiNotes:   "Macros entered manually",
