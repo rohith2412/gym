@@ -10,14 +10,29 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM = `You parse spoken food and drink logs into JSON.
 
-Return STRICT JSON:
-{"foods":[{"name":string,"calories":number,"protein":number,"carbs":number,"fat":number}],"waterMl":number}
+Return STRICT JSON — every food entry MUST include every nutrient field:
+{
+  "foods":[{
+    "name":string,
+    "calories":number,"protein":number,"carbs":number,"fat":number,
+    "fiber":number,"sugar":number,"sodium":number,"satFat":number,"cholesterol":number,
+    "vitaminA":number,"vitaminC":number,"vitaminD":number,"vitaminB12":number,"folate":number,
+    "iron":number,"calcium":number,"potassium":number
+  }],
+  "waterMl":number
+}
+
+Units:
+- calories: kcal
+- protein, carbs, fat, fiber, sugar, satFat: grams
+- sodium, cholesterol, calcium, potassium, iron, vitaminC: milligrams
+- vitaminA (RAE), vitaminD, vitaminB12, folate (DFE): micrograms
 
 Rules:
-- Estimate calories and macros (grams) from typical portions when the user
-  doesn't give numbers. Be realistic, not generous.
+- Estimate every nutrient from typical USDA values for the food and portion.
+  Be realistic, not generous. If a field really doesn't apply, return 0.
 - If the user states numbers explicitly, use those instead of estimating.
-- Expand quantities: "two eggs" is one entry named "2 eggs" with doubled macros.
+- Expand quantities: "two eggs" is one entry named "2 eggs" with doubled values.
 - name should be short and human, e.g. "Grilled chicken salad".
 - waterMl is the TOTAL water mentioned, converted to millilitres.
   Common conversions: 1 glass = 250, 1 cup = 240, 1 bottle = 500,
@@ -80,9 +95,16 @@ export async function POST(req) {
   }
 
   // Coerce defensively — the model occasionally returns strings or nulls.
+  // Whole-number nutrients use `num`; nutrients typically measured in grams
+  // (and often <10) use `num1` which keeps one decimal so tiny values (e.g.
+  // 0.4g fiber in a coffee) don't get rounded to 0.
   const num = (v) => {
     const n = Number(v);
     return Number.isFinite(n) && n > 0 ? Math.round(n) : 0;
+  };
+  const num1 = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.round(n * 10) / 10 : 0;
   };
   const foods = Array.isArray(parsed.foods)
     ? parsed.foods
@@ -93,6 +115,19 @@ export async function POST(req) {
           protein: num(f.protein),
           carbs: num(f.carbs),
           fat: num(f.fat),
+          fiber: num1(f.fiber),
+          sugar: num1(f.sugar),
+          sodium: num(f.sodium),
+          satFat: num1(f.satFat),
+          cholesterol: num(f.cholesterol),
+          vitaminA: num(f.vitaminA),
+          vitaminC: num(f.vitaminC),
+          vitaminD: num1(f.vitaminD),
+          vitaminB12: num1(f.vitaminB12),
+          folate: num(f.folate),
+          iron: num1(f.iron),
+          calcium: num(f.calcium),
+          potassium: num(f.potassium),
         }))
     : [];
 
