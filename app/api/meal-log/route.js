@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import { connectdb }                 from "@/lib/connectdb";
-import MealLog, { calculateTotals } from "@/models/mealLogModel";
+import MealLog, { calculateTotals, NUTRIENT_KEYS } from "@/models/mealLogModel";
 import { ObjectId }                  from "mongodb";
 import OpenAI                        from "openai";
 import { getAuthUser }               from "@/lib/getAuthUser";
@@ -80,13 +80,11 @@ export async function POST(req) {
 
     // ── Manual macros path ──────────────────────────────────────────────────
     if (manualMacros && !image) {
-      const macros = {
-        calories: parseFloat(manualMacros.calories) || 0,
-        protein:  parseFloat(manualMacros.protein)  || 0,
-        carbs:    parseFloat(manualMacros.carbs)     || 0,
-        fat:      parseFloat(manualMacros.fat)       || 0,
-        fiber:    parseFloat(manualMacros.fiber)     || 0,
-      };
+      // Coerce every nutrient key. Missing fields default to 0 so older
+      // clients that only send calories/protein/carbs/fat still work.
+      const macros = Object.fromEntries(
+        NUTRIENT_KEYS.map((k) => [k, parseFloat(manualMacros[k]) || 0]),
+      );
 
       const foods = [{
         name:       note.trim() || "Manual entry",
@@ -157,10 +155,21 @@ export async function POST(req) {
           role:    "system",
           content: `Nutrition analyst. Analyse the food image.${noteContext} Return JSON only:
 {
-  "foods": [{ "name":"string","portion":"string","macros":{"calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0},"confidence":0.0-1.0 }],
+  "foods": [{
+    "name":"string",
+    "portion":"string",
+    "macros":{
+      "calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,
+      "sugar":0,"sodium":0,"satFat":0,"cholesterol":0,
+      "vitaminA":0,"vitaminC":0,"vitaminD":0,"vitaminB12":0,"folate":0,
+      "iron":0,"calcium":0,"potassium":0
+    },
+    "confidence":0.0-1.0
+  }],
   "aiNotes":"max 120 chars"
 }
-Rules: macros in grams except calories (kcal), round to 1 decimal, confidence<0.7 if uncertain, empty foods array if no food detected.`,
+Units — grams: protein, carbs, fat, fiber, sugar, satFat. Milligrams: sodium, cholesterol, calcium, potassium, iron, vitaminC. Micrograms: vitaminA (RAE), vitaminD, vitaminB12, folate (DFE). kcal: calories.
+Rules: round to 1 decimal, confidence<0.7 if uncertain, empty foods array if no food detected. Use standard USDA values for the portion you see.`,
         },
         {
           role: "user",
@@ -224,13 +233,9 @@ export async function PATCH(req) {
     const $set = {};
 
     if (body.totals) {
-      $set.totals = {
-        calories: parseFloat(body.totals.calories) || 0,
-        protein:  parseFloat(body.totals.protein)  || 0,
-        carbs:    parseFloat(body.totals.carbs)     || 0,
-        fat:      parseFloat(body.totals.fat)       || 0,
-        fiber:    parseFloat(body.totals.fiber)     || 0,
-      };
+      $set.totals = Object.fromEntries(
+        NUTRIENT_KEYS.map((k) => [k, parseFloat(body.totals[k]) || 0]),
+      );
     }
     if (body.foods) {
       $set.foods = body.foods;
