@@ -559,15 +559,28 @@ export default function HomePageV2() {
 
       {addMode && (
         <AddFoodModal
+          // Keying on the photo's identity forces a remount on Retake --
+          // pendingPhoto changes but addMode stays "scan", so without this
+          // React would reuse the same ScanFlow instance and its internal
+          // preview/analysis state would never reset for the new photo.
+          key={addMode === "scan" ? `scan-${pendingPhoto?.name}-${pendingPhoto?.lastModified}` : addMode}
           initialMode={addMode}
           file={pendingPhoto}
           localDate={selectedDay}
+          onRetake={() => photoInputRef.current?.click()}
           onClose={() => {
             setAddMode(null);
             setPendingPhoto(null);
           }}
           onSaved={(doc) => {
-            setEntries((prev) => [doc, ...prev]);
+            // A scan's "Calculate" step already inserts the doc server-side
+            // before the review form's "Save meal" ever fires; if a
+            // background refetch (tab focus/visibility) lands in between,
+            // the same _id can already be sitting in `entries` by the time
+            // onSaved prepends it again. Dedupe so the id is never
+            // duplicated, and use whichever copy is newest (the one being
+            // saved now reflects any edits made in review).
+            setEntries((prev) => [doc, ...prev.filter((e) => e._id !== doc._id)]);
             setAddMode(null);
             setPendingPhoto(null);
           }}

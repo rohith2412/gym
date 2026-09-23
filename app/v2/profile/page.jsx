@@ -165,6 +165,20 @@ export default function ProfilePageV2() {
           </a>
         </div>
 
+        {/* Admin -- cosmetic gate only, same pattern as mobile's
+            ProfileDetailScreen.tsx (real enforcement is server-side in
+            lib/requireAdmin.js, which the /v2/admin page itself already
+            redirects away from for anyone this check would miss). */}
+        {email?.toLowerCase() === "rohithra75@gmail.com" && (
+          <Link
+            href="/v2/admin"
+            className="flex items-center justify-between w-full border border-neutral-300 dark:border-neutral-700 rounded-2xl px-4 py-3.5 mb-10 text-sm font-semibold hover:border-black dark:hover:border-white transition-colors"
+          >
+            Admin
+            <ChevronRight size={16} className="text-neutral-400" />
+          </Link>
+        )}
+
         {/* Sign out */}
         <button
           onClick={async () => {

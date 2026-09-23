@@ -140,7 +140,13 @@ export async function POST(req) {
     }
 
     const base64Data = image.includes(",") ? image.split(",")[1] : image;
-    const mediaType  = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
+    // Read the image's actual declared MIME type instead of guessing
+    // between only png/jpeg -- a client sending some other format
+    // (e.g. HEIC, before the client-side JPEG normalization) would
+    // otherwise get silently mislabeled and fail to decode correctly
+    // on OpenAI's end.
+    const mediaTypeMatch = image.match(/^data:([^;]+);base64/);
+    const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/jpeg";
 
     const noteContext = note.trim()
       ? ` The user added this note about the meal: "${note.trim()}". Factor this into your analysis.`
