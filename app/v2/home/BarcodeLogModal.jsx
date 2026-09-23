@@ -72,6 +72,7 @@ async function lookupBarcode(barcode) {
 
 export function BarcodeLogModal({ localDate, onClose, onSaved }) {
   const [manualCode, setManualCode] = useState("");
+  const [showManual, setShowManual] = useState(false);
   const [looking, setLooking] = useState(false);
   const [error, setError] = useState("");
   const [product, setProduct] = useState(null);
@@ -85,10 +86,17 @@ export function BarcodeLogModal({ localDate, onClose, onSaved }) {
   const detectorRef = useRef(null);
   const stoppedRef = useRef(false);
 
+  // Camera is the primary way to scan a barcode, same as the app --
+  // launch it the moment the sheet opens instead of waiting for an
+  // extra tap. Manual entry stays available as a fallback (behind an
+  // explicit "Enter it manually" link) for when BarcodeDetector isn't
+  // supported (Safari) or the camera permission is denied.
   useEffect(() => {
     if (typeof window !== "undefined" && "BarcodeDetector" in window) {
       setScannerReady(true);
+      startScanner();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const runLookup = async (code) => {
@@ -206,6 +214,9 @@ export function BarcodeLogModal({ localDate, onClose, onSaved }) {
                   <div className="rounded-2xl overflow-hidden bg-black aspect-square relative">
                     {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                     <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-[75%] aspect-[3/2] border-2 border-white/70 rounded-xl" />
+                    </div>
                   </div>
                 ) : (
                   <button
@@ -215,28 +226,37 @@ export function BarcodeLogModal({ localDate, onClose, onSaved }) {
                     Open camera to scan
                   </button>
                 )}
+                {looking && <p className="text-xs text-neutral-500 text-center mt-2">Looking up…</p>}
               </div>
             )}
 
-            <p className="text-xs font-semibold text-neutral-500 mb-2">
-              {scannerReady ? "OR ENTER MANUALLY" : "ENTER BARCODE"}
-            </p>
-            <div className="flex gap-2">
-              <input
-                value={manualCode}
-                onChange={(e) => setManualCode(e.target.value.replace(/[^0-9]/g, ""))}
-                placeholder="e.g. 012345678905"
-                inputMode="numeric"
-                className="flex-1 border-b border-neutral-300 dark:border-neutral-700 bg-transparent py-3 text-sm outline-none focus:border-black dark:focus:border-white"
-              />
-              <button
-                onClick={() => runLookup(manualCode)}
-                disabled={!manualCode || looking}
-                className="px-4 text-sm font-bold disabled:opacity-30"
-              >
-                {looking ? "…" : "Look up"}
+            {showManual || !scannerReady ? (
+              <>
+                <p className="text-xs font-semibold text-neutral-500 mb-2">
+                  {scannerReady ? "OR ENTER MANUALLY" : "ENTER BARCODE"}
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    value={manualCode}
+                    onChange={(e) => setManualCode(e.target.value.replace(/[^0-9]/g, ""))}
+                    placeholder="e.g. 012345678905"
+                    inputMode="numeric"
+                    className="flex-1 border-b border-neutral-300 dark:border-neutral-700 bg-transparent py-3 text-sm outline-none focus:border-black dark:focus:border-white"
+                  />
+                  <button
+                    onClick={() => runLookup(manualCode)}
+                    disabled={!manualCode || looking}
+                    className="px-4 text-sm font-bold disabled:opacity-30"
+                  >
+                    {looking ? "…" : "Look up"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button onClick={() => setShowManual(true)} className="text-xs text-neutral-500 underline">
+                Enter the barcode manually instead
               </button>
-            </div>
+            )}
             {error && <p className="text-xs text-red-500 mt-3">{error}</p>}
           </>
         )}

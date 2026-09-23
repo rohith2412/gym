@@ -16,6 +16,7 @@ import {
 import { useV2Theme } from "../ThemeProvider";
 import { AddFoodModal } from "./AddFoodModal";
 import { EditGoalsModal } from "./EditGoalsModal";
+import { FabMenu } from "./FabMenu";
 import { NutrientBreakdown } from "./NutrientBreakdown";
 import { WaterCard } from "./WaterCard";
 
@@ -100,11 +101,37 @@ export default function HomePageV2() {
   const [entries, setEntries] = useState([]);
   const [goals, setGoals] = useState(DEFAULT_GOALS);
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [addMode, setAddMode] = useState(null); // "scan" | "barcode" | "voice" | "manual" | null
+  const [pendingPhoto, setPendingPhoto] = useState(null);
   const [showEditGoals, setShowEditGoals] = useState(false);
+  const photoInputRef = useRef(null);
+  const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/v2/login");
+  }, [status, router]);
+
+  // Same gate the mobile app uses (hasRequiredIntro): weight, height,
+  // age and a goal all have to be on the UserIntro doc before showing
+  // the dashboard, otherwise /api/nutrition-goals has nothing to
+  // calculate real calorie/macro targets from and silently falls back
+  // to the hardcoded defaults.
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/user-intro")
+      .then((r) => r.json())
+      .then((json) => {
+        const intro = json?.data;
+        const complete =
+          json?.exists && intro?.weight != null && intro?.height != null && intro?.age != null && !!intro?.fitnessGoal;
+        if (!complete) {
+          router.replace("/v2/onboarding");
+          return;
+        }
+        setIntroReady(true);
+      })
+      .catch(() => setIntroReady(true));
   }, [status, router]);
 
   const fetchGoals = () => {
@@ -169,6 +196,15 @@ export default function HomePageV2() {
   // the past is never yanked back.
   const followingTodayRef = useRef(true);
   const weekStripRef = useRef(null);
+  const todayCellRef = useRef(null);
+
+  // Focuses today at the right edge of the strip (not tomorrow's
+  // dimmed padding slot) -- scrollIntoView aligns the actual "today"
+  // cell itself, so it works regardless of the trailing future day.
+  const scrollToToday = () => {
+    todayCellRef.current?.scrollIntoView({ inline: "end", block: "nearest" });
+  };
+
   useEffect(() => {
     const id = setInterval(() => {
       const now = toISODay();
@@ -177,11 +213,7 @@ export default function HomePageV2() {
           if (prev === now) return prev;
           // Re-scroll to show the new today, same jump-not-animate
           // behavior as the initial mount scroll below.
-          requestAnimationFrame(() => {
-            if (weekStripRef.current) {
-              weekStripRef.current.scrollLeft = weekStripRef.current.scrollWidth;
-            }
-          });
+          requestAnimationFrame(scrollToToday);
           return now;
         });
       }
@@ -219,6 +251,11 @@ export default function HomePageV2() {
     return n;
   }, [entries]);
 
+  // Exact port of gym-ios's WeekStrip.tsx: one continuous scrollable
+  // row of the last 30 days (not paginated by week), ending at
+  // tomorrow so today isn't jammed against the edge. Opens scrolled to
+  // the end -- today is what you almost always want, the past is one
+  // flick away.
   const weekDays = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -240,20 +277,17 @@ export default function HomePageV2() {
     });
   }, [entries, selectedDay, goals.calories, todayIso]);
 
-  // Web port of WeekStrip.tsx's `onContentSizeChange={() =>
-  // scrollRef.current?.scrollToEnd({ animated: false })}` -- the strip
-  // renders all 30 days left-to-right starting from the OLDEST day, so
-  // without this it opens scrolled to 28 days ago instead of today. Jump,
-  // don't animate (mobile's own comment: "an opening screen that slides
-  // itself sideways reads as a glitch"). Guarded to fire once per mount,
-  // not on every entries/goals refresh -- otherwise a background refetch
-  // while the user has manually scrolled left through history would yank
-  // their view back to today mid-browse.
+  // Opens with today focused at the right edge. Jump, don't animate
+  // (mobile's own comment: "an opening screen that slides itself
+  // sideways reads as a glitch"). Guarded to fire once per mount, not
+  // on every entries/goals refresh, so a background refetch while the
+  // user has manually scrolled left through history doesn't yank their
+  // view back to today mid-browse.
   const hasScrolledRef = useRef(false);
   useEffect(() => {
     if (hasScrolledRef.current) return;
     if (weekDays.length === 0 || !weekStripRef.current) return;
-    weekStripRef.current.scrollLeft = weekStripRef.current.scrollWidth;
+    scrollToToday();
     hasScrolledRef.current = true;
   }, [weekDays]);
 
@@ -270,7 +304,16 @@ export default function HomePageV2() {
     setMacroPage(Math.round(el.scrollLeft / el.clientWidth));
   };
 
-  if (status === "loading" || status === "unauthenticated") return null;
+  const onMenuSelect = (key) => {
+    setMenuOpen(false);
+    if (key === "scan") {
+      photoInputRef.current?.click();
+      return;
+    }
+    setAddMode(key);
+  };
+
+  if (status === "loading" || status === "unauthenticated" || !introReady) return null;
 
   const pct = goals.calories > 0 ? totals.calories / goals.calories : 0;
   const over = totals.calories > goals.calories;
@@ -301,31 +344,51 @@ export default function HomePageV2() {
               <Flame size={15} color="#F59E0B" fill="#F59E0B" />
               <span className="text-sm font-bold">{logStreak}</span>
             </div>
-            {session?.user?.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={session.user.photo}
-                alt=""
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : (
-              <div
-                style={{ backgroundColor: c.surfaceAlt }}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-              >
-                {(session?.user?.name || session?.user?.email || "?")[0].toUpperCase()}
-              </div>
-            )}
+            <button onClick={() => router.push("/v2/profile")} aria-label="Profile">
+              {session?.user?.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={session.user.photo}
+                  alt=""
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  style={{ backgroundColor: c.surfaceAlt }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                >
+                  {(session?.user?.name || session?.user?.email || "?")[0].toUpperCase()}
+                </div>
+              )}
+            </button>
           </div>
         </div>
 
         {/* Week strip */}
-        <div ref={weekStripRef} className="flex gap-2.5 overflow-x-auto mb-6 -mx-1 px-1 pb-1">
+        <div
+          ref={(node) => {
+            weekStripRef.current = node;
+            // Callback refs fire during commit, bottom-up -- by the time
+            // this (the container) runs, the today-cell's own ref below
+            // has already attached, so this can scroll synchronously on
+            // first mount instead of waiting for a `weekDays`-dependent
+            // effect to re-fire (which only happens once the entries/
+            // goals fetches resolve and give it a new array reference --
+            // fast, but not instant, so a reload could briefly show the
+            // strip parked at its default scrollLeft of 0 first).
+            if (node && !hasScrolledRef.current && todayCellRef.current) {
+              scrollToToday();
+              hasScrolledRef.current = true;
+            }
+          }}
+          className="flex gap-2.5 overflow-x-auto mb-6 -mx-1 px-1 pb-1"
+        >
           {weekDays.map((d) => {
             const filled = d.logged && !d.isFuture;
             return (
               <button
                 key={d.iso}
+                ref={d.isToday ? todayCellRef : undefined}
                 disabled={d.isFuture}
                 onClick={() => onDaySelect(d.iso)}
                 className="flex-shrink-0 w-[52px] flex flex-col items-center gap-1.5"
@@ -458,23 +521,55 @@ export default function HomePageV2() {
         )}
       </div>
 
-      {/* FAB */}
+      {/* FAB + hidden photo input -- the "Scan a photo" menu item triggers
+          this input directly (mirrors mobile's camera launch on tap), then
+          AddFoodModal opens straight into its "scan" mode once a file is
+          picked. */}
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (file) {
+            setPendingPhoto(file);
+            setAddMode("scan");
+          }
+        }}
+      />
       <button
-        onClick={() => setShowAdd(true)}
+        onClick={() => setMenuOpen((v) => !v)}
         style={{ backgroundColor: c.text, color: c.bg }}
-        className="fixed bottom-8 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+        className="fixed bottom-8 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
         aria-label="Add food"
       >
-        <Plus size={26} />
+        <Plus
+          size={26}
+          style={{
+            transform: menuOpen ? "rotate(135deg)" : "rotate(0deg)",
+            transition: `transform ${menuOpen ? 220 : 160}ms ${menuOpen ? "cubic-bezier(0.16,1,0.3,1)" : "cubic-bezier(0.4,0,1,1)"}`,
+          }}
+        />
       </button>
 
-      {showAdd && (
+      <FabMenu c={c} open={menuOpen} onClose={() => setMenuOpen(false)} onSelect={onMenuSelect} />
+
+      {addMode && (
         <AddFoodModal
+          initialMode={addMode}
+          file={pendingPhoto}
           localDate={selectedDay}
-          onClose={() => setShowAdd(false)}
+          onClose={() => {
+            setAddMode(null);
+            setPendingPhoto(null);
+          }}
           onSaved={(doc) => {
             setEntries((prev) => [doc, ...prev]);
-            setShowAdd(false);
+            setAddMode(null);
+            setPendingPhoto(null);
           }}
         />
       )}

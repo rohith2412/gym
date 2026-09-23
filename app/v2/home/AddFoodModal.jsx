@@ -1,37 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Barcode, Camera, ChevronLeft, Mic, PenLine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import { BarcodeLogModal } from "./BarcodeLogModal";
 import { VoiceLogModal } from "./VoiceLogModal";
 import { uploadFoodPhoto } from "./uploadPhoto";
 
 /**
- * Four real paths -- the full set the mobile app offers, all hitting
- * the actual backend, none faked:
- *   - "Scan a photo": uploads the photo to R2 (same presign flow
- *     mobile's uploadImageToR2 uses) IN PARALLEL with base64-encoding
- *     it for the AI call, then POSTs { image, imageUrl } to
- *     /api/meal-log in one request. GPT-4o vision path is fully built
- *     server-side -- estimates the full nutrient panel AND inserts the
- *     document, no separate confirm step. If the R2 upload fails, the
- *     scan still proceeds without a saved photo rather than blocking
- *     the whole log -- a missing photo beats a lost meal.
- *   - "Scan barcode": BarcodeLogModal -- Open Food Facts lookup,
- *     called directly from the browser (public API, no auth), then
- *     the same /api/meal-log manualMacros save.
- *   - "Voice log": VoiceLogModal -- MediaRecorder -> the real
- *     /api/voice/nutrition (Whisper + GPT parsing) -> review -> save.
- *   - "Enter manually": POSTs { manualMacros }, unchanged from before.
+ * Renders whichever logging flow the FabMenu-style picker in page.jsx
+ * chose -- "choose" itself now lives there since it needs to animate
+ * out of the FAB's actual DOM position, matching gym-ios's
+ * src/ui/FabMenu.tsx. This component only handles what comes after a
+ * choice is made:
+ *   - "scan": uploads `file` to R2 (same presign flow mobile's
+ *     uploadImageToR2 uses) IN PARALLEL with base64-encoding it for
+ *     the AI call, then POSTs { image, imageUrl } to /api/meal-log in
+ *     one request. GPT-4o vision path is fully built server-side --
+ *     estimates the full nutrient panel AND inserts the document, no
+ *     separate confirm step. If the R2 upload fails, the scan still
+ *     proceeds without a saved photo rather than blocking the log.
+ *   - "barcode": BarcodeLogModal.
+ *   - "voice": VoiceLogModal.
+ *   - "manual": inline form, POSTs { manualMacros }.
  */
-export function AddFoodModal({ localDate, onClose, onSaved }) {
-  const [mode, setMode] = useState("choose"); // "choose" | "scan" | "barcode" | "voice" | "manual"
-  const [scanning, setScanning] = useState(false);
+export function AddFoodModal({ initialMode, file, localDate, onClose, onSaved }) {
+  const [scanning, setScanning] = useState(initialMode === "scan");
   const [error, setError] = useState("");
-  const fileInputRef = useRef(null);
 
-  const handleFile = async (file) => {
-    if (!file) return;
+  useEffect(() => {
+    if (initialMode === "scan" && file) handleFile(file);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleFile = async (f) => {
     setScanning(true);
     setError("");
     try {
@@ -40,12 +41,12 @@ export function AddFoodModal({ localDate, onClose, onSaved }) {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.onerror = reject;
-          reader.readAsDataURL(file);
+          reader.readAsDataURL(f);
         });
 
       const [dataUrl, imageUrl] = await Promise.all([
         toDataUrl(),
-        uploadFoodPhoto(file).catch(() => null),
+        uploadFoodPhoto(f).catch(() => null),
       ]);
 
       const res = await fetch("/api/meal-log", {
@@ -70,90 +71,15 @@ export function AddFoodModal({ localDate, onClose, onSaved }) {
     }
   };
 
-  if (mode === "choose") {
-    return (
-      <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center">
-        <div className="w-full sm:max-w-sm bg-white dark:bg-black text-black dark:text-white p-6 transition-colors">
-          <div className="flex items-center justify-between mb-6">
-            <button onClick={onClose} className="text-sm text-neutral-500">
-              Cancel
-            </button>
-            <p className="text-sm font-bold">Add food</p>
-            <div className="w-12" />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (file) {
-                  setMode("scan");
-                  handleFile(file);
-                }
-              }}
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center gap-3 border border-neutral-300 dark:border-neutral-700 rounded-2xl p-4 text-left hover:border-black dark:hover:border-white transition-colors"
-            >
-              <Camera size={20} />
-              <div>
-                <p className="text-sm font-semibold">Scan a photo</p>
-                <p className="text-xs text-neutral-500">AI reads your meal</p>
-              </div>
-            </button>
-            <button
-              onClick={() => setMode("barcode")}
-              className="w-full flex items-center gap-3 border border-neutral-300 dark:border-neutral-700 rounded-2xl p-4 text-left hover:border-black dark:hover:border-white transition-colors"
-            >
-              <Barcode size={20} />
-              <div>
-                <p className="text-sm font-semibold">Scan barcode</p>
-                <p className="text-xs text-neutral-500">Look up a packaged food</p>
-              </div>
-            </button>
-            <button
-              onClick={() => setMode("voice")}
-              className="w-full flex items-center gap-3 border border-neutral-300 dark:border-neutral-700 rounded-2xl p-4 text-left hover:border-black dark:hover:border-white transition-colors"
-            >
-              <Mic size={20} />
-              <div>
-                <p className="text-sm font-semibold">Voice log</p>
-                <p className="text-xs text-neutral-500">Say your meal and water</p>
-              </div>
-            </button>
-            <button
-              onClick={() => setMode("manual")}
-              className="w-full flex items-center gap-3 border border-neutral-300 dark:border-neutral-700 rounded-2xl p-4 text-left hover:border-black dark:hover:border-white transition-colors"
-            >
-              <PenLine size={20} />
-              <div>
-                <p className="text-sm font-semibold">Enter manually</p>
-                <p className="text-xs text-neutral-500">Type in calories and macros</p>
-              </div>
-            </button>
-          </div>
-          {error && <p className="text-xs text-red-500 mt-4">{error}</p>}
-        </div>
-      </div>
-    );
-  }
-
-  if (mode === "barcode") {
+  if (initialMode === "barcode") {
     return <BarcodeLogModal localDate={localDate} onClose={onClose} onSaved={onSaved} />;
   }
 
-  if (mode === "voice") {
+  if (initialMode === "voice") {
     return <VoiceLogModal localDate={localDate} onClose={onClose} onSaved={onSaved} />;
   }
 
-  if (mode === "scan") {
+  if (initialMode === "scan") {
     return (
       <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center">
         <div className="w-full sm:max-w-sm bg-white dark:bg-black text-black dark:text-white p-6 text-center transition-colors">
@@ -165,12 +91,9 @@ export function AddFoodModal({ localDate, onClose, onSaved }) {
           ) : (
             <>
               {error && <p className="text-xs text-red-500 mb-4">{error}</p>}
-              <button
-                onClick={() => setMode("choose")}
-                className="text-sm text-neutral-500 flex items-center gap-1 mx-auto"
-              >
+              <button onClick={onClose} className="text-sm text-neutral-500 flex items-center gap-1 mx-auto">
                 <ChevronLeft size={16} />
-                Back
+                Close
               </button>
             </>
           )}
@@ -179,10 +102,10 @@ export function AddFoodModal({ localDate, onClose, onSaved }) {
     );
   }
 
-  return <ManualEntry localDate={localDate} onBack={() => setMode("choose")} onClose={onClose} onSaved={onSaved} />;
+  return <ManualEntry localDate={localDate} onClose={onClose} onSaved={onSaved} />;
 }
 
-function ManualEntry({ localDate, onBack, onClose, onSaved }) {
+function ManualEntry({ localDate, onClose, onSaved }) {
   const [name, setName] = useState("");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -232,9 +155,8 @@ function ManualEntry({ localDate, onBack, onClose, onSaved }) {
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center">
       <div className="w-full sm:max-w-sm bg-white dark:bg-black text-black dark:text-white p-6 transition-colors">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={onBack} className="text-sm text-neutral-500 flex items-center gap-1">
-            <ChevronLeft size={16} />
-            Back
+          <button onClick={onClose} className="text-sm text-neutral-500">
+            Cancel
           </button>
           <p className="text-sm font-bold">Enter manually</p>
           <button onClick={save} disabled={!canSave || saving} className="text-sm font-bold disabled:opacity-30">
@@ -276,9 +198,6 @@ function ManualEntry({ localDate, onBack, onClose, onSaved }) {
           </div>
           {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
-        <button onClick={onClose} className="text-xs text-neutral-500 mt-6">
-          Cancel
-        </button>
       </div>
     </div>
   );

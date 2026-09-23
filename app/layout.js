@@ -64,6 +64,11 @@ export const metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: "/pocketgym-icon.png",
+    shortcut: "/pocketgym-icon.png",
+    apple: "/pocketgym-icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {

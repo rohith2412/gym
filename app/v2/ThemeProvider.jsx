@@ -10,15 +10,15 @@ import { createContext, useContext, useEffect, useState } from "react";
  *
  * Known simplification: theme is read from localStorage in an effect
  * (client-only), so a fresh page load briefly renders the default
- * ("dark") before correcting. Fine for now; fixable later with a
+ * ("light") before correcting. Fine for now; fixable later with a
  * blocking inline script in the head if the flash becomes annoying.
  */
 
 const STORAGE_KEY = "v2-theme";
-const ThemeContext = createContext({ theme: "dark", setTheme: () => {} });
+const ThemeContext = createContext({ theme: "light", setTheme: () => {} });
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState("dark");
+  const [theme, setThemeState] = useState("light");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
