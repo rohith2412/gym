@@ -283,16 +283,16 @@ function ScanField({ label, value, onChange, unit, numeric, decimal, flex }) {
     return t;
   };
   return (
-    <label className={`flex flex-col gap-1 ${flex ? "flex-1" : ""}`}>
-      <span className="text-[9px] font-bold text-neutral-500 tracking-wide uppercase">{label}</span>
-      <div className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-900 rounded-xl px-2.5 h-[42px]">
+    <label className={`flex flex-col gap-1 min-w-0 ${flex ? "flex-1" : ""}`}>
+      <span className="text-[9px] font-bold text-neutral-500 tracking-wide uppercase truncate">{label}</span>
+      <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-900 rounded-xl px-2 h-[42px] min-w-0">
         <input
           value={value}
           onChange={(e) => onChange(sanitize(e.target.value))}
           inputMode={decimal ? "decimal" : numeric ? "numeric" : "text"}
-          className="flex-1 min-w-0 bg-transparent text-sm font-bold outline-none"
+          className="flex-1 w-0 min-w-0 bg-transparent text-sm font-bold outline-none"
         />
-        {unit && <span className="text-[10px] text-neutral-400 flex-shrink-0">{unit}</span>}
+        {unit && <span className="text-[9px] text-neutral-400 flex-shrink-0">{unit}</span>}
       </div>
     </label>
   );
