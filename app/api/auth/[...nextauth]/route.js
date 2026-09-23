@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 
 import { connectdb } from "../../../../lib/connectdb";
-import Auth from "../../../../models/authModel";
 import CredentialAuth from "../../../../models/credentialAuthModel";
 import userIntroModel from "../../../../models/userIntroModel";
 import NextAuth from "next-auth";
@@ -59,25 +58,38 @@ const authOptions = {
 
       await connectdb();
 
-      const existingUser = await Auth.findOne({ email: profile.email });
+      // Google web login resolves against the SAME CredentialAuth
+      // collection mobile's /api/auth/google + email/password login
+      // already use, instead of the legacy Auth collection. Before this,
+      // someone signing in with Google on web and password (or Google)
+      // on mobile with the same email ended up with two entirely
+      // separate accounts -- two different userIds, so their food log /
+      // workouts / everything logged on one side was invisible on the
+      // other. CredentialAuth requires a password, so a brand-new Google
+      // user gets a random unusable hash, same pattern the mobile REST
+      // route already uses.
+      const existingUser = await CredentialAuth.findOne({ email: profile.email });
 
       if (!existingUser) {
-        await Auth.create({
-          name: profile.name,
-          email: profile.email,
-          photo: profile.picture,
-        });
-      } else {
-        await Auth.updateOne(
-          { email: profile.email },
-          { photo: profile.picture }
+        const randomPassword = await bcrypt.hash(
+          `google-web:${profile.email}:${Date.now()}`,
+          10
         );
+        await CredentialAuth.create({
+          name: profile.name || profile.email.split("@")[0],
+          email: profile.email,
+          password: randomPassword,
+        });
       }
+      // No update-on-existing branch: CredentialAuth has no `photo`
+      // field (mobile's Google login never persisted one either) --
+      // the profile picture is passed through the session below
+      // without being stored in the DB.
 
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, profile }) {
       // first time credentials login
       if (account?.provider === "credentials" && user) {
         token.userId = user.id;
@@ -91,15 +103,21 @@ const authOptions = {
         return token;
       }
 
+      // Google's own profile picture arrives fresh on every sign-in
+      // (account/profile only present on that initial call, never on
+      // later silent token refreshes) -- capture it into the token so
+      // it survives for the rest of the session without needing a
+      // photo field on CredentialAuth.
+      if (profile?.picture) token.photo = profile.picture;
+
       if (!token.email) return token;
 
       await connectdb();
 
-      const dbUser = await Auth.findOne({ email: token.email });
+      const dbUser = await CredentialAuth.findOne({ email: token.email });
 
       if (dbUser) {
         token.userId = dbUser._id.toString();
-        token.photo = dbUser.photo ?? null;
 
         if (!token.isNewUserChecked) {
           if (dbUser.createdAt?.getTime() === dbUser.updatedAt?.getTime()) {

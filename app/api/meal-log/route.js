@@ -198,6 +198,10 @@ Rules: round to 1 decimal, confidence<0.7 if uncertain, empty foods array if no 
       date:      date ? new Date(date) : new Date(),
       localDate: resolvedLocalDate,   // ← timezone-safe date string
       mealType,
+      // R2 photo URL from the client, same field the manual path already
+      // persists -- previously only manual entries could ever have a
+      // saved photo; an AI scan analyzed the image and then discarded it.
+      imageUrl:  imageUrl || null,
       foods,
       totals:    calculateTotals(foods),
       aiNotes:   parsed.aiNotes || "",

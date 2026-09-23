@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { connectdb } from "@/lib/connectdb";
 import { getAuthUser } from "@/lib/getAuthUser";
-import Auth from "@/models/authModel";
+import CredentialAuth from "@/models/credentialAuthModel";
 import Referral from "@/models/referralModel";
 import { normalizeCode } from "@/lib/referralCode";
 
@@ -38,7 +38,7 @@ export async function POST(req) {
       return Response.json({ error: "Invalid code" }, { status: 400 });
 
     // Look up the code's owner. `code` is unique + indexed.
-    const referrer = await Auth.findOne({ code })
+    const referrer = await CredentialAuth.findOne({ code })
       .select("_id createdAt")
       .lean();
     if (!referrer)

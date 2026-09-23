@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/*
+ * v2's dark/light toggle. Scoped to `data-v2-theme` (not the usual
+ * `.dark` class) so it can never collide with anything v1 might add
+ * later -- v2's `dark:` utilities only respond to this attribute, set
+ * by app/v2/ThemeProvider.jsx, not to the OS's prefers-color-scheme
+ * (that's what the plain CSS vars below the @theme block already do
+ * for v1/root, untouched).
+ */
+@custom-variant dark (&:where([data-v2-theme="dark"], [data-v2-theme="dark"] *));
+
 :root {
   --background: #ffffff;
   --foreground: #000000;
@@ -23,5 +33,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* v2's swipeable macro/water pager -- a paged swipe UI should look
+   native (no visible scroll track), unlike a normal scrolling list. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 

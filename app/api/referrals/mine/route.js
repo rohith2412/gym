@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { connectdb } from "@/lib/connectdb";
 import { getAuthUser } from "@/lib/getAuthUser";
-import Auth from "@/models/authModel";
+import CredentialAuth from "@/models/credentialAuthModel";
 import Referral from "@/models/referralModel";
 import { ensureCode } from "@/lib/referralCode";
 
@@ -41,7 +41,7 @@ export async function GET(req) {
     const code = await ensureCode(authUser.id);
 
     const [me, invitees] = await Promise.all([
-      Auth.findById(authUser.id).select("refBalance adsUntil").lean(),
+      CredentialAuth.findById(authUser.id).select("refBalance adsUntil").lean(),
       Referral.find({ referrerId: authUser.id })
         .select("refereeId status createdAt creditedAt")
         .sort({ createdAt: -1 })

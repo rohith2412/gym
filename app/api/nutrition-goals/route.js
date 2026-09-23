@@ -113,7 +113,15 @@ export async function PATCH(req) {
     if (Object.keys($set).length === 0)
       return Response.json({ error: "Nothing to update" }, { status: 400 });
 
-    await UserIntro.updateOne({ userId: authUser.id }, { $set });
+    // upsert: a user without a UserIntro doc yet (no onboarding done --
+    // true for everyone on v2 right now) would otherwise get a silent
+    // no-op here: updateOne matches nothing, returns success, and the
+    // "saved" goal never actually persists.
+    await UserIntro.updateOne(
+      { userId: authUser.id },
+      { $set },
+      { upsert: true }
+    );
 
     return Response.json({ success: true, updated: $set });
   } catch (err) {
