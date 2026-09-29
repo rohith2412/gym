@@ -26,6 +26,7 @@ const credentialAuthSchema = new mongoose.Schema(
     // so the value stays tied to the moment of acquisition.
     acquisitionSource:   { type: String, default: null, index: true },
     acquisitionSourceAt: { type: Date, default: null },
+    photo: { type: String, default: null },
   },
   { timestamps: true }
 );

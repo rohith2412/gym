@@ -27,7 +27,7 @@ export async function GET(req) {
 
     // ── Fetch all models in parallel ──────────────────────────────────────────
     const [user, intro, logs] = await Promise.all([
-      User.findById(decoded.id).select("name email createdAt").lean(),
+      User.findById(decoded.id).select("name email photo createdAt").lean(),
       userIntroModel.findOne({ userId: decoded.id }).lean(),
       TrackingModel.find({ userId: decoded.id }).lean(),
     ]);
@@ -56,6 +56,7 @@ export async function GET(req) {
         // User
         name:      user.name,
         email:     user.email,
+        photo:     user.photo ?? null,
         memberSince: user.createdAt,
 
         // Intro / body stats
@@ -107,6 +108,9 @@ export async function PUT(req) {
       }
       update.name = trimmed;
     }
+    if ("photo" in body) {
+      update.photo = typeof body.photo === "string" ? body.photo : null;
+    }
 
     if (!Object.keys(update).length) {
       return Response.json({ success: false, error: "No editable fields provided" }, { status: 400 });
@@ -115,7 +119,7 @@ export async function PUT(req) {
     const updated = await User.findByIdAndUpdate(decoded.id, update, {
       new: true,
       runValidators: true,
-    }).select("name email");
+    }).select("name email photo");
 
     if (!updated) {
       return Response.json({ success: false, error: "User not found" }, { status: 404 });
@@ -123,7 +127,7 @@ export async function PUT(req) {
 
     return Response.json({
       success: true,
-      data: { name: updated.name, email: updated.email },
+      data: { name: updated.name, email: updated.email, photo: updated.photo ?? null },
     });
   } catch (err) {
     return Response.json({ success: false, error: err.message }, { status: 500 });

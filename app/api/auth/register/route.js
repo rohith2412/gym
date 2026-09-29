@@ -43,6 +43,7 @@ export async function POST(req) {
         id: user._id,
         name: user.name,
         email: user.email,
+        photo: user.photo ?? null,
         hasIntro,
       },
     });
