@@ -23,9 +23,9 @@ export default function ClientLayout({ children }) {
   // 🚫 Hide Dock on specific routes
   const hideDock =
     isV2 ||
+    pathname.startsWith("/v1/blog") ||
     [
       "/",
-      "/v1/blog/caloriesAI",
       "/v1/StartersIntro",
       "/v1/login",
       "/v1/pricing",
