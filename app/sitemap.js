@@ -1,8 +1,19 @@
-export const dynamic = "force-dynamic"
-
-const BASE_URL = "https://www.yourpocketgym.com/";
+const BASE_URL = "https://www.yourpocketgym.com";
 
 export default function sitemap() {
+  const blogPosts = [
+    "protein-intake-guide",
+    "calorie-deficit-tips",
+    "beginner-gym-mistakes",
+    "easy-meal-prep",
+    "scale-weight-fluctuations",
+    "cardio-vs-lifting",
+    "read-nutrition-labels",
+    "lean-bulk-guide",
+    "tracking-macros-guide",
+    "best-workout-split",
+  ];
+
   return [
     {
       url: BASE_URL,
@@ -11,11 +22,23 @@ export default function sitemap() {
       priority: 1.0,
     },
     {
+      url: `${BASE_URL}/v1/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${BASE_URL}/v1/blog/caloriesAI`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    ...blogPosts.map((slug) => ({
+      url: `${BASE_URL}/v1/blog/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    })),
     {
       url: `${BASE_URL}/v1/recipes`,
       lastModified: new Date(),
@@ -40,8 +63,6 @@ export default function sitemap() {
       changeFrequency: "weekly",
       priority: 0.7,
     },
-
-    // ✅ Legal pages (important for SEO)
     {
       url: `${BASE_URL}/legal/terms`,
       lastModified: new Date(),
