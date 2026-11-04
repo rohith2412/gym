@@ -139,22 +139,22 @@ export default function Page() {
 
 const S = {
   h1: {
-    fontSize: "clamp(28px, 6vw, 40px)",
-    fontWeight: 800,
-    color: "#1a1a1a",
-    letterSpacing: "-0.04em",
-    lineHeight: 1.15,
-    marginBottom: "1.5rem",
-  },
-  date: { fontSize: 13, color: "#bbb", fontWeight: 600, marginBottom: 8 },
-  h2: {
-    fontSize: 22,
+    fontSize: 32,
     fontWeight: 800,
     color: "#1a1a1a",
     letterSpacing: "-0.03em",
-    marginTop: "2.5rem",
+    lineHeight: 1.15,
+    marginBottom: "2rem",
+  },
+  date: { fontSize: 13, color: "#999", fontWeight: 500, marginBottom: 8 },
+  h2: {
+    fontSize: 20,
+    fontWeight: 800,
+    color: "#1a1a1a",
+    letterSpacing: "-0.03em",
+    marginTop: "3rem",
     marginBottom: "0.75rem",
   },
-  p: { fontSize: 16, color: "#444", lineHeight: 1.75, marginBottom: "1.25rem" },
+  p: { fontSize: 17, color: "#333", lineHeight: 1.8, marginBottom: "1.5rem" },
   strong: { color: "#1a1a1a", fontWeight: 700 },
 };

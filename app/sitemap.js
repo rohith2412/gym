@@ -12,6 +12,16 @@ export default function sitemap() {
     "lean-bulk-guide",
     "tracking-macros-guide",
     "best-workout-split",
+    "rest-day-guide",
+    "creatine-guide",
+    "breaking-plateaus",
+    "eating-out-on-a-diet",
+    "home-workouts",
+    "sleep-and-gains",
+    "water-intake-guide",
+    "morning-vs-evening-gym",
+    "body-recomposition",
+    "sugar-and-fat-loss",
   ];
 
   return [

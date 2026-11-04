@@ -28,63 +28,103 @@ export const metadata = {
 
 const POSTS = [
   {
+    slug: "body-recomposition",
+    title: "Can You Lose Fat and Build Muscle at the Same Time?",
+    date: "Nov 2026",
+  },
+  {
+    slug: "creatine-guide",
+    title: "Creatine: The Only Supplement Worth Your Money",
+    date: "Nov 2026",
+  },
+  {
+    slug: "eating-out-on-a-diet",
+    title: "How to Eat at Restaurants Without Blowing Your Diet",
+    date: "Nov 2026",
+  },
+  {
+    slug: "rest-day-guide",
+    title: "What to Actually Do on Rest Days",
+    date: "Nov 2026",
+  },
+  {
+    slug: "breaking-plateaus",
+    title: "Your Lifts Stopped Going Up. Now What?",
+    date: "Nov 2026",
+  },
+  {
     slug: "protein-intake-guide",
     title: "How Much Protein Do You Actually Need?",
-    desc: "The real numbers, not bro-science. What the research says and how to hit your target without choking down six chicken breasts a day.",
     date: "Oct 2026",
   },
   {
     slug: "calorie-deficit-tips",
     title: "How to Cut Calories Without Wanting to Quit",
-    desc: "A calorie deficit doesn't have to feel like punishment. Small swaps, volume eating, and knowing when to take a break.",
+    date: "Oct 2026",
+  },
+  {
+    slug: "sleep-and-gains",
+    title: "Sleep Is Doing More for Your Gains Than Your Pre-Workout",
+    date: "Oct 2026",
+  },
+  {
+    slug: "sugar-and-fat-loss",
+    title: "Sugar Isn't the Enemy (But Here's What Is)",
     date: "Oct 2026",
   },
   {
     slug: "beginner-gym-mistakes",
     title: "5 Gym Mistakes That Are Costing You Gains",
-    desc: "Program hopping, skipping food, ego lifting — the stuff nobody tells you until you've wasted six months.",
     date: "Sep 2026",
   },
   {
     slug: "easy-meal-prep",
     title: "Meal Prep for People Who Hate Cooking",
-    desc: "You don't need Pinterest recipes. Two proteins, two carbs, one pan. Sunday sorted in under an hour.",
+    date: "Sep 2026",
+  },
+  {
+    slug: "home-workouts",
+    title: "Home Workouts That Actually Build Muscle",
     date: "Sep 2026",
   },
   {
     slug: "scale-weight-fluctuations",
     title: "Why Your Scale Weight Jumped 3 Pounds Overnight",
-    desc: "You didn't gain 3 lbs of fat. Here's what actually happened and why weekly averages matter more.",
     date: "Aug 2026",
   },
   {
     slug: "cardio-vs-lifting",
     title: "Cardio vs Lifting: Which One Actually Burns More Fat?",
-    desc: "The answer isn't what most people think. Why weights win long-term and where cardio still matters.",
+    date: "Aug 2026",
+  },
+  {
+    slug: "water-intake-guide",
+    title: "How Much Water Do You Actually Need?",
     date: "Aug 2026",
   },
   {
     slug: "read-nutrition-labels",
     title: "How to Read a Nutrition Label in 10 Seconds",
-    desc: "Serving sizes are designed to trick you. Here's what to actually look at and what to ignore.",
     date: "Jul 2026",
   },
   {
     slug: "lean-bulk-guide",
     title: "How to Gain Muscle Without Getting Fat",
-    desc: "Lean bulking isn't complicated — small surplus, enough protein, hard training. Here's the playbook.",
+    date: "Jul 2026",
+  },
+  {
+    slug: "morning-vs-evening-gym",
+    title: "Morning vs Evening Workouts: Does It Actually Matter?",
     date: "Jul 2026",
   },
   {
     slug: "tracking-macros-guide",
     title: "The No-Nonsense Guide to Tracking Macros",
-    desc: "You don't need to weigh every grain of rice. How to track well enough to see results without losing your mind.",
     date: "Jun 2026",
   },
   {
     slug: "best-workout-split",
     title: "The Best Workout Split (Hint: It's the One You'll Do)",
-    desc: "PPL, upper/lower, full body — none of it matters if you skip Thursday. How to pick the split that fits your life.",
     date: "Jun 2026",
   },
 ];
@@ -94,11 +134,11 @@ export default function BlogIndex() {
     <div
       className={jakarta.className}
       style={{
-        background: "#fafaf8",
+        background: "#fff",
         minHeight: "100dvh",
-        maxWidth: 680,
+        maxWidth: 620,
         margin: "0 auto",
-        padding: "0 1.25rem 4rem",
+        padding: "0 1.5rem 5rem",
       }}
     >
       <nav
@@ -106,19 +146,19 @@ export default function BlogIndex() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "1.25rem 0 2rem",
+          padding: "1.5rem 0 3rem",
         }}
       >
         <Link href="/" style={{ textDecoration: "none" }}>
           <span
             style={{
-              fontSize: 18,
-              fontWeight: 800,
-              letterSpacing: "-0.035em",
-              color: "#1a1a1a",
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "#111",
             }}
           >
-            Your<span style={{ color: "#ff6b35" }}>Pocket</span>Gym
+            PocketGym
           </span>
         </Link>
         <a
@@ -127,93 +167,82 @@ export default function BlogIndex() {
           rel="noopener noreferrer"
           style={{
             fontSize: 13,
-            fontWeight: 700,
-            color: "#ff6b35",
+            fontWeight: 600,
+            color: "#111",
             textDecoration: "none",
-            padding: "0.4rem 1rem",
-            border: "1px solid rgba(255,107,53,0.3)",
-            borderRadius: 99,
+            padding: "0.4rem 0.9rem",
+            border: "1px solid #e0e0e0",
+            borderRadius: 8,
           }}
         >
-          Get the app →
+          Get the app
         </a>
       </nav>
 
       <h1
         style={{
-          fontSize: "clamp(28px, 6vw, 40px)",
+          fontSize: 32,
           fontWeight: 800,
-          color: "#1a1a1a",
+          color: "#111",
           letterSpacing: "-0.04em",
           lineHeight: 1.15,
-          marginBottom: "0.5rem",
+          marginBottom: "0.25rem",
         }}
       >
         Blog
       </h1>
       <p
         style={{
-          fontSize: 16,
-          color: "#888",
-          lineHeight: 1.6,
+          fontSize: 15,
+          color: "#999",
+          lineHeight: 1.5,
           marginBottom: "2.5rem",
         }}
       >
-        Practical fitness and nutrition guides. No fluff.
+        Practical fitness and nutrition guides.
       </p>
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 16,
         }}
       >
-        {POSTS.map((post) => (
+        {POSTS.map((post, i) => (
           <Link
             key={post.slug}
             href={`/v1/blog/${post.slug}`}
             style={{
               textDecoration: "none",
-              background: "#fff",
-              border: "1px solid #e8e5de",
-              borderRadius: 20,
-              padding: "1.5rem",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              transition: "box-shadow 150ms ease",
+              padding: "1.25rem 0",
+              borderTop: i === 0 ? "1px solid #f0f0f0" : "none",
+              borderBottom: "1px solid #f0f0f0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              gap: 16,
             }}
           >
-            <p
-              style={{
-                fontSize: 12,
-                color: "#bbb",
-                fontWeight: 600,
-                marginBottom: 6,
-              }}
-            >
-              {post.date}
-            </p>
             <h2
               style={{
-                fontSize: 18,
-                fontWeight: 800,
-                color: "#1a1a1a",
-                letterSpacing: "-0.03em",
-                marginBottom: 6,
-                lineHeight: 1.3,
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#111",
+                letterSpacing: "-0.01em",
+                lineHeight: 1.4,
               }}
             >
               {post.title}
             </h2>
-            <p
+            <span
               style={{
-                fontSize: 14,
-                color: "#888",
-                lineHeight: 1.6,
+                fontSize: 13,
+                color: "#bbb",
+                flexShrink: 0,
               }}
             >
-              {post.desc}
-            </p>
+              {post.date}
+            </span>
           </Link>
         ))}
       </div>
